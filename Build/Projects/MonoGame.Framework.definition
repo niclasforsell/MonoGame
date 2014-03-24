@@ -15,12 +15,8 @@
 	<Platform Name="PlayStation4">1A2F0C59-F119-469E-8213-CEF1D65969EE</Platform>
   </ProjectGuids>
 
-  <!-- Common assembly references -->
+  <!-- See FrameworkReferences.definition for all references -->
   <References>
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-
-    <!-- See FrameworkReferences.definition for the platform specific references -->
     <Reference Include="FrameworkReferences" />
   </References>
 

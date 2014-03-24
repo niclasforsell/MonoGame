@@ -2,6 +2,8 @@
 <ExternalProject Name="FrameworkReferences">
  
   <Platform Type="iOS">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
     <Reference Include="OpenTK" />
@@ -17,6 +19,8 @@
   </Platform>
   
   <Platform Type="Linux">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Drawing" />
     <Binary
       Name="Tao.Sdl" 
@@ -31,6 +35,8 @@
   </Platform>
   
   <Platform Type="MacOS">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
@@ -44,6 +50,8 @@
   </Platform>
 
   <Platform Type="Android">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK" />
@@ -55,6 +63,8 @@
   </Platform>
   
   <Platform Type="Ouya">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK" />
@@ -69,6 +79,8 @@
   </Platform>
   
   <Platform Type="PSMobile">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Sce.PlayStation.Core" />
@@ -79,12 +91,17 @@
   </Platform>
 
   <Platform Type="PlayStation4">
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml" />
+    <ExplicitReference	Include="$(MONO_PS4)\bcl\mscorlib.dll"
+						Link="bcl\mscorlib.dll" />
+    <ExplicitReference	Include="$(MONO_PS4)\bcl\System.dll"
+						Link="bcl\System.dll" />
+    <ExplicitReference	Include="$(MONO_PS4)\bcl\System.Runtime.Serialization.dll"
+						Link="bcl\System.Runtime.Serialization.dll" />
   </Platform>
   
   <Platform Type="Windows">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
@@ -122,6 +139,8 @@
   </Platform>
 
   <Platform Type="Windows8">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Libs/SharpDX/Windows 8 Metro/SharpDX.dll" />
@@ -146,6 +165,8 @@
   </Platform>
 
   <Platform Type="WindowsGL">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
@@ -165,6 +186,8 @@
   </Platform>
 
   <Platform Type="WindowsPhone">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Libs/SharpDX/Windows Phone/$(Platform)/SharpDX.dll" />
