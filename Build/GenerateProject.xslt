@@ -789,7 +789,6 @@
         </xsl:for-each>
 
 		<!-- _ExplicitReference style references -->
-		<xsl:message>Processing _ExplicitReference</xsl:message>
         <xsl:for-each select="$project/References/Reference">
           <xsl:variable name="include-name" select="./@Include" />
           <xsl:if test="
