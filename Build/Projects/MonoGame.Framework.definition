@@ -136,7 +136,7 @@
     <Compile Include="Audio\Cue.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL</Platforms>
+      <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,PlayStation4</Platforms>
     </Compile>
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Audio\SoundBank.cs" />
