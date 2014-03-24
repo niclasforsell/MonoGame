@@ -77,6 +77,12 @@
       Guid="167676EE-E2D5-440A-BB2B-EFBD02BC8493"
       Path="ThirdParty/Lidgren.Network/Lidgren.Network.PSMobile.csproj" />
   </Platform>
+
+  <Platform Type="PlayStation4">
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </Platform>
   
   <Platform Type="Windows">
     <Reference Include="System.Core" />

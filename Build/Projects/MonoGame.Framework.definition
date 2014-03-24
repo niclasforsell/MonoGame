@@ -12,6 +12,7 @@
 	<Platform Name="Windows8">0518563C-ACCA-4A14-8C5D-DDBE93E2605F</Platform>
 	<Platform Name="WindowsGL">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
 	<Platform Name="WindowsPhone">BAA9A6E4-7690-4DE0-9531-DE0EAEEC9739</Platform>
+	<Platform Name="PlayStation4">1A2F0C59-F119-469E-8213-CEF1D65969EE</Platform>
   </ProjectGuids>
 
   <!-- Common assembly references -->
@@ -40,6 +41,7 @@
       <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="WindowsGL">TRACE;WINDOWS;OPENGL</Platform>
       <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</Platform>
+      <Platform Name="PlayStation4">TRACE;PLAYSTATION4</Platform>
     </CustomDefinitions>
 
   </Properties>
@@ -148,6 +150,9 @@
     <Compile Include="Audio\SoundEffect.PSM.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Audio\SoundEffect.PS4.cs">
+      <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Audio\SoundEffect.XAudio.cs">
       <Platforms>Windows,Windows8,WindowsPhone</Platforms>
     </Compile>
@@ -157,6 +162,9 @@
     </Compile>
     <Compile Include="Audio\SoundEffectInstance.PSM.cs">
       <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Audio\SoundEffectInstance.PS4.cs">
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffectInstance.XAudio.cs">
       <Platforms>Windows,Windows8,WindowsPhone</Platforms>
@@ -392,6 +400,9 @@
     <Compile Include="Graphics\GraphicsDevice.PSM.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\GraphicsDevice.PS4.cs">
+      <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
@@ -496,6 +507,9 @@
     <Compile Include="Graphics\Vertices\IndexBuffer.PSM.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\Vertices\IndexBuffer.PS4.cs">
+      <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Graphics\Vertices\IVertexType.cs" />
     <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
@@ -508,6 +522,9 @@
     </Compile>
     <Compile Include="Graphics\Vertices\VertexBuffer.PSM.cs">
       <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexBuffer.PS4.cs">
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
