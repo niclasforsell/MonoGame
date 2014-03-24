@@ -8,11 +8,8 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed partial class SoundEffect : IDisposable
+    public sealed partial class SoundEffect
     {
-        private Sound _audioBuffer;
-        private SoundEffectInstance _instance;
-
         private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
         {
             throw new NotImplementedException();
