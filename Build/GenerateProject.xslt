@@ -161,11 +161,13 @@
     <xsl:if test="/Input/Generation/Platform = 'Windows8'">
       <DefaultLanguage>en-US</DefaultLanguage>
     </xsl:if>
+    <xsl:if test="user:IsTrue(/Input/Properties/NoStdLib)">
+	    <NoStdLib>True</NoStdLib>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="configuration"
     xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
     <xsl:param name="type" />
     <xsl:param name="debug" />
     <xsl:choose>

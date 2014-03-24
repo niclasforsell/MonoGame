@@ -65,6 +65,8 @@ MonoGame.Framework.Ouya.csproj
 MonoGame.Framework.Ouya.sln
 MonoGame.Framework.PSMobile.csproj
 MonoGame.Framework.PSMobile.sln
+MonoGame.Framework.PlayStation4.csproj
+MonoGame.Framework.PlayStation4.sln
 MonoGame.Framework.Windows.csproj
 MonoGame.Framework.Windows.sln
 MonoGame.Framework.Windows8.csproj
