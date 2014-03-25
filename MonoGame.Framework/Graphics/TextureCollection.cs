@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetTextures(GraphicsDevice device)
         {
-#if OPENGL
+#if !DIRECTX 
             Threading.EnsureUIThread();
 #endif
 
