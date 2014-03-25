@@ -101,6 +101,16 @@
         <xsl:with-param name="path" select="current()/@Path" />
       </xsl:call-template>
     </xsl:for-each>
+    <xsl:for-each select="/Input/Projects/ExternalProject
+                          /Platform[@Type=/Input/Generation/Platform]
+                          /RelatedProject">
+      <xsl:call-template name="project-definition">
+        <xsl:with-param name="type" select="current()/@Type" />
+        <xsl:with-param name="name" select="current()/@Name" />
+        <xsl:with-param name="guid" select="current()/@Guid" />
+        <xsl:with-param name="path" select="current()/@Path" />
+      </xsl:call-template>
+    </xsl:for-each>
     <xsl:choose>
       <xsl:when test="/Input/Generation/Platform = 'iOS'">
         <xsl:text>Global
@@ -161,6 +171,14 @@
         <xsl:with-param name="root" select="current()" />
       </xsl:call-template>
     </xsl:for-each>
+    <xsl:for-each select="/Input/Projects/ExternalProject
+                          /Platform[@Type=/Input/Generation/Platform]
+                          /RelatedProject">
+      <xsl:call-template name="project-configuration">
+        <xsl:with-param name="guid" select="current()/@Guid" />
+        <xsl:with-param name="root" select="current()" />
+      </xsl:call-template>
+    </xsl:for-each>
     <xsl:text>        EndGlobalSection
 EndGlobal
 </xsl:text>
@@ -188,7 +206,14 @@ EndGlobal
     <xsl:text>", "{</xsl:text>
     <xsl:value-of select="$guid" />
     <xsl:text>}"
-EndProject
+</xsl:text>
+    <xsl:for-each select="PostProject">
+		<xsl:text>	ProjectSection(ProjectDependencies) = postProject
+		{</xsl:text><xsl:value-of select="current()/@Guid" /><xsl:text>} = {</xsl:text><xsl:value-of select="current()/@Guid" /><xsl:text>}
+	EndProjectSection
+</xsl:text>
+    </xsl:for-each>
+<xsl:text>EndProject
 </xsl:text>
   </xsl:template>
   
