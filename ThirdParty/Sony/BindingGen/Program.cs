@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CppSharp;
 using CppSharp.AST;
 using CppSharp.Passes;
 
-namespace GenBindings
+namespace BindingGen
 {
     class Library : ILibrary
     {
