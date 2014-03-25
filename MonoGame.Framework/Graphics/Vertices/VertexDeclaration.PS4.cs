@@ -4,9 +4,9 @@
 
 using System;
 
-namespace Microsoft.Xna.Framework
+namespace Microsoft.Xna.Framework.Graphics
 {
-    public partial class ClassName
+    public partial class VertexDeclaration
     {
     }
 }

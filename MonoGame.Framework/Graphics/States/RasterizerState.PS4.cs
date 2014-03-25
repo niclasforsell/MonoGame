@@ -4,9 +4,13 @@
 
 using System;
 
-namespace Microsoft.Xna.Framework
+namespace Microsoft.Xna.Framework.Graphics
 {
-    public partial class ClassName
+    public partial class RasterizerState
     {
+        internal void PlatformApplyState(GraphicsDevice device)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
