@@ -7,8 +7,8 @@
     <ProjectGuid>{008B1B4E-EEB0-44ED-885E-C8C1EB956739}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GenBindings</RootNamespace>
-    <AssemblyName>GenBindings</AssemblyName>
+    <RootNamespace>BindingGen</RootNamespace>
+    <AssemblyName>BindingGen</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
