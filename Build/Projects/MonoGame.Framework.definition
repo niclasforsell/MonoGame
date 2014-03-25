@@ -447,6 +447,9 @@
     <Compile Include="Graphics\RenderTarget2D.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\RenderTarget2D.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Graphics\RenderTarget3D.cs">
         <Platforms>Windows,Windows8,WindowsPhone</Platforms>
     </Compile>
@@ -468,6 +471,9 @@
     <Compile Include="Graphics\SamplerStateCollection.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\SamplerStateCollection.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Graphics\SetDataOptions.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
     <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
@@ -480,6 +486,9 @@
     <Compile Include="Graphics\Shader\ConstantBuffer.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\Shader\ConstantBuffer.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Graphics\Shader\Shader.cs" />
     <Compile Include="Graphics\Shader\Shader.DirectX.cs">
         <Platforms>Windows,Windows8,WindowsPhone</Platforms>
@@ -489,6 +498,9 @@
     </Compile>
     <Compile Include="Graphics\Shader\Shader.PSM.cs">
         <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Shader\Shader.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs">
       <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
@@ -515,6 +527,9 @@
     <Compile Include="Graphics\States\BlendState.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\States\BlendState.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\CompareFunction.cs" />
     <Compile Include="Graphics\States\CullMode.cs" />
     <Compile Include="Graphics\States\DepthFormat.cs" />
@@ -528,6 +543,9 @@
     <Compile Include="Graphics\States\DepthStencilState.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\States\DepthStencilState.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\FillMode.cs" />
     <Compile Include="Graphics\States\RasterizerState.cs" />
     <Compile Include="Graphics\States\RasterizerState.DirectX.cs">
@@ -539,12 +557,18 @@
     <Compile Include="Graphics\States\RasterizerState.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\States\RasterizerState.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\States\SamplerState.DirectX.cs">
         <Platforms>Windows,Windows8,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Graphics\States\SamplerState.OpenGL.cs">
         <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\SamplerState.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\States\SaveStateMode.cs" />
     <Compile Include="Graphics\States\StencilOperation.cs" />
@@ -565,6 +589,9 @@
     <Compile Include="Graphics\Texture2D.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\Texture2D.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Graphics\Texture3D.cs" />
     <Compile Include="Graphics\Texture3D.DirectX.cs">
         <Platforms>Windows,Windows8,WindowsPhone</Platforms>
@@ -574,6 +601,9 @@
     </Compile>
     <Compile Include="Graphics\Texture3D.PSM.cs">
         <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Texture3D.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\TextureCollection.cs" />
     <Compile Include="Graphics\Texture.cs" />
@@ -586,6 +616,9 @@
     <Compile Include="Graphics\Texture.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\Texture.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="Graphics\TextureCube.DirectX.cs">
         <Platforms>Windows,Windows8,WindowsPhone</Platforms>
@@ -595,6 +628,9 @@
     </Compile>
     <Compile Include="Graphics\TextureCube.PSM.cs">
         <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Graphics\TextureCube.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\Vertices\BufferUsage.cs" />
@@ -640,6 +676,9 @@
     </Compile>
     <Compile Include="Graphics\Vertices\VertexDeclaration.PSM.cs">
         <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexDeclaration.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexElement.cs" />
     <Compile Include="Graphics\Vertices\VertexElementDeclaration.cs" />
@@ -844,7 +883,7 @@
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs">
-      <Platforms>Android,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <Platforms>Android,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,PlayStation4</Platforms>
     </Compile>
 
     
@@ -1144,6 +1183,12 @@
     </Compile>
     <Compile Include="PSSuite\PSSHelper.cs">
       <Platforms>PSMobile</Platforms>
+    </Compile>
+
+
+    <!-- PlayStation 4 Platform -->
+    <Compile Include="PlayStation4\PS4GamePlatform.cs">
+        <Platforms>PlayStation4</Platforms>
     </Compile>
 
 
