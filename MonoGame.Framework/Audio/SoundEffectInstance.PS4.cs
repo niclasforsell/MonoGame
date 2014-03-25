@@ -50,6 +50,11 @@ namespace Microsoft.Xna.Framework.Audio
             throw new NotImplementedException();
         }
 
+        private float PlatformGetPan()
+        {
+            throw new NotImplementedException();
+        }
+
         private void PlatformSetPan(float value)
         {
             throw new NotImplementedException();
