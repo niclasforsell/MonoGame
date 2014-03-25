@@ -17,10 +17,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGraphicsDeviceResetting()
         {
+            throw new NotImplementedException();
         }
 
         private void PlatformDispose(bool disposing)
         {
+            throw new NotImplementedException();
         }
     }
 }
