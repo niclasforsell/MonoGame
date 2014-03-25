@@ -1190,6 +1190,9 @@
     <Compile Include="PlayStation4\PS4GamePlatform.cs">
         <Platforms>PlayStation4</Platforms>
     </Compile>
+    <Compile Include="PlayStation4\Media\Video.cs">
+        <Platforms>PlayStation4</Platforms>
+    </Compile>
 
 
     <!-- Windows 8 Platform -->
