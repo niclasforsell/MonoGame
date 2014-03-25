@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _valid = 0;
         }
 
-#if DIRECTX
+#if DIRECTX || PLAYSTATION4
         internal void SetConstantBuffers(GraphicsDevice device)
 #elif OPENGL || PSM
         internal void SetConstantBuffers(GraphicsDevice device, int shaderProgram)

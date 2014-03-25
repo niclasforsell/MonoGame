@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
@@ -47,11 +49,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         internal void PlatformApplyState(bool applyShaders)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
             throw new NotImplementedException();
         }
