@@ -66,6 +66,8 @@ namespace Microsoft.Xna.Framework
 			Location = NSBundle.MainBundle.ResourcePath;
 #elif PSM
 			Location = "/Application";
+#elif PLAYSTATION4
+            Location = "/app0";
 #else
             Location = string.Empty;
 #endif
