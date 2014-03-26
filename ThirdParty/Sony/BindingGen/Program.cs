@@ -19,6 +19,7 @@ namespace BindingGen
             options.TargetTriple = "x86_64"; //-pc-freebsd";      
             options.MicrosoftMode = false;
             options.NoBuiltinIncludes = true;
+            options.WriteOnlyWhenChanged = true;
 
             options.Verbose = true;
             options.GenerateProperties = true;
@@ -30,16 +31,23 @@ namespace BindingGen
             options.OutputNamespace = "Sce.PlayStation4";
             options.SharedLibraryName = "scePlayStation4.prx";
 
-            options.IncludeDirs.Add(@"..\");
-            //options.Headers.Add("MonoGame.Native.h");
-            //options.Libraries.Add(@"..\bin\Debug\MonoGame.Native_stub.a");
+            // The paths to search for headers.
+            options.IncludeDirs.Add(@".\");
 
+            // The headers to process.
+            //
+            // NOTE: The casing here will influence the final .cs file.
+            //
+            options.Headers.Add(@"Graphics\Texture.h");
+
+            // Make sure any system headers needed is available.
             var orbisSDK = System.Environment.GetEnvironmentVariable("SCE_ORBIS_SDK_DIR");
             options.SystemIncludeDirs.Add(orbisSDK + @"\host_tools\lib\clang\include");
             options.SystemIncludeDirs.Add(orbisSDK + @"\target\include");
             options.SystemIncludeDirs.Add(orbisSDK + @"\target\include_common");
 
-            options.OutputDir = @"..\..\Sce.PlayStation4";
+            // Output it to the C# wrapper project.
+            options.OutputDir = @"..\Sce.PlayStation4";
         }
 
         public void SetupPasses(Driver driver)
