@@ -68,6 +68,8 @@ namespace BindingGen
 
         public void Preprocess(Driver driver, ASTContext lib)
         {
+            // Force it to skip generation of anything in the predecls header.
+            lib.IgnoreHeadersWithName("predecls");
         }
 
         public void Postprocess(Driver driver, ASTContext lib)
