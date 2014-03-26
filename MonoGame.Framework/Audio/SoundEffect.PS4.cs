@@ -25,12 +25,7 @@ namespace Microsoft.Xna.Framework.Audio
             throw new NotImplementedException();
         }
 
-        private void PlatformInitializeInstance(SoundEffectInstance instance)
-        {
-            throw new NotImplementedException();
-        }
-
-        private SoundEffectInstance PlatformCreateInstance()
+        private void PlatformSetupInstance(SoundEffectInstance inst)
         {
             throw new NotImplementedException();
         }
