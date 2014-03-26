@@ -114,35 +114,35 @@
     <xsl:choose>
       <xsl:when test="/Input/Generation/Platform = 'iOS'">
         <xsl:text>Global
-        GlobalSection(SolutionConfigurationPlatforms) = preSolution
-                Debug|iPhoneSimulator = Debug|iPhoneSimulator
-                Release|iPhoneSimulator = Release|iPhoneSimulator
-                Debug|iPhone = Debug|iPhone
-                Release|iPhone = Release|iPhone
-                Ad-Hoc|iPhone = Ad-Hoc|iPhone
-                AppStore|iPhone = AppStore|iPhone
-        EndGlobalSection
-        GlobalSection(ProjectConfigurationPlatforms) = postSolution
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|iPhoneSimulator = Debug|iPhoneSimulator
+		Release|iPhoneSimulator = Release|iPhoneSimulator
+		Debug|iPhone = Debug|iPhone
+		Release|iPhone = Release|iPhone
+		Ad-Hoc|iPhone = Ad-Hoc|iPhone
+		AppStore|iPhone = AppStore|iPhone
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 </xsl:text>
       </xsl:when>
       <xsl:when test="/Input/Generation/Platform = 'WindowsPhone'">
         <xsl:text>Global
-        GlobalSection(SolutionConfigurationPlatforms) = preSolution
-                Debug|x86 = Debug|x86
-                Release|x86 = Release|x86
-                Debug|ARM = Debug|ARM
-                Release|ARM = Release|ARM
-        EndGlobalSection
-        GlobalSection(ProjectConfigurationPlatforms) = postSolution
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+		Debug|ARM = Debug|ARM
+		Release|ARM = Release|ARM
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 </xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:text>Global
-        GlobalSection(SolutionConfigurationPlatforms) = preSolution
-                Debug|Any CPU = Debug|Any CPU
-                Release|Any CPU = Release|Any CPU
-        EndGlobalSection
-        GlobalSection(ProjectConfigurationPlatforms) = postSolution
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 </xsl:text>
       </xsl:otherwise>
     </xsl:choose>
@@ -179,7 +179,10 @@
         <xsl:with-param name="root" select="current()" />
       </xsl:call-template>
     </xsl:for-each>
-    <xsl:text>        EndGlobalSection
+    <xsl:text>	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 EndGlobal
 </xsl:text>
   </xsl:template>
@@ -235,7 +238,7 @@ EndGlobal
     
     <xsl:choose>
       <xsl:when test="/Input/Generation/Platform = 'iOS'">
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Ad-Hoc|iPhone.ActiveCfg = </xsl:text>
         <xsl:choose>
@@ -248,7 +251,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Ad-Hoc|iPhone.Build.0 = </xsl:text>
         <xsl:choose>
@@ -261,7 +264,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.AppStore|iPhone.ActiveCfg = </xsl:text>
         <xsl:choose>
@@ -274,7 +277,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.AppStore|iPhone.Build.0 = </xsl:text>
         <xsl:choose>
@@ -287,7 +290,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Debug|iPhone.ActiveCfg = </xsl:text>
         <xsl:choose>
@@ -300,7 +303,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Debug|iPhone.Build.0 = </xsl:text>
         <xsl:choose>
@@ -313,7 +316,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Debug|iPhoneSimulator.ActiveCfg = </xsl:text>
         <xsl:choose>
@@ -326,7 +329,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Debug|iPhoneSimulator.Build.0 = </xsl:text>
         <xsl:choose>
@@ -339,7 +342,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Release|iPhone.ActiveCfg = </xsl:text>
         <xsl:choose>
@@ -352,7 +355,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Release|iPhone.Build.0 = </xsl:text>
         <xsl:choose>
@@ -365,7 +368,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Release|iPhoneSimulator.ActiveCfg = </xsl:text>
         <xsl:choose>
@@ -378,7 +381,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Release|iPhoneSimulator.Build.0 = </xsl:text>
         <xsl:choose>
@@ -393,7 +396,7 @@ EndGlobal
 </xsl:text>
       </xsl:when>
       <xsl:when test="/Input/Generation/Platform = 'WindowsPhone'">
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Debug|x86.ActiveCfg = </xsl:text>
         <xsl:choose>
@@ -406,7 +409,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Debug|x86.Build.0 = </xsl:text>
         <xsl:choose>
@@ -419,7 +422,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Release|x86.ActiveCfg = </xsl:text>
         <xsl:choose>
@@ -432,7 +435,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Release|x86.Build.0 = </xsl:text>
         <xsl:choose>
@@ -445,7 +448,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Debug|ARM.ActiveCfg = </xsl:text>
         <xsl:choose>
@@ -458,7 +461,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Debug|ARM.Build.0 = </xsl:text>
         <xsl:choose>
@@ -471,7 +474,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Release|ARM.ActiveCfg = </xsl:text>
         <xsl:choose>
@@ -484,7 +487,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Release|ARM.Build.0 = </xsl:text>
         <xsl:choose>
@@ -499,7 +502,7 @@ EndGlobal
 </xsl:text>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Debug|Any CPU.ActiveCfg = </xsl:text>
         <xsl:choose>
@@ -512,7 +515,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Debug|Any CPU.Build.0 = </xsl:text>
         <xsl:choose>
@@ -525,7 +528,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Release|Any CPU.ActiveCfg = </xsl:text>
         <xsl:choose>
@@ -538,7 +541,7 @@ EndGlobal
         </xsl:choose>
         <xsl:text>
 </xsl:text>
-        <xsl:text>                {</xsl:text>
+        <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Release|Any CPU.Build.0 = </xsl:text>
         <xsl:choose>
