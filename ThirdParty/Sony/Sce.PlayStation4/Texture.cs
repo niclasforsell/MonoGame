@@ -56,6 +56,11 @@ namespace Sce.PlayStation4
                 __Instance = native;
             }
 
+            ~Texture()
+            {
+                Dispose(false);
+            }
+
             public void Dispose()
             {
                 Dispose(disposing: true);
