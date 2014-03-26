@@ -15,13 +15,18 @@ namespace BindingGen
         {
             var options = driver.Options;
 
+            // This sets the correct calling convention 
+            // and target architecture for PS4.
             options.Abi = CppAbi.Itanium;
-            options.TargetTriple = "x86_64"; //-pc-freebsd";      
+            options.TargetTriple = "x86_64";
+   
             options.MicrosoftMode = false;
             options.NoBuiltinIncludes = true;
             options.WriteOnlyWhenChanged = true;
 
-            options.Verbose = true;
+            // Flip on verbose mode if you have an issue to debug.
+            options.Verbose = false;
+
             options.GenerateProperties = true;
             options.GenerateFunctionTemplates = true;
             //options.GenerateVirtualTables = true;
