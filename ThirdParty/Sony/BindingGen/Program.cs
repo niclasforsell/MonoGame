@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,39 +16,60 @@ namespace BindingGen
         {
             var options = driver.Options;
 
+            // This sets the correct calling convention 
+            // and target architecture for PS4.
             options.Abi = CppAbi.Itanium;
-            options.TargetTriple = "x86_64"; //-pc-freebsd";      
+            options.TargetTriple = "x86_64";
+   
             options.MicrosoftMode = false;
             options.NoBuiltinIncludes = true;
+            options.WriteOnlyWhenChanged = true;
 
-            options.Verbose = true;
+            // Flip on verbose mode if you have an issue to debug.
+            options.Verbose = false;
+            options.Quiet = false;
+
             options.GenerateProperties = true;
             options.GenerateFunctionTemplates = true;
             //options.GenerateVirtualTables = true;
+            options.GenerateFinalizers = true;
 
             options.GenerateLibraryNamespace = true;
             options.LibraryName = "Sce.PlayStation4";           
             options.OutputNamespace = "Sce.PlayStation4";
             options.SharedLibraryName = "scePlayStation4.prx";
 
-            options.IncludeDirs.Add(@"..\");
-            //options.Headers.Add("MonoGame.Native.h");
-            //options.Libraries.Add(@"..\bin\Debug\MonoGame.Native_stub.a");
+            // The paths to search for headers.
+            options.IncludeDirs.Add(@".\");
 
+            // The headers to process.
+            //
+            // NOTE: The casing here will influence the final .cs file.
+            //
+            options.Headers.Add(@"Graphics\Texture.h");
+
+            // Make sure any system headers needed is available.
             var orbisSDK = System.Environment.GetEnvironmentVariable("SCE_ORBIS_SDK_DIR");
             options.SystemIncludeDirs.Add(orbisSDK + @"\host_tools\lib\clang\include");
             options.SystemIncludeDirs.Add(orbisSDK + @"\target\include");
             options.SystemIncludeDirs.Add(orbisSDK + @"\target\include_common");
 
-            options.OutputDir = @"..\..\Sce.PlayStation4";
+            // Output it to the C# wrapper project.
+            options.OutputDir = @"..\Sce.PlayStation4";
         }
 
         public void SetupPasses(Driver driver)
         {
+            // TODO: The GenerateInlinesCodePass is what creates those inlines.cpp/txt files 
+            // in the output folder which we never use.  This gross hack disables them.
+            driver.TranslationUnitPasses.Passes.Remove(
+                driver.TranslationUnitPasses.FindPass<GenerateInlinesCodePass>());
         }
 
         public void Preprocess(Driver driver, ASTContext lib)
         {
+            // Force it to skip generation of anything in the predecls header.
+            lib.IgnoreHeadersWithName("predecls");
         }
 
         public void Postprocess(Driver driver, ASTContext lib)
@@ -59,6 +81,12 @@ namespace BindingGen
             public static void Main(string[] args)
             {
                 ConsoleDriver.Run(new Library());
+
+                // HACK: It would be nice if we could just disable the compile
+                // step instead of doing hardcoded cleanup here.
+                try { File.Delete("Sce.PlayStation4.dll"); } catch {}
+                try { File.Delete("Sce.PlayStation4.pdb"); } catch {}
+                try { File.Delete("Sce.PlayStation4.xml"); } catch {}
             }
         }
     }
