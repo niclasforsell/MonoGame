@@ -87,6 +87,7 @@
     <ClCompile Include="prx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Graphics\predecls.h" />
     <ClInclude Include="Graphics\texture.h" />
   </ItemGroup>
   <ItemGroup>
