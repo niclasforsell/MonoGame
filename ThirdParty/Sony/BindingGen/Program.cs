@@ -52,6 +52,10 @@ namespace BindingGen
 
         public void SetupPasses(Driver driver)
         {
+            // TODO: The GenerateInlinesCodePass is what creates those inlines.cpp/txt files 
+            // in the output folder which we never use.  This gross hack disables them.
+            driver.TranslationUnitPasses.Passes.Remove(
+                driver.TranslationUnitPasses.FindPass<GenerateInlinesCodePass>());
         }
 
         public void Preprocess(Driver driver, ASTContext lib)
