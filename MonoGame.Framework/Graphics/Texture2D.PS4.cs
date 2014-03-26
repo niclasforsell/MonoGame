@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D
     {
-        private Texture _texture;
+        private Sce.PlayStation4.Graphics.Texture _texture;
 
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
