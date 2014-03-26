@@ -6,13 +6,16 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace Sce_PlayStation4
+namespace Sce.PlayStation4
 {
-    public unsafe partial class Texture : IDisposable, CppSharp.Runtime.ICppMarshal
+    public unsafe partial class Texture : IDisposable
     {
         [StructLayout(LayoutKind.Explicit, Size = 16)]
         public struct Internal
         {
+            [FieldOffset(8)]
+            internal global::System.IntPtr _texture;
+
             [SuppressUnmanagedCodeSecurity]
             [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
                 EntryPoint="_ZN7TextureD2Ev")]
@@ -36,19 +39,6 @@ namespace Sce_PlayStation4
 
         public global::System.IntPtr __Instance { get; protected set; }
 
-        int CppSharp.Runtime.ICppMarshal.NativeDataSize
-        {
-            get { return 16; }
-        }
-
-        void CppSharp.Runtime.ICppMarshal.MarshalManagedToNative(global::System.IntPtr instance)
-        {
-        }
-
-        void CppSharp.Runtime.ICppMarshal.MarshalNativeToManaged(global::System.IntPtr instance)
-        {
-        }
-
         internal Texture(Texture.Internal* native)
             : this(new global::System.IntPtr(native))
         {
@@ -59,7 +49,7 @@ namespace Sce_PlayStation4
         {
         }
 
-        internal Texture(global::System.IntPtr native)
+        public Texture(global::System.IntPtr native)
         {
             __Instance = native;
         }
