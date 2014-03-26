@@ -1,6 +1,6 @@
 #include "Texture.h"
 
-//#include "Allocator.h"
+#include "../allocator.h"
 #include <gnm.h>
 #include <assert.h>
 
@@ -13,7 +13,7 @@ Texture::Texture(sce::Gnm::Texture *texture)
 
 Texture::~Texture()
 {
-	//Allocator::Get()->release(_texture->getBaseAddress());
+	Allocator::Get()->release(_texture->getBaseAddress());
 	delete _texture;
 }
 

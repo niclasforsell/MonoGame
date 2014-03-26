@@ -84,12 +84,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="allocator.cpp" />
+    <ClCompile Include="Graphics\graphicsSystem.cpp" />
+    <ClCompile Include="Graphics\renderTarget.cpp" />
     <ClCompile Include="Graphics\texture.cpp" />
     <ClCompile Include="prx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allocator.h" />
+    <ClInclude Include="Graphics\displayBuffer.h" />
+    <ClInclude Include="Graphics\graphicsSystem.h" />
     <ClInclude Include="Graphics\predecls.h" />
+    <ClInclude Include="Graphics\renderTarget.h" />
     <ClInclude Include="Graphics\texture.h" />
   </ItemGroup>
   <ItemGroup>

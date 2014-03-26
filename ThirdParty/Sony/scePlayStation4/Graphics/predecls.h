@@ -3,10 +3,11 @@
 
 // Include all pre-declarations used from header files.
 
+struct _SceKernelEqueue;
+
 /*
 typedef int32_t ControllerHandle;
 
-struct _SceKernelEqueue;
 struct SceSaveDataMountPoint;
 struct SceSaveDataMount;
 struct SceSaveDataDirName;
@@ -35,10 +36,14 @@ class PS4GamePadState;
 class AudioOut;
 class ScePadData;
 class Effect;
-class Texture;
-class RenderTarget;
-class Allocator;
 class GamePadManager;
 class PS4GamePadState;
-struct DisplayBuffer;
 */
+
+namespace Graphics {
+
+class Texture;
+class RenderTarget;
+struct DisplayBuffer;
+
+}
