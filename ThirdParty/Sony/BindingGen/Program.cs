@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ namespace BindingGen
 
             // Flip on verbose mode if you have an issue to debug.
             options.Verbose = false;
+            options.Quiet = false;
 
             options.GenerateProperties = true;
             options.GenerateFunctionTemplates = true;
@@ -77,6 +79,12 @@ namespace BindingGen
             public static void Main(string[] args)
             {
                 ConsoleDriver.Run(new Library());
+
+                // HACK: It would be nice if we could just disable the compile
+                // step instead of doing hardcoded cleanup here.
+                try { File.Delete("Sce.PlayStation4.dll"); } catch {}
+                try { File.Delete("Sce.PlayStation4.pdb"); } catch {}
+                try { File.Delete("Sce.PlayStation4.xml"); } catch {}
             }
         }
     }
