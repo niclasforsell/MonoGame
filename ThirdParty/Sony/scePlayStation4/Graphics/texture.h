@@ -2,6 +2,8 @@
 
 #include "predecls.h"
 
+namespace Graphics {
+
 
 class __declspec(dllexport) Texture
 {
@@ -27,3 +29,4 @@ public:
 	uint32_t getHeight();
 };
 
+} // namespace Graphics

@@ -8,86 +8,89 @@ using System.Security;
 
 namespace Sce.PlayStation4
 {
-    public unsafe partial class Texture : IDisposable
+    namespace Graphics
     {
-        [StructLayout(LayoutKind.Explicit, Size = 16)]
-        public struct Internal
+        public unsafe partial class Texture : IDisposable
         {
-            [FieldOffset(8)]
-            internal global::System.IntPtr _texture;
-
-            [SuppressUnmanagedCodeSecurity]
-            [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                EntryPoint="_ZN7TextureD2Ev")]
-            internal static extern void dtor_0(global::System.IntPtr instance);
-
-            [SuppressUnmanagedCodeSecurity]
-            [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                EntryPoint="_ZN7Texture7SetDataEPhj")]
-            internal static extern void SetData_0(global::System.IntPtr instance, byte* data, uint bytes);
-
-            [SuppressUnmanagedCodeSecurity]
-            [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                EntryPoint="_ZN7Texture8getWidthEv")]
-            internal static extern uint getWidth_0(global::System.IntPtr instance);
-
-            [SuppressUnmanagedCodeSecurity]
-            [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                EntryPoint="_ZN7Texture9getHeightEv")]
-            internal static extern uint getHeight_0(global::System.IntPtr instance);
-        }
-
-        public global::System.IntPtr __Instance { get; protected set; }
-
-        internal Texture(Texture.Internal* native)
-            : this(new global::System.IntPtr(native))
-        {
-        }
-
-        internal Texture(Texture.Internal native)
-            : this(&native)
-        {
-        }
-
-        public Texture(global::System.IntPtr native)
-        {
-            __Instance = native;
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            Internal.dtor_0(__Instance);
-            Marshal.FreeHGlobal(__Instance);
-        }
-
-        public void SetData(byte* data, uint bytes)
-        {
-            var arg0 = data;
-            var arg1 = bytes;
-            Internal.SetData_0(__Instance, arg0, arg1);
-        }
-
-        public uint width
-        {
-            get
+            [StructLayout(LayoutKind.Explicit, Size = 16)]
+            public struct Internal
             {
-                var __ret = Internal.getWidth_0(__Instance);
-                return __ret;
+                [FieldOffset(8)]
+                internal global::System.IntPtr _texture;
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics7TextureD2Ev")]
+                internal static extern void dtor_0(global::System.IntPtr instance);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics7Texture7SetDataEPhj")]
+                internal static extern void SetData_0(global::System.IntPtr instance, byte* data, uint bytes);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics7Texture8getWidthEv")]
+                internal static extern uint getWidth_0(global::System.IntPtr instance);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics7Texture9getHeightEv")]
+                internal static extern uint getHeight_0(global::System.IntPtr instance);
             }
-        }
 
-        public uint height
-        {
-            get
+            public global::System.IntPtr __Instance { get; protected set; }
+
+            internal Texture(Texture.Internal* native)
+                : this(new global::System.IntPtr(native))
             {
-                var __ret = Internal.getHeight_0(__Instance);
-                return __ret;
+            }
+
+            internal Texture(Texture.Internal native)
+                : this(&native)
+            {
+            }
+
+            public Texture(global::System.IntPtr native)
+            {
+                __Instance = native;
+            }
+
+            public void Dispose()
+            {
+                Dispose(disposing: true);
+                GC.SuppressFinalize(this);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                Internal.dtor_0(__Instance);
+                Marshal.FreeHGlobal(__Instance);
+            }
+
+            public void SetData(byte* data, uint bytes)
+            {
+                var arg0 = data;
+                var arg1 = bytes;
+                Internal.SetData_0(__Instance, arg0, arg1);
+            }
+
+            public uint width
+            {
+                get
+                {
+                    var __ret = Internal.getWidth_0(__Instance);
+                    return __ret;
+                }
+            }
+
+            public uint height
+            {
+                get
+                {
+                    var __ret = Internal.getHeight_0(__Instance);
+                    return __ret;
+                }
             }
         }
     }

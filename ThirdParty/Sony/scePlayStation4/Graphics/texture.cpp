@@ -4,6 +4,7 @@
 #include <gnm.h>
 #include <assert.h>
 
+using namespace Graphics;
 
 Texture::Texture(sce::Gnm::Texture *texture)
 {
