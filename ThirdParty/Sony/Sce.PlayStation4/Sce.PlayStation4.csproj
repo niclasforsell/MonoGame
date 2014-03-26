@@ -51,6 +51,7 @@
     <Compile Include="CppSharp\Runtime\StdVector.cs" />
     <Compile Include="CppSharp\Runtime\SymbolResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Texture.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
