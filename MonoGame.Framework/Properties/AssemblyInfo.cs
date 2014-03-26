@@ -30,6 +30,8 @@ using System.Resources;
 [assembly: AssemblyDescription("MonoGame for iOS")]
 #elif WINDOWS_PHONE
 [assembly: AssemblyDescription("MonoGame for Windows Phone 8")]
+#elif PLAYSTATION4
+[assembly: AssemblyDescription("MonoGame for PlayStation 4")]
 #endif
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
