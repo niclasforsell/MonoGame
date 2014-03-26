@@ -105,6 +105,7 @@
     </Project>
     <RelatedProject
       Name="scePlayStation4"
+	  Type="Cpp"
       Guid="73E143CF-7BB5-4EAA-B952-F9DBCEA7FB76"
       Path="ThirdParty\Sony\scePlayStation4\scePlayStation4.vcxproj">
 		<PostProject Guid="008B1B4E-EEB0-44ED-885E-C8C1EB956739" />

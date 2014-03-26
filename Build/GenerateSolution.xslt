@@ -197,6 +197,9 @@ EndGlobal
       <xsl:when test="$type = 'Content'">
         <xsl:text>9344BDBB-3E7F-41FC-A0DD-8665D75EE146</xsl:text>
       </xsl:when>
+      <xsl:when test="$type = 'Cpp'">
+        <xsl:text>8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942</xsl:text>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:text>FAE04EC0-301F-11D3-BF4B-00C04F79EFBC</xsl:text>
       </xsl:otherwise>
