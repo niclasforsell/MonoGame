@@ -33,22 +33,14 @@
   </PropertyGroup>
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">
+  <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
+  <PropertyGroup>
     <OutDir>bin\$(Configuration)\</OutDir>
     <IntDir>obj\$(Configuration)\</IntDir>
-    <IncludePath>$(SCE_ORBIS_SDK_DIR)\target\samples\sample_code\graphics\tutorial_graphics_programming\common;$(SCE_ORBIS_SDK_DIR)\target\samples\sample_code\graphics\api_gnm\toolkit;$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">
-    <OutDir>bin\$(Configuration)\</OutDir>
-    <IntDir>obj\$(Configuration)\</IntDir>
-    <IncludePath>$(SCE_ORBIS_SDK_DIR)\target\samples\sample_code\graphics\tutorial_graphics_programming\common;$(SCE_ORBIS_SDK_DIR)\target\samples\sample_code\graphics\api_gnm\toolkit;$(IncludePath)</IncludePath>
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
     <ClCompile>
@@ -58,7 +50,7 @@
     </ClCompile>
     <Link>
       <OutputFile>bin\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>-lSceVideoOut_stub_weak;-lSceGnmDriver_stub_weak;-lSceGnmx;-lSceGnm;-lSceNgs2_stub_weak;-lSceAudioOut_stub_weak;-lSceGpuAddress;-lScePngDec_stub_weak;-lSceSysmodule_stub_weak;-lScePad_stub_weak;-lSceUserService_stub_weak;-lSceSaveData_stub_weak;-lSceSystemService_stub_weak;-lSceNpTrophy_stub_weak;-lSceNpCommon_stub_weak;-lSceNpManager_stub_weak;-lSceVideoRecording_stub_weak;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;$(SCE_ORBIS_SDK_DIR)\target\samples\sample_code\graphics\api_gnm\toolkit\toolkit-debug.a;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>-lSceVideoOut_stub_weak;-lSceGnmDriver_stub_weak;-lSceGnmx;-lSceGnm;-lSceNgs2_stub_weak;-lSceAudioOut_stub_weak;-lSceGpuAddress;-lScePngDec_stub_weak;-lSceSysmodule_stub_weak;-lScePad_stub_weak;-lSceUserService_stub_weak;-lSceSaveData_stub_weak;-lSceSystemService_stub_weak;-lSceNpTrophy_stub_weak;-lSceNpCommon_stub_weak;-lSceNpManager_stub_weak;-lSceVideoRecording_stub_weak;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">
@@ -69,7 +61,7 @@
     </ClCompile>
     <Link>
       <OutputFile>bin\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>-lSceVideoOut_stub_weak;-lSceGnmDriver_stub_weak;-lSceGnmx;-lSceGnm;-lSceNgs2_stub_weak;-lSceAudioOut_stub_weak;-lSceGpuAddress;-lScePngDec_stub_weak;-lSceSysmodule_stub_weak;-lScePad_stub_weak;-lSceUserService_stub_weak;-lSceSaveData_stub_weak;-lSceSystemService_stub_weak;-lSceNpTrophy_stub_weak;-lSceNpCommon_stub_weak;-lSceNpManager_stub_weak;-lSceVideoRecording_stub_weak;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;$(SCE_ORBIS_SDK_DIR)\target\samples\sample_code\graphics\api_gnm\toolkit\toolkit.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>-lSceVideoOut_stub_weak;-lSceGnmDriver_stub_weak;-lSceGnmx;-lSceGnm;-lSceNgs2_stub_weak;-lSceAudioOut_stub_weak;-lSceGpuAddress;-lScePngDec_stub_weak;-lSceSysmodule_stub_weak;-lScePad_stub_weak;-lSceUserService_stub_weak;-lSceSaveData_stub_weak;-lSceSystemService_stub_weak;-lSceNpTrophy_stub_weak;-lSceNpCommon_stub_weak;-lSceNpManager_stub_weak;-lSceVideoRecording_stub_weak;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
