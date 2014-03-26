@@ -11,6 +11,7 @@ struct SceSaveDataMountPoint;
 struct SceSaveDataMount;
 struct SceSaveDataDirName;
 struct ScePadColor;
+*/
 
 namespace sce {
 
@@ -29,6 +30,7 @@ namespace sce {
 	}
 }
 
+/*
 class PS4GamePadState;
 class AudioOut;
 class ScePadData;
