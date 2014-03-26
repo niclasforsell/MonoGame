@@ -5,6 +5,7 @@
     <ClCompile Include="Graphics\texture.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="allocator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -18,5 +19,6 @@
     <ClInclude Include="Graphics\predecls.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="allocator.h" />
   </ItemGroup>
 </Project>
