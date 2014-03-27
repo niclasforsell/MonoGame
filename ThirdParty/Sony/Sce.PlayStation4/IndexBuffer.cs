@@ -22,10 +22,13 @@ namespace Sce.PlayStation4
             public struct Internal
             {
                 [FieldOffset(8)]
-                internal void* _data;
+                internal void* _indexData;
 
                 [FieldOffset(16)]
-                internal uint _count;
+                internal uint _indexCount;
+
+                [FieldOffset(20)]
+                internal int _indexSize;
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,

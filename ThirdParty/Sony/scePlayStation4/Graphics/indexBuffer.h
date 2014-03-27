@@ -23,7 +23,7 @@ private:
 
 	void *_indexData;
 	uint32_t _indexCount;
-	sce::Gnm::IndexSize _indexSize;
+	int32_t _indexSize;
 
 	// No default or copy constructors.
 	IndexBuffer() { }

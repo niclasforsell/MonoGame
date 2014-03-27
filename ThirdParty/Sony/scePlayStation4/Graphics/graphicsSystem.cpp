@@ -357,7 +357,7 @@ void GraphicsSystem::SetIndexBuffer(IndexBuffer *buffer)
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
-	gfxc.setIndexSize(buffer->_indexSize);
+	gfxc.setIndexSize((Gnm::IndexSize)buffer->_indexSize);
 	gfxc.setIndexCount(buffer->_indexCount);
 	gfxc.setIndexBuffer(buffer->_indexData);
 }
