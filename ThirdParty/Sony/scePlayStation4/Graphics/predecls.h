@@ -47,6 +47,7 @@ class Texture;
 class RenderTarget;
 class VertexShader;
 class PixelShader;
+class VertexBuffer;
 
 struct DisplayBuffer;
 

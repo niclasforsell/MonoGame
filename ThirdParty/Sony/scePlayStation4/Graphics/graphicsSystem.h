@@ -75,6 +75,8 @@ public:
 
 	virtual void SetBlendState(const char* name);
 
+	virtual void SetVertexBuffer(VertexBuffer *buffer);
+
 	virtual void SetVertexShader(VertexShader *shader);
 	virtual void SetPixelShader(PixelShader *shader);
 	virtual void SetShaderConstants(ShaderStage stage, void *data, uint32_t sizeInBytes);

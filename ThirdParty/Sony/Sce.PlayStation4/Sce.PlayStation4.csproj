@@ -57,6 +57,7 @@
     <Compile Include="RenderTarget.cs" />
     <Compile Include="Texture.cs" />
     <Compile Include="TextureFormat.cs" />
+    <Compile Include="VertexBuffer.cs" />
     <Compile Include="VertexShader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

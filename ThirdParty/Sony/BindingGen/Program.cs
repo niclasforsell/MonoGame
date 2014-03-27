@@ -52,6 +52,7 @@ namespace BindingGen
             options.Headers.Add(@"Graphics\TextureFormat.h");
             options.Headers.Add(@"Graphics\VertexShader.h");
             options.Headers.Add(@"Graphics\PixelShader.h");
+            options.Headers.Add(@"Graphics\VertexBuffer.h");
 
             // Make sure any system headers needed is available.
             var orbisSDK = System.Environment.GetEnvironmentVariable("SCE_ORBIS_SDK_DIR");

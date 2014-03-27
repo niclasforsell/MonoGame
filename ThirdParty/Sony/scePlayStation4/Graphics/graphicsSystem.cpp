@@ -5,8 +5,10 @@
 #include "vertexShader.h"
 #include "pixelShader.h"
 #include "renderTarget.h"
-#include "../allocator.h"
 #include "displayBuffer.h"
+#include "vertexBuffer.h"
+
+#include "../allocator.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -357,6 +359,14 @@ void GraphicsSystem::Clear(float r, float g, float b, float a)
 	// Clear the color and the depth target
 	//Toolkit::SurfaceUtil::clearRenderTarget(gfxc, renTar, Vector4(r, g, b, a));
 	//Toolkit::SurfaceUtil::clearDepthTarget(gfxc, &backBuffer->depthTarget, 1.f);
+}
+
+void GraphicsSystem::SetVertexBuffer(VertexBuffer *buffer)
+{
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+	Gnmx::GfxContext &gfxc = backBuffer->context;
+
+	gfxc.setVertexBuffers(sce::Gnm::ShaderStage::kShaderStageVs, 0, buffer->_bufferCount, buffer->_buffers);
 }
 
 /*

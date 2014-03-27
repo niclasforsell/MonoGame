@@ -123,6 +123,11 @@ namespace Sce.PlayStation4
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics14GraphicsSystem15SetVertexBufferEPNS_12VertexBufferE")]
+                internal static extern void SetVertexBuffer_0(global::System.IntPtr instance, global::System.IntPtr buffer);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
                     EntryPoint="_ZN8Graphics14GraphicsSystem15SetVertexShaderEPNS_12VertexShaderE")]
                 internal static extern void SetVertexShader_0(global::System.IntPtr instance, global::System.IntPtr shader);
 
@@ -249,6 +254,12 @@ namespace Sce.PlayStation4
                 var arg0 = Marshal.StringToHGlobalAnsi(name);
                 Internal.SetBlendState_0(__Instance, arg0);
                 Marshal.FreeHGlobal(arg0);
+            }
+
+            public virtual void SetVertexBuffer(Graphics.VertexBuffer buffer)
+            {
+                var arg0 = buffer == (Graphics.VertexBuffer) null ? global::System.IntPtr.Zero : buffer.__Instance;
+                Internal.SetVertexBuffer_0(__Instance, arg0);
             }
 
             public virtual void SetVertexShader(Graphics.VertexShader shader)
