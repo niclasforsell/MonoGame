@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.InteropServices;
 using Sce.PlayStation4.Graphics;
 using PSIndexBuffer = Sce.PlayStation4.Graphics.IndexBuffer;
 
@@ -29,7 +30,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-            throw new NotImplementedException();
+            var elementSizeInBytes = IndexElementSize == IndexElementSize.SixteenBits ? sizeof(Int16) : sizeof(Int32);
+            var startBytes = startIndex * elementSizeInBytes;
+            var dataBytes = elementCount * elementSizeInBytes;
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+
+            unsafe
+            {
+                _buffer.SetData((uint)offsetInBytes, (byte*)dataPtr, (uint)dataBytes);
+            }
+
+            dataHandle.Free();
         }
 
         private void PlatformDispose(bool disposing)

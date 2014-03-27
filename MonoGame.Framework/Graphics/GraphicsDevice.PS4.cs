@@ -64,6 +64,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 _vertexBufferDirty = false;
             }
 
+            if (_indexBufferDirty)
+            {
+                _system.SetIndexBuffer(_indexBuffer._buffer);
+                _indexBufferDirty = false;
+            }
+
             if (_vertexShader == null)
                 throw new InvalidOperationException("A vertex shader must be set!");
             if (_pixelShader == null)
