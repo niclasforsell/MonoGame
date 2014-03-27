@@ -85,6 +85,9 @@
   <ItemGroup>
     <ClCompile Include="allocator.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="Audio\audioBuffer.cpp" />
+    <ClCompile Include="Audio\samplerVoice.cpp" />
+    <ClCompile Include="Audio\soundSystem.cpp" />
     <ClCompile Include="Graphics\graphicsSystem.cpp" />
     <ClCompile Include="Graphics\pixelShader.cpp" />
     <ClCompile Include="Graphics\renderTarget.cpp" />
@@ -96,6 +99,11 @@
   <ItemGroup>
     <ClInclude Include="allocator.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="Audio\audioBuffer.h" />
+    <ClInclude Include="Audio\audioOut.h" />
+    <ClInclude Include="Audio\predecls.h" />
+    <ClInclude Include="Audio\samplerVoice.h" />
+    <ClInclude Include="Audio\soundSystem.h" />
     <ClInclude Include="Graphics\displayBuffer.h" />
     <ClInclude Include="Graphics\graphicsSystem.h" />
     <ClInclude Include="Graphics\pixelShader.h" />
