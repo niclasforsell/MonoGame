@@ -3,44 +3,48 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Sce.PlayStation4.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
     {
+        internal GraphicsSystem _system;
+
         private void PlatformSetup()
         {
-            throw new NotImplementedException();
+            _system = new GraphicsSystem();
         }
 
         private void PlatformInitialize()
         {
-            throw new NotImplementedException();
+            _system.Initialize();
         }
 
         private void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-            throw new NotImplementedException();
+            _system.Clear(color.X, color.Y, color.Z, color.W);
         }
 
         private void PlatformDispose()
         {
-            throw new NotImplementedException();
+            _system.Dispose();
+            _system = null;
         }
 
         private void PlatformPresent()
         {
-            throw new NotImplementedException();
+            _system.Present();
         }
 
-        private void PlatformSetViewport(ref Viewport value)
+        private void PlatformSetViewport(ref Viewport viewport)
         {
-            throw new NotImplementedException();
+            _system.SetViewport(viewport.X, viewport.Y, viewport.Width, viewport.Height, viewport.MinDepth, viewport.MaxDepth);
         }
 
         private void PlatformApplyDefaultRenderTarget()
         {
-            throw new NotImplementedException();
+            _system.SetRenderTarget(null);
         }
 
         private IRenderTarget PlatformApplyRenderTargets()
