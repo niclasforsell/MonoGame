@@ -21,13 +21,3 @@ RenderTarget::~RenderTarget()
 	delete _renderTarget;
 	delete _texture;
 }
-
-uint32_t RenderTarget::getWidth()
-{ 
-	return _renderTarget->getWidth();
-}
-
-uint32_t RenderTarget::getHeight() 
-{ 
-	return _renderTarget->getHeight();
-}

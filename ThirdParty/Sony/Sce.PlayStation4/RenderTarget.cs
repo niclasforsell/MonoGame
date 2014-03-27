@@ -25,16 +25,6 @@ namespace Sce.PlayStation4
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
                     EntryPoint="_ZN8Graphics12RenderTargetD2Ev")]
                 internal static extern void dtor_0(global::System.IntPtr instance);
-
-                [SuppressUnmanagedCodeSecurity]
-                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics12RenderTarget8getWidthEv")]
-                internal static extern uint getWidth_0(global::System.IntPtr instance);
-
-                [SuppressUnmanagedCodeSecurity]
-                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics12RenderTarget9getHeightEv")]
-                internal static extern uint getHeight_0(global::System.IntPtr instance);
             }
 
             public global::System.IntPtr __Instance { get; protected set; }
@@ -69,24 +59,6 @@ namespace Sce.PlayStation4
             {
                 Internal.dtor_0(__Instance);
                 Marshal.FreeHGlobal(__Instance);
-            }
-
-            public uint width
-            {
-                get
-                {
-                    var __ret = Internal.getWidth_0(__Instance);
-                    return __ret;
-                }
-            }
-
-            public uint height
-            {
-                get
-                {
-                    var __ret = Internal.getHeight_0(__Instance);
-                    return __ret;
-                }
             }
         }
     }
