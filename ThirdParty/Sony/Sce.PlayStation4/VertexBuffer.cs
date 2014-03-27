@@ -10,6 +10,22 @@ namespace Sce.PlayStation4
 {
     namespace Graphics
     {
+        public enum VertexElement : uint
+        {
+            VertexElement_Single = 0,
+            VertexElement_Vector2 = 1,
+            VertexElement_Vector3 = 2,
+            VertexElement_Vector4 = 3,
+            VertexElement_Color = 4,
+            VertexElement_Byte4 = 5,
+            VertexElement_Short2 = 6,
+            VertexElement_Short4 = 7,
+            VertexElement_NormalizedShort2 = 8,
+            VertexElement_NormalizedShort4 = 9,
+            VertexElement_HalfVector2 = 10,
+            VertexElement_HalfVector4 = 11
+        }
+
         public unsafe partial class VertexBuffer : IDisposable
         {
             [StructLayout(LayoutKind.Explicit, Size = 32)]
@@ -26,8 +42,8 @@ namespace Sce.PlayStation4
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics12VertexBufferC2Ejj")]
-                internal static extern void ctor_2(global::System.IntPtr instance, uint vertexStride, uint vertexCount);
+                    EntryPoint="_ZN8Graphics12VertexBufferC2EPNS_13VertexElementEjjj")]
+                internal static extern void ctor_2(global::System.IntPtr instance, Graphics.VertexElement elements, uint elementCount, uint vertexStride, uint vertexCount);
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
@@ -37,7 +53,7 @@ namespace Sce.PlayStation4
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
                     EntryPoint="_ZN8Graphics12VertexBuffer7SetDataEjPhj")]
-                internal static extern void SetData_0(global::System.IntPtr instance, uint offset, byte* data, uint bytes);
+                internal static extern void SetData_0(global::System.IntPtr instance, uint offsetInBytes, byte* data, uint bytes);
             }
 
             public global::System.IntPtr __Instance { get; protected set; }
@@ -57,12 +73,14 @@ namespace Sce.PlayStation4
                 __Instance = native;
             }
 
-            public VertexBuffer(uint vertexStride, uint vertexCount)
+            public VertexBuffer(Graphics.VertexElement elements, uint elementCount, uint vertexStride, uint vertexCount)
             {
                 __Instance = Marshal.AllocHGlobal(32);
-                var arg0 = vertexStride;
-                var arg1 = vertexCount;
-                Internal.ctor_2(__Instance, arg0, arg1);
+                var arg0 = elements;
+                var arg1 = elementCount;
+                var arg2 = vertexStride;
+                var arg3 = vertexCount;
+                Internal.ctor_2(__Instance, arg0, arg1, arg2, arg3);
             }
 
             ~VertexBuffer()
@@ -82,9 +100,9 @@ namespace Sce.PlayStation4
                 Marshal.FreeHGlobal(__Instance);
             }
 
-            public virtual void SetData(uint offset, byte* data, uint bytes)
+            public virtual void SetData(uint offsetInBytes, byte* data, uint bytes)
             {
-                var arg0 = offset;
+                var arg0 = offsetInBytes;
                 var arg1 = data;
                 var arg2 = bytes;
                 Internal.SetData_0(__Instance, arg0, arg1, arg2);

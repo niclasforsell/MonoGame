@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.InteropServices;
 using Sce.PlayStation4.Graphics;
 
 
@@ -14,7 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformConstruct()
         {
-            _buffer = new Sce.PlayStation4.Graphics.VertexBuffer((uint)VertexDeclaration.VertexStride, (uint)VertexCount);
+            //_buffer = new Sce.PlayStation4.Graphics.VertexBuffer((uint)VertexDeclaration.VertexStride, (uint)VertexCount);
         }
 
         private void PlatformGraphicsDeviceResetting()
@@ -29,7 +30,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options, int bufferSize, int elementSizeInBytes) where T : struct
         {
-            throw new NotImplementedException();
+            var startBytes = startIndex * elementSizeInBytes;
+            var dataBytes = elementCount * elementSizeInBytes;            
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+
+            unsafe
+            {
+                _buffer.SetData((uint)offsetInBytes, (byte*)dataPtr, (uint)dataBytes);
+            }
+
+            dataHandle.Free();
         }
 
         private void PlatformDispose(bool disposing)
