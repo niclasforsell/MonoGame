@@ -46,6 +46,9 @@ namespace BindingGen
             //
             // NOTE: The casing here will influence the final .cs file.
             //
+            options.Headers.Add(@"Audio\AudioBuffer.h");
+            options.Headers.Add(@"Audio\SamplerVoice.h");
+            options.Headers.Add(@"Audio\SoundSystem.h");
             options.Headers.Add(@"Graphics\Texture.h");
 
             // Make sure any system headers needed is available.

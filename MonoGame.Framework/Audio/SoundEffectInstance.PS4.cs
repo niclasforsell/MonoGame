@@ -10,6 +10,9 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffectInstance
     {
+        internal Sce.PlayStation4.Audio.SamplerVoice _voice;
+        internal Sce.PlayStation4.Audio.AudioBuffer _buffer;
+
         private void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
         {
             throw new NotImplementedException();
@@ -17,77 +20,124 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return;
+
+            Sce.PlayStation4.Audio.SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Paused, -1);
         }
 
         private void PlatformPause()
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return;
+
+            Sce.PlayStation4.Audio.SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Paused, -1);
         }
 
         private void PlatformPlay()
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return;
+
+            Sce.PlayStation4.Audio.SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Playing, -1);
         }
 
         private void PlatformResume()
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return;
+
+            Sce.PlayStation4.Audio.SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Playing, -1);
         }
 
         private void PlatformStop(bool immediate)
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return;
+
+            Sce.PlayStation4.Audio.SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Stopped, -1);
         }
 
         private void PlatformSetIsLooped(bool value)
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return;
+
+            _voice.Looped = value;
         }
 
         private bool PlatformGetIsLooped()
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return false;
+
+            return _voice.Looped;
         }
 
         private float PlatformGetPan()
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return 0.0f;
+
+            return _voice.Pan;
         }
 
         private void PlatformSetPan(float value)
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return;
+
+            _voice.Pan = value;
         }
 
         private void PlatformSetPitch(float value)
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return;
+
+            _voice.Pitch = value;
         }
 
         private float PlatformGetPitch()
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return 0.0f;
+
+            return _voice.Pitch;
         }
 
         private SoundState PlatformGetState()
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return SoundState.Stopped;
+
+            // This assumes the native SoundState mirrors the managed one.
+            return (SoundState)_voice.State;
         }
 
         private void PlatformSetVolume(float value)
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return;
+
+            _voice.Volume = value;
         }
 
         private float PlatformGetVolume()
         {
-            throw new NotImplementedException();
+            if (_voice == null)
+                return 0.0f;
+
+            return _voice.Volume;
         }
 
         private void PlatformDispose()
         {
-            throw new NotImplementedException();
+            if (_voice != null)
+            {
+                _voice.Dispose();
+                _voice = null;
+            }
         }
     }
 }

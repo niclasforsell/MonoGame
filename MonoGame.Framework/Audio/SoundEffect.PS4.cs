@@ -5,14 +5,30 @@
 using Microsoft.Xna.Framework.Audio;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect
     {
+        private Sce.PlayStation4.Audio.AudioBuffer _buffer;
+
         private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
         {
-            throw new NotImplementedException();
+            PlatformInitialize(buffer, 0, buffer.Length, sampleRate, channels, 0, buffer.Length);
+        }
+
+        private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        {
+            unsafe
+            {
+                var handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+                var addr = (IntPtr)(handle.AddrOfPinnedObject().ToInt64() + offset);
+                _buffer = new Sce.PlayStation4.Audio.AudioBuffer((void*)addr, (uint)count);
+                // TODO: Looping?
+
+                handle.Free();
+            }
         }
 
         private void PlatformLoadAudioStream(Stream s)
@@ -20,29 +36,10 @@ namespace Microsoft.Xna.Framework.Audio
             throw new NotImplementedException();
         }
 
-        private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
-        {
-            throw new NotImplementedException();
-        }
-
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
-            throw new NotImplementedException();
-        }
-
-        private bool PlatformPlay()
-        {
-            throw new NotImplementedException();
-        }
-
-        private bool PlatformPlay(float volume, float pitch, float pan)
-        {
-            throw new NotImplementedException();
-        }
-
-        private TimeSpan PlatformGetDuration()
-        {
-            throw new NotImplementedException();
+            inst._voice = Sce.PlayStation4.Audio.SoundSystem.Instance.CreateVoice(_buffer);
+            inst._buffer = _buffer;
         }
 
         private static void PlatformSetMasterVolume()
@@ -52,7 +49,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose()
         {
-            throw new NotImplementedException();
+            if (_buffer != null)
+            {
+                _buffer.Dispose();
+                _buffer = null;
+            }
         }
     }
 }
