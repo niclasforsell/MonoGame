@@ -46,6 +46,7 @@ namespace BindingGen
             //
             // NOTE: The casing here will influence the final .cs file.
             //
+            options.Headers.Add(@"Game.h");
             options.Headers.Add(@"Graphics\Texture.h");
             options.Headers.Add(@"Graphics\RenderTarget.h");
             options.Headers.Add(@"Graphics\GraphicsSystem.h");
