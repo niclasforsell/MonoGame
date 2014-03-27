@@ -92,24 +92,6 @@ void GraphicsSystem::Initialize()
 		return;
 	}
 
-	/*
-	// Allocate the scratch pad memory required by the Toolkit module
-	Toolkit::MemoryRequests toolkitMemRequests;
-	toolkitMemRequests.initialize();
-	Toolkit::addToMemoryRequests(&toolkitMemRequests);
-	void *toolkitMemGarlic = Allocator::Get()->allocate(toolkitMemRequests.m_garlic.m_sizeAlign, SCE_KERNEL_WC_GARLIC);
-	void *toolkitMemOnion = Allocator::Get()->allocate(toolkitMemRequests.m_onion.m_sizeAlign, SCE_KERNEL_WB_ONION);
-	if( !toolkitMemGarlic || !toolkitMemOnion )
-	{
-		printf("Cannot allocate the scratch pad area for the Toolkit module\n");
-		return; // SCE_KERNEL_ERROR_ENOMEM;
-	}
-
-	// Initialize the Toolkit module
-	toolkitMemRequests.m_garlic.fulfill(toolkitMemGarlic);
-	toolkitMemRequests.m_onion.fulfill(toolkitMemOnion);
-	Toolkit::initializeWithMemoryRequests(&toolkitMemRequests);
-	*/
 
 	static const sce::Gnm::ZFormat kZFormat				= sce::Gnm::kZFormat32Float;
 	static const sce::Gnm::StencilFormat kStencilFormat	= sce::Gnm::kStencil8;
