@@ -49,7 +49,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private IRenderTarget PlatformApplyRenderTargets()
         {
-            throw new NotImplementedException();
+            // TODO: Need to support multiple render targets!
+
+            var target = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
+            _system.SetRenderTarget(target._target);
+            return target;
         }
 
         internal void PlatformApplyState(bool applyShaders)
