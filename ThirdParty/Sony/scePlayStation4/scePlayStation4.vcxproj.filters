@@ -30,6 +30,7 @@
     <ClCompile Include="Graphics\vertexBuffer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="game.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -83,5 +84,6 @@
     <ClInclude Include="Graphics\vertexBuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="game.h" />
   </ItemGroup>
 </Project>
