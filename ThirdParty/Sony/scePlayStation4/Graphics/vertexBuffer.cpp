@@ -18,6 +18,10 @@ VertexBuffer::VertexBuffer(VertexElement *elements, uint32_t elementCount, uint3
 	//_buffers[0].initAsVertexBuffer(_bufferData + 0, Gnm::kDataFormatR32G32B32Float, vertexStride, vertCount);
 	//_buffers[1].initAsVertexBuffer(_bufferData + 12, Gnm::kDataFormatR8G8B8A8Unorm, vertexStride, vertCount);
 	//_buffers[2].initAsVertexBuffer(_bufferData + 16, Gnm::kDataFormatR32G32Float, vertexStride, vertCount);
+
+	// It is worth initializing it here for consistant
+	// behavior when accidentally unset.
+	memset(_bufferData, 0, sizeInBytes);
 }
 
 VertexBuffer::~VertexBuffer()

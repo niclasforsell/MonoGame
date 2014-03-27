@@ -89,6 +89,7 @@
     <ClCompile Include="Audio\samplerVoice.cpp" />
     <ClCompile Include="Audio\soundSystem.cpp" />
     <ClCompile Include="Graphics\graphicsSystem.cpp" />
+    <ClCompile Include="Graphics\indexBuffer.cpp" />
     <ClCompile Include="Graphics\pixelShader.cpp" />
     <ClCompile Include="Graphics\renderTarget.cpp" />
     <ClCompile Include="Graphics\texture.cpp" />
@@ -106,6 +107,7 @@
     <ClInclude Include="Audio\soundSystem.h" />
     <ClInclude Include="Graphics\displayBuffer.h" />
     <ClInclude Include="Graphics\graphicsSystem.h" />
+    <ClInclude Include="Graphics\indexBuffer.h" />
     <ClInclude Include="Graphics\pixelShader.h" />
     <ClInclude Include="Graphics\predecls.h" />
     <ClInclude Include="Graphics\renderTarget.h" />

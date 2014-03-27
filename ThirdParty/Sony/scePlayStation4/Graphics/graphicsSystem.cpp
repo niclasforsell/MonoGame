@@ -7,6 +7,7 @@
 #include "renderTarget.h"
 #include "displayBuffer.h"
 #include "vertexBuffer.h"
+#include "indexBuffer.h"
 
 #include "../allocator.h"
 
@@ -350,6 +351,17 @@ void GraphicsSystem::SetVertexBuffer(VertexBuffer *buffer)
 
 	gfxc.setVertexBuffers(sce::Gnm::ShaderStage::kShaderStageVs, 0, buffer->_bufferCount, buffer->_buffers);
 }
+
+void GraphicsSystem::SetIndexBuffer(IndexBuffer *buffer)
+{
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+	Gnmx::GfxContext &gfxc = backBuffer->context;
+
+	gfxc.setIndexSize(buffer->_indexSize);
+	gfxc.setIndexCount(buffer->_indexCount);
+	gfxc.setIndexBuffer(buffer->_indexData);
+}
+
 
 /*
 void GraphicsSystem::DrawIndexedSprites(uint32_t vertCount, void *vertexData, uint32_t idxCount, const void *idxData)

@@ -76,6 +76,7 @@ public:
 	virtual void SetBlendState(const char* name);
 
 	virtual void SetVertexBuffer(VertexBuffer *buffer);
+	virtual void SetIndexBuffer(IndexBuffer *buffer);
 
 	virtual void SetVertexShader(VertexShader *shader);
 	virtual void SetPixelShader(PixelShader *shader);

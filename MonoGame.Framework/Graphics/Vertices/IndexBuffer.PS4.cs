@@ -3,19 +3,23 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Sce.PlayStation4.Graphics;
+using PSIndexBuffer = Sce.PlayStation4.Graphics.IndexBuffer;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class IndexBuffer
     {
+        internal PSIndexBuffer _buffer;
+
         private void PlatformConstruct(IndexElementSize indexElementSize, int indexCount)
         {
-            throw new NotImplementedException();
+            _buffer = new PSIndexBuffer((IndexElement)IndexElementSize, (uint)indexCount);
         }
 
         private void PlatformGraphicsDeviceResetting()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         private void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
@@ -30,7 +34,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDispose(bool disposing)
         {
-            throw new NotImplementedException();
+            if (disposing)
+            {
+                _buffer.Dispose();
+                _buffer = null;
+            }
         }
     }
 }

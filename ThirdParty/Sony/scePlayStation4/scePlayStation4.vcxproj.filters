@@ -30,6 +30,9 @@
     <ClCompile Include="Graphics\vertexBuffer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\indexBuffer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
     <ClCompile Include="game.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +85,9 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\vertexBuffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\indexBuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="game.h" />
