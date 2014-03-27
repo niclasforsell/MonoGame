@@ -799,53 +799,6 @@ void GraphicsSystem::SetBlendState(const char* name)
 	gfxc.setBlendControl(0, blendControl);
 }
 
-/*
-Effect* GraphicsSystem::CreateEffect(const char *name)
-{
-	return new Effect(name);
-}
-
-void GraphicsSystem::_applyEffect(sce::Gnmx::GfxContext &gfxc)
-{
-}
-
-void GraphicsSystem::ApplyEffect(Effect *effect)
-{
-	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
-
-	gfxc.setActiveShaderStages(Gnm::kActiveShaderStagesVsPs);
-
-	_effect = effect;
-	if (_effect->_vsShader)
-	{
-		gfxc.setVsShader(_effect->_vsShader, _effect->_shaderModifier, _effect->_fsMem);
-		if (_effect->_vsConstantsSize > 0)
-		{
-			void *vsConstants = gfxc.allocateFromCommandBuffer(_effect->_vsConstantsSize, Gnm::kEmbeddedDataAlignment4);
-			memcpy(vsConstants, _effect->_vsConstants, _effect->_vsConstantsSize);
-			Gnm::Buffer constBuffer;
-			constBuffer.initAsConstantBuffer(vsConstants, _effect->_vsConstantsSize);
-			constBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
-			gfxc.setConstantBuffers(Gnm::kShaderStageVs, 0, 1, &constBuffer);
-		}
-	}
-
-	if (_effect->_psShader)
-	{
-		gfxc.setPsShader(_effect->_psShader);
-		if (_effect->_psConstantsSize > 0)
-		{
-			void *psConstants = gfxc.allocateFromCommandBuffer(_effect->_psConstantsSize, Gnm::kEmbeddedDataAlignment4);
-			memcpy(psConstants, _effect->_psConstants, _effect->_psConstantsSize);
-			Gnm::Buffer constBuffer;
-			constBuffer.initAsConstantBuffer(psConstants, _effect->_psConstantsSize);
-			constBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
-			gfxc.setConstantBuffers(Gnm::kShaderStagePs, 0, 1, &constBuffer);
-		}
-	}
-}
-*/
-
 void GraphicsSystem::SetVertexShader(VertexShader *shader)
 {
 	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
@@ -856,4 +809,17 @@ void GraphicsSystem::SetPixelShader(PixelShader *shader)
 {
 	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
 	gfxc.setPsShader(shader->_shader);
+}
+
+void GraphicsSystem::SetShaderConstants(ShaderStage stage, void *data, uint32_t sizeInBytes)
+{
+	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
+
+	void *constants = gfxc.allocateFromCommandBuffer(sizeInBytes, Gnm::kEmbeddedDataAlignment4);
+	memcpy(constants, data, sizeInBytes);
+
+	Gnm::Buffer constBuffer;
+	constBuffer.initAsConstantBuffer(constants, sizeInBytes);
+	constBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+	gfxc.setConstantBuffers(stage == ShaderStage_Pixel ? Gnm::kShaderStagePs : Gnm::kShaderStageVs, 0, 1, &constBuffer);
 }

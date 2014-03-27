@@ -4,6 +4,13 @@
 
 namespace Graphics {
 
+enum ShaderStage
+{
+	ShaderStage_Vertex,
+	ShaderStage_Pixel
+};
+
+
 class __declspec(dllexport) GraphicsSystem
 {
 private:
@@ -70,9 +77,7 @@ public:
 
 	virtual void SetVertexShader(VertexShader *shader);
 	virtual void SetPixelShader(PixelShader *shader);
-
-	//virtual Effect* CreateEffect(const char *name);
-	//virtual void ApplyEffect(Effect *effect);
+	virtual void SetShaderConstants(ShaderStage stage, void *data, uint32_t sizeInBytes);
 };
 
 } // namespace Graphics

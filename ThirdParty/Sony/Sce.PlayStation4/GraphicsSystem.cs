@@ -10,6 +10,12 @@ namespace Sce.PlayStation4
 {
     namespace Graphics
     {
+        public enum ShaderStage : uint
+        {
+            ShaderStage_Vertex = 0,
+            ShaderStage_Pixel = 1
+        }
+
         public unsafe partial class GraphicsSystem : IDisposable
         {
             [StructLayout(LayoutKind.Explicit, Size = 80)]
@@ -124,6 +130,11 @@ namespace Sce.PlayStation4
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
                     EntryPoint="_ZN8Graphics14GraphicsSystem14SetPixelShaderEPNS_11PixelShaderE")]
                 internal static extern void SetPixelShader_0(global::System.IntPtr instance, global::System.IntPtr shader);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics14GraphicsSystem18SetShaderConstantsENS_11ShaderStageEPvj")]
+                internal static extern void SetShaderConstants_0(global::System.IntPtr instance, Graphics.ShaderStage stage, void* data, uint sizeInBytes);
             }
 
             public global::System.IntPtr __Instance { get; protected set; }
@@ -250,6 +261,14 @@ namespace Sce.PlayStation4
             {
                 var arg0 = shader == (Graphics.PixelShader) null ? global::System.IntPtr.Zero : shader.__Instance;
                 Internal.SetPixelShader_0(__Instance, arg0);
+            }
+
+            public virtual void SetShaderConstants(Graphics.ShaderStage stage, void* data, uint sizeInBytes)
+            {
+                var arg0 = stage;
+                var arg1 = data;
+                var arg2 = sizeInBytes;
+                Internal.SetShaderConstants_0(__Instance, arg0, arg1, arg2);
             }
         }
     }

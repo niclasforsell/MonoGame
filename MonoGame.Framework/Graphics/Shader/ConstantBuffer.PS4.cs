@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using PSShaderStage = Sce.PlayStation4.Graphics.ShaderStage;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -16,6 +17,27 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformClear()
         {
             throw new NotImplementedException();
+        }
+
+        internal void PlatformApply(GraphicsDevice device, ShaderStage stage, int slot)
+        {
+            // PS4 we copy the data always!
+            _dirty = false;
+
+            var system = GraphicsDevice._system;
+            var sizeInBytes = _buffer.Length;
+
+            unsafe
+            {
+                fixed(void *data = _buffer)
+                {
+                    // Set the buffer to the right stage.
+                    if (stage == ShaderStage.Vertex)
+                        system.SetShaderConstants(PSShaderStage.ShaderStage_Vertex, data, (uint)sizeInBytes);
+                    else
+                        system.SetShaderConstants(PSShaderStage.ShaderStage_Pixel, data, (uint)sizeInBytes);
+                }
+            }
         }
     }
 }
