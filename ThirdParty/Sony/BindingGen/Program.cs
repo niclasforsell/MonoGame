@@ -47,6 +47,9 @@ namespace BindingGen
             // NOTE: The casing here will influence the final .cs file.
             //
             options.Headers.Add(@"Graphics\Texture.h");
+            options.Headers.Add(@"Graphics\RenderTarget.h");
+            options.Headers.Add(@"Graphics\GraphicsSystem.h");
+            options.Headers.Add(@"Graphics\TextureFormat.h");
 
             // Make sure any system headers needed is available.
             var orbisSDK = System.Environment.GetEnvironmentVariable("SCE_ORBIS_SDK_DIR");

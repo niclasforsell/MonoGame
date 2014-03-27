@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Sce.PlayStation4.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -14,12 +15,33 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
-            throw new NotImplementedException();
+            if (type != SurfaceType.Texture)
+                return;
+
+            _texture = GraphicsDevice._system.CreateTexture((TextureFormat)format, (uint)width, (uint)height, (uint)(mipmap ? _levelCount : 0));
         }
 
         private void PlatformSetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
         {
-            throw new NotImplementedException();
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var startBytes = startIndex * elementSizeInByte;
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+
+            if (rect.HasValue)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                unsafe
+                {
+                    _texture.SetData((uint)level, (byte*)dataPtr, (uint)(elementSizeInByte * elementCount));
+                }
+            }
+
+            dataHandle.Free();
         }
 
         private void PlatformGetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)

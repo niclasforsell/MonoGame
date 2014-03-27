@@ -52,8 +52,8 @@ public:
 	virtual RenderTarget* CreateRenderTarget(uint32_t width, uint32_t height);
 	virtual void GetRenderTargetData(RenderTarget *target, unsigned char *data, uint32_t bytes);
 	
-	virtual Texture* CreateTexture(uint32_t width, uint32_t height, uint32_t mips);
-	virtual Texture* CreateTextureFromPng(unsigned char *data, uint32_t bytes);
+	virtual Texture* CreateTexture(TextureFormat format, uint32_t width, uint32_t height, uint32_t mips);
+	//virtual Texture* CreateTextureFromPng(unsigned char *data, uint32_t bytes);
 
 	virtual void SetRenderTarget(RenderTarget *renderTarget);
 
@@ -65,7 +65,7 @@ public:
 	virtual void SetTexture(int slot, Texture* texture);
 	virtual void SetTextureRT(int slot, RenderTarget* target);
 
-	virtual void SetViewport(int left, int top, int right, int bot);
+	virtual void SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth);
 
 	virtual void SetBlendState(const char* name);
 

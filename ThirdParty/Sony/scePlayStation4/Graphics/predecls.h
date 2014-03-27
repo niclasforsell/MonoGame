@@ -44,6 +44,9 @@ namespace Graphics {
 
 class Texture;
 class RenderTarget;
+
 struct DisplayBuffer;
 
 }
+
+#include "textureFormat.h"

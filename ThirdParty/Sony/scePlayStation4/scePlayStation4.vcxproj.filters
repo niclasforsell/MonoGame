@@ -35,5 +35,8 @@
     <ClInclude Include="Graphics\renderTarget.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\textureFormat.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

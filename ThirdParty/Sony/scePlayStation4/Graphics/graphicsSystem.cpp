@@ -309,7 +309,7 @@ void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget)
 	gfxc.setDepthRenderTarget(NULL);
 	gfxc.setRenderTargetMask(0xF);
 
-	SetViewport(0, 0, renderTarget->getWidth(), renderTarget->getHeight());
+	SetViewport(0, 0, renderTarget->getWidth(), renderTarget->getHeight(), 0.0f, 1.0f);
 
 	// Setup some default state.
 	sce::Gnm::PrimitiveSetup prim;
@@ -560,7 +560,7 @@ void GraphicsSystem::GetRenderTargetData(RenderTarget *target, unsigned char *da
 	*/
 }
 
-Texture* GraphicsSystem::CreateTexture(uint32_t width, uint32_t height, uint32_t mips)
+Texture* GraphicsSystem::CreateTexture(TextureFormat format, uint32_t width, uint32_t height, uint32_t mips)
 {
 	sce::Gnm::Texture *texture = new sce::Gnm::Texture();
 
@@ -584,14 +584,17 @@ Texture* GraphicsSystem::CreateTexture(uint32_t width, uint32_t height, uint32_t
 	return new Texture(texture);
 }
 
-void GraphicsSystem::SetViewport(int left, int top, int right, int bot)
+void GraphicsSystem::SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
-	gfxc.setupScreenViewport(left, top, right, bot, 1.0f, 0.0f);
+	// TODO: min/max depth needs to be implemented!
+
+	gfxc.setupScreenViewport(left, top, left + width, top + height, 1.0f, 0.0f);
 }
 
+/*
 Texture* GraphicsSystem::CreateTextureFromPng(unsigned char *data, uint32_t bytes)
 {
 	ScePngDecParseParam parseParam;
@@ -658,6 +661,7 @@ Texture* GraphicsSystem::CreateTextureFromPng(unsigned char *data, uint32_t byte
 
 	return texture;
 }
+*/
 
 void GraphicsSystem::_setSamplerState(int slot)
 {

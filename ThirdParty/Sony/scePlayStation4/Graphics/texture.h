@@ -4,7 +4,6 @@
 
 namespace Graphics {
 
-
 class __declspec(dllexport) Texture
 {
 	friend class GraphicsSystem;
@@ -23,10 +22,8 @@ protected:
 public:
 	virtual ~Texture();
 
-	void SetData(unsigned char *data, uint32_t bytes);
+	void SetData(uint32_t level, unsigned char *data, uint32_t bytes);
 
-	uint32_t getWidth();
-	uint32_t getHeight();
 };
 
 } // namespace Graphics

@@ -3,6 +3,7 @@
 #include "../allocator.h"
 #include <gnm.h>
 #include <assert.h>
+#include <math.h>
 
 using namespace Graphics;
 
@@ -17,17 +18,7 @@ Texture::~Texture()
 	delete _texture;
 }
 
-uint32_t Texture::getWidth()
-{ 
-	return _texture->getWidth();
-}
-
-uint32_t Texture::getHeight() 
-{ 
-	return _texture->getHeight();
-}
-
-void Texture::SetData(unsigned char *data, uint32_t bytes)
+void Texture::SetData(uint32_t level, unsigned char *data, uint32_t bytes)
 {
 	auto width = _texture->getWidth();
 	auto height = _texture->getHeight();
@@ -39,6 +30,18 @@ void Texture::SetData(unsigned char *data, uint32_t bytes)
 
 	auto baseAddr = (unsigned char*)_texture->getBaseAddress();
 	auto pitch = _texture->getPitch();
+
+	auto levelZeroSize = pitch * height * pixelBytes;
+	while (level > 1)
+	{
+		baseAddr += levelZeroSize;
+		levelZeroSize /= 4;
+		--level;
+
+		width = MAX(1, width << 1);
+		height = MAX(1, height << 1);
+		pitch = MAX(1, pitch << 1);
+	}
 
 	if (pitch == width)
 		memcpy(baseAddr, data, bytes);
