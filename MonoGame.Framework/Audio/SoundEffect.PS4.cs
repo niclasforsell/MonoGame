@@ -6,12 +6,14 @@ using Microsoft.Xna.Framework.Audio;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using AudioBuffer = Sce.PlayStation4.Audio.AudioBuffer;
+using SoundSystem = Sce.PlayStation4.Audio.SoundSystem;
 
 namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect
     {
-        private Sce.PlayStation4.Audio.AudioBuffer _buffer;
+        private AudioBuffer _buffer;
 
         private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
         {
@@ -24,9 +26,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 var handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
                 var addr = (IntPtr)(handle.AddrOfPinnedObject().ToInt64() + offset);
-                _buffer = new Sce.PlayStation4.Audio.AudioBuffer((void*)addr, (uint)count);
-                // TODO: Looping?
-
+                _buffer = new AudioBuffer((void*)addr, (uint)count);
                 handle.Free();
             }
         }
@@ -38,13 +38,16 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
-            inst._voice = Sce.PlayStation4.Audio.SoundSystem.Instance.CreateVoice(_buffer);
+            inst._voice = SoundSystem.Instance.CreateVoice(_buffer);
             inst._buffer = _buffer;
+            inst._voice.Looped = inst.IsLooped;
         }
 
         private static void PlatformSetMasterVolume()
         {
-            throw new NotImplementedException();
+            var activeSounds = SoundEffectInstancePool.GetAllPlayingSounds();
+            foreach (var sound in activeSounds)
+                sound.Volume = _masterVolume;
         }
 
         private void PlatformDispose()

@@ -6,5 +6,9 @@
 struct SceNgs2WaveformInfo;
 
 namespace Audio {
+	class AudioBuffer;
 	class AudioOut;
+	class SamplerVoice;
+
+	struct AudioOutBufferInfo;
 }

@@ -5,10 +5,6 @@
 
 namespace Audio {
 
-class AudioBuffer;
-class SamplerVoice;
-struct AudioOutBufferInfo;
-
 class __declspec(dllexport) SoundSystem
 {
 

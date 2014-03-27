@@ -5,13 +5,16 @@
 using Microsoft.Xna.Framework.Audio;
 using System;
 using System.IO;
+using AudioBuffer = Sce.PlayStation4.Audio.AudioBuffer;
+using SamplerVoice = Sce.PlayStation4.Audio.SamplerVoice;
+using SoundSystem = Sce.PlayStation4.Audio.SoundSystem;
 
 namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffectInstance
     {
-        internal Sce.PlayStation4.Audio.SamplerVoice _voice;
-        internal Sce.PlayStation4.Audio.AudioBuffer _buffer;
+        internal SamplerVoice _voice;
+        internal AudioBuffer _buffer;
 
         private void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
         {
@@ -23,7 +26,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            Sce.PlayStation4.Audio.SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Paused, -1);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Paused, -1);
         }
 
         private void PlatformPause()
@@ -31,7 +34,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            Sce.PlayStation4.Audio.SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Paused, -1);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Paused, -1);
         }
 
         private void PlatformPlay()
@@ -39,7 +42,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            Sce.PlayStation4.Audio.SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Playing, -1);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Playing, -1);
         }
 
         private void PlatformResume()
@@ -47,7 +50,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            Sce.PlayStation4.Audio.SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Playing, -1);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Playing, -1);
         }
 
         private void PlatformStop(bool immediate)
@@ -55,7 +58,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            Sce.PlayStation4.Audio.SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Stopped, -1);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Stopped, -1);
         }
 
         private void PlatformSetIsLooped(bool value)
@@ -128,7 +131,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return 0.0f;
 
-            return _voice.Volume;
+            return _voice.Volume * SoundEffect.MasterVolume;
         }
 
         private void PlatformDispose()
