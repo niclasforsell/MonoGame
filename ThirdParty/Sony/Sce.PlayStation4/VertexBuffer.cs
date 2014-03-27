@@ -42,8 +42,8 @@ namespace Sce.PlayStation4
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics12VertexBufferC2EPNS_13VertexElementEjjj")]
-                internal static extern void ctor_2(global::System.IntPtr instance, Graphics.VertexElement elements, uint elementCount, uint vertexStride, uint vertexCount);
+                    EntryPoint="_ZN8Graphics12VertexBufferC2EPiiii")]
+                internal static extern void ctor_2(global::System.IntPtr instance, int* elements, int elementCount, int vertexStride, int vertexCount);
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
@@ -73,7 +73,7 @@ namespace Sce.PlayStation4
                 __Instance = native;
             }
 
-            public VertexBuffer(Graphics.VertexElement elements, uint elementCount, uint vertexStride, uint vertexCount)
+            public VertexBuffer(int* elements, int elementCount, int vertexStride, int vertexCount)
             {
                 __Instance = Marshal.AllocHGlobal(32);
                 var arg0 = elements;

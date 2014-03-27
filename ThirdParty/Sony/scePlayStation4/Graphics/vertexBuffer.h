@@ -42,7 +42,7 @@ private:
 	static sce::Gnm::DataFormat GetFormat(VertexElement element);
 
 public:
-	VertexBuffer(VertexElement *elements, uint32_t elementCount, uint32_t vertexStride, uint32_t vertexCount);
+	VertexBuffer(int32_t *elements, int32_t elementCount, int32_t vertexStride, int32_t vertexCount);
 	virtual ~VertexBuffer();
 
 	virtual void SetData(uint32_t offsetInBytes, unsigned char *data, uint32_t bytes);

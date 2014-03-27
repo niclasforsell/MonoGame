@@ -10,14 +10,21 @@ using namespace sce::Gnm;
 using namespace Graphics;
 
 
-VertexBuffer::VertexBuffer(VertexElement *elements, uint32_t elementCount, uint32_t vertexStride, uint32_t vertexCount)
+VertexBuffer::VertexBuffer(int32_t *elements, int32_t elementCount, int32_t vertexStride, int32_t vertexCount)
 {
 	auto sizeInBytes = vertexStride * vertexCount;
 	_bufferData = Allocator::Get()->allocate(sizeInBytes, Gnm::kAlignmentOfBufferInBytes, SCE_KERNEL_WC_GARLIC);
 
-	//_buffers[0].initAsVertexBuffer(_bufferData + 0, Gnm::kDataFormatR32G32B32Float, vertexStride, vertCount);
-	//_buffers[1].initAsVertexBuffer(_bufferData + 12, Gnm::kDataFormatR8G8B8A8Unorm, vertexStride, vertCount);
-	//_buffers[2].initAsVertexBuffer(_bufferData + 16, Gnm::kDataFormatR32G32Float, vertexStride, vertCount);
+	_buffers = (Gnm::Buffer*)Allocator::Get()->allocate(sizeof(Gnm::Buffer) * elementCount);
+
+	auto offset = 0;
+	for (auto i=0; i < elementCount; i++)
+	{
+		auto format = GetFormat((VertexElement)elements[i]);
+		_buffers[i].initAsVertexBuffer((uint8_t*)_bufferData + offset, format, vertexStride, vertexCount);
+		_buffers[i].setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+		offset += format.getBytesPerElement();
+	}
 
 	// It is worth initializing it here for consistant
 	// behavior when accidentally unset.
@@ -26,6 +33,7 @@ VertexBuffer::VertexBuffer(VertexElement *elements, uint32_t elementCount, uint3
 
 VertexBuffer::~VertexBuffer()
 {
+	Allocator::Get()->release(_buffers);	
 	Allocator::Get()->release(_bufferData);
 }
 
