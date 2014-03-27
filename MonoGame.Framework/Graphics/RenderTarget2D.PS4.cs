@@ -3,26 +3,34 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Sce.PlayStation4.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RenderTarget2D
     {
+        internal Sce.PlayStation4.Graphics.RenderTarget _target;
+
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount,
             RenderTargetUsage usage, bool shared)
         {
-            throw new NotImplementedException();
+            _target = graphicsDevice._system.CreateRenderTarget((TextureFormat)preferredFormat, (uint)width, (uint)height);
         }
 
         private void PlatformGraphicsDeviceResetting()
         {
+            // Don't think this will happen on PS4.
             throw new NotImplementedException();
         }
 
         private void PlatformDispose(bool disposing)
         {
-            throw new NotImplementedException();
+            if (disposing)
+            {
+                _target.Dispose();
+                _target = null;
+            }
         }
     }
 }

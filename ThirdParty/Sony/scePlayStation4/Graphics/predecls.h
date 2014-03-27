@@ -3,10 +3,11 @@
 
 // Include all pre-declarations used from header files.
 
+struct _SceKernelEqueue;
+
 /*
 typedef int32_t ControllerHandle;
 
-struct _SceKernelEqueue;
 struct SceSaveDataMountPoint;
 struct SceSaveDataMount;
 struct SceSaveDataDirName;
@@ -19,6 +20,7 @@ namespace sce {
 		class Buffer;
 		class Texture;
 		class RenderTarget;
+		class DataFormat;
 	}
 
 	namespace Gnmx {
@@ -35,10 +37,20 @@ class PS4GamePadState;
 class AudioOut;
 class ScePadData;
 class Effect;
-class Texture;
-class RenderTarget;
-class Allocator;
 class GamePadManager;
 class PS4GamePadState;
-struct DisplayBuffer;
 */
+
+namespace Graphics {
+
+class Texture;
+class RenderTarget;
+class VertexShader;
+class PixelShader;
+class VertexBuffer;
+
+struct DisplayBuffer;
+
+}
+
+#include "textureFormat.h"

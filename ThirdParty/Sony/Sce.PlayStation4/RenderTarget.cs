@@ -10,43 +10,41 @@ namespace Sce.PlayStation4
 {
     namespace Graphics
     {
-        public unsafe partial class Texture : IDisposable
+        public unsafe partial class RenderTarget : IDisposable
         {
-            [StructLayout(LayoutKind.Explicit, Size = 16)]
+            [StructLayout(LayoutKind.Explicit, Size = 24)]
             public struct Internal
             {
                 [FieldOffset(8)]
+                internal global::System.IntPtr _renderTarget;
+
+                [FieldOffset(16)]
                 internal global::System.IntPtr _texture;
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics7TextureD2Ev")]
+                    EntryPoint="_ZN8Graphics12RenderTargetD2Ev")]
                 internal static extern void dtor_0(global::System.IntPtr instance);
-
-                [SuppressUnmanagedCodeSecurity]
-                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics7Texture7SetDataEjPhj")]
-                internal static extern void SetData_0(global::System.IntPtr instance, uint level, byte* data, uint bytes);
             }
 
             public global::System.IntPtr __Instance { get; protected set; }
 
-            internal Texture(Texture.Internal* native)
+            internal RenderTarget(RenderTarget.Internal* native)
                 : this(new global::System.IntPtr(native))
             {
             }
 
-            internal Texture(Texture.Internal native)
+            internal RenderTarget(RenderTarget.Internal native)
                 : this(&native)
             {
             }
 
-            public Texture(global::System.IntPtr native)
+            public RenderTarget(global::System.IntPtr native)
             {
                 __Instance = native;
             }
 
-            ~Texture()
+            ~RenderTarget()
             {
                 Dispose(false);
             }
@@ -61,14 +59,6 @@ namespace Sce.PlayStation4
             {
                 Internal.dtor_0(__Instance);
                 Marshal.FreeHGlobal(__Instance);
-            }
-
-            public void SetData(uint level, byte* data, uint bytes)
-            {
-                var arg0 = level;
-                var arg1 = data;
-                var arg2 = bytes;
-                Internal.SetData_0(__Instance, arg0, arg1, arg2);
             }
         }
     }
