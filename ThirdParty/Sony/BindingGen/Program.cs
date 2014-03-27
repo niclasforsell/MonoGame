@@ -46,13 +46,10 @@ namespace BindingGen
             //
             // NOTE: The casing here will influence the final .cs file.
             //
-<<<<<<< HEAD
             options.Headers.Add(@"Game.h");
-=======
             options.Headers.Add(@"Audio\AudioBuffer.h");
             options.Headers.Add(@"Audio\SamplerVoice.h");
             options.Headers.Add(@"Audio\SoundSystem.h");
->>>>>>> develop
             options.Headers.Add(@"Graphics\Texture.h");
             options.Headers.Add(@"Graphics\RenderTarget.h");
             options.Headers.Add(@"Graphics\GraphicsSystem.h");
