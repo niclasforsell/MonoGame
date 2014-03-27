@@ -508,12 +508,60 @@ void GraphicsSystem::prepareBackBuffer()
 	_currentRenderTarget = NULL;
 }
 
-RenderTarget* GraphicsSystem::CreateRenderTarget(uint32_t width, uint32_t height)
+sce::Gnm::DataFormat GraphicsSystem::GetFormat(TextureFormat format)
+{
+	switch (format)
+	{
+	default:
+	case TextureFormat_Color:
+		return Gnm::kDataFormatR8G8B8A8Unorm;
+	case TextureFormat_Bgr565:
+		return Gnm::kDataFormatB5G6R5Unorm;
+	case TextureFormat_Bgra5551:
+		return Gnm::kDataFormatB5G5R5A1Unorm;
+	case TextureFormat_Bgra4444:
+		return Gnm::kDataFormatB4G4R4A4Unorm;
+	case TextureFormat_Dxt1:
+		return Gnm::kDataFormatBc1Unorm;
+	case TextureFormat_Dxt3:
+		return Gnm::kDataFormatBc2Unorm;
+	case TextureFormat_Dxt5:
+		return Gnm::kDataFormatBc3Unorm;
+	case TextureFormat_NormalizedByte2:
+		return Gnm::kDataFormatR8G8Snorm;
+	case TextureFormat_NormalizedByte4:
+		return Gnm::kDataFormatR8G8B8A8Snorm;
+	case TextureFormat_Rgba1010102:
+		return Gnm::kDataFormatR10G10B10A2Unorm;
+	case TextureFormat_Rg32:
+		return Gnm::kDataFormatR16G16Unorm;
+	case TextureFormat_Rgba64:
+		return Gnm::kDataFormatR16G16B16A16Unorm;
+	case TextureFormat_Alpha8:
+		return Gnm::kDataFormatA8Unorm;
+	case TextureFormat_Single:
+		return Gnm::kDataFormatR32Float;
+	case TextureFormat_Vector2:
+		return Gnm::kDataFormatR32G32Float;
+	case TextureFormat_Vector4:
+		return Gnm::kDataFormatR32G32B32A32Float;
+	case TextureFormat_HalfSingle:
+		return Gnm::kDataFormatR16Float;
+	case TextureFormat_HalfVector2:
+		return Gnm::kDataFormatR16G16Float;
+	case TextureFormat_HalfVector4:
+		return Gnm::kDataFormatR16G16B16A16Float;
+	case TextureFormat_HdrBlendable:
+		return Gnm::kDataFormatR16G16B16A16Float;
+	};
+}
+
+RenderTarget* GraphicsSystem::CreateRenderTarget(TextureFormat format_, uint32_t width, uint32_t height)
 {
 	sce::Gnm::RenderTarget *renderTarget = new sce::Gnm::RenderTarget();
 
 	Gnm::TileMode tileMode;
-	Gnm::DataFormat format = Gnm::kDataFormatR8G8B8A8Unorm;
+	auto format = GetFormat(format_);
 	GpuAddress::computeSurfaceTileMode(&tileMode, GpuAddress::kSurfaceTypeColorTarget, format, 1);
 
 	Gnm::SizeAlign renTargetSizeAlign = renderTarget->init(
@@ -566,7 +614,7 @@ Texture* GraphicsSystem::CreateTexture(TextureFormat format, uint32_t width, uin
 
 	Gnm::SizeAlign textureSizeAlign = texture->initAs2d(
 		width, height, mips,
-		Gnm::kDataFormatR8G8B8A8Unorm,
+		GetFormat(format),
 		Gnm::kTileModeDisplay_LinearAligned,
 		Gnm::kNumSamples1);
 

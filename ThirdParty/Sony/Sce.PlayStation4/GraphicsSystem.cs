@@ -67,8 +67,8 @@ namespace Sce.PlayStation4
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics14GraphicsSystem18CreateRenderTargetEjj")]
-                internal static extern global::System.IntPtr CreateRenderTarget_0(global::System.IntPtr instance, uint width, uint height);
+                    EntryPoint="_ZN8Graphics14GraphicsSystem18CreateRenderTargetENS_13TextureFormatEjj")]
+                internal static extern global::System.IntPtr CreateRenderTarget_0(global::System.IntPtr instance, Graphics.TextureFormat format, uint width, uint height);
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
@@ -161,11 +161,12 @@ namespace Sce.PlayStation4
                 Internal.Initialize_0(__Instance);
             }
 
-            public virtual Graphics.RenderTarget CreateRenderTarget(uint width, uint height)
+            public virtual Graphics.RenderTarget CreateRenderTarget(Graphics.TextureFormat format, uint width, uint height)
             {
-                var arg0 = width;
-                var arg1 = height;
-                var __ret = Internal.CreateRenderTarget_0(__Instance, arg0, arg1);
+                var arg0 = format;
+                var arg1 = width;
+                var arg2 = height;
+                var __ret = Internal.CreateRenderTarget_0(__Instance, arg0, arg1, arg2);
                 if (__ret == global::System.IntPtr.Zero) return null;
                 return new Graphics.RenderTarget(__ret);
             }

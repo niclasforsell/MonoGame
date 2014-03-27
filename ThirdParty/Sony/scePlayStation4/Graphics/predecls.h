@@ -20,6 +20,7 @@ namespace sce {
 		class Buffer;
 		class Texture;
 		class RenderTarget;
+		class DataFormat;
 	}
 
 	namespace Gnmx {

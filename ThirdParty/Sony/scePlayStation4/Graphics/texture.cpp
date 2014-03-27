@@ -23,15 +23,10 @@ void Texture::SetData(uint32_t level, unsigned char *data, uint32_t bytes)
 	auto width = _texture->getWidth();
 	auto height = _texture->getHeight();
 	auto pixelBytes = _texture->getDataFormat().getBytesPerElement();
-
-	// We expect this call to set the entire 
-	// buffer at this point.
-	assert((width * height * pixelBytes) == bytes);
-
 	auto baseAddr = (unsigned char*)_texture->getBaseAddress();
 	auto pitch = _texture->getPitch();
-
 	auto levelZeroSize = pitch * height * pixelBytes;
+
 	while (level > 1)
 	{
 		baseAddr += levelZeroSize;

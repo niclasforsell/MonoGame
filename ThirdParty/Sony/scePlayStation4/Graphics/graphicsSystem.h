@@ -42,6 +42,8 @@ private:
 	void _applyRenderTarget(sce::Gnm::RenderTarget *renderTarget);
 	void _setSamplerState(int slot);
 
+	static sce::Gnm::DataFormat GetFormat(TextureFormat format);
+
 public:
 
 	GraphicsSystem();
@@ -49,7 +51,7 @@ public:
 
 	virtual void Initialize();
 
-	virtual RenderTarget* CreateRenderTarget(uint32_t width, uint32_t height);
+	virtual RenderTarget* CreateRenderTarget(TextureFormat format, uint32_t width, uint32_t height);
 	virtual void GetRenderTargetData(RenderTarget *target, unsigned char *data, uint32_t bytes);
 	
 	virtual Texture* CreateTexture(TextureFormat format, uint32_t width, uint32_t height, uint32_t mips);
