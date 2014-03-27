@@ -58,7 +58,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void PlatformApplyState(bool applyShaders)
         {
-            throw new NotImplementedException();
+            if (_vertexShader == null)
+                throw new InvalidOperationException("A vertex shader must be set!");
+            if (_pixelShader == null)
+                throw new InvalidOperationException("A pixel shader must be set!");
+
+            if (_vertexShaderDirty)
+                _system.SetVertexShader(_vertexShader._vertexShader);
+
+            if (_pixelShaderDirty)
+                _system.SetPixelShader(_pixelShader._pixelShader);
         }
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)

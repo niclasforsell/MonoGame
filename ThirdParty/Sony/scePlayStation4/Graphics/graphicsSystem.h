@@ -32,9 +32,6 @@ private:
 	uint32_t _frameIndex;
 	RenderTarget *_currentRenderTarget;
 
-	//Effect *_effect;
-	//bool _effectDirty;
-
 	void prepareBackBuffer();
 
 	//void _applyEffect(sce::Gnmx::GfxContext &gfxc);
@@ -70,6 +67,9 @@ public:
 	virtual void SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth);
 
 	virtual void SetBlendState(const char* name);
+
+	virtual void SetVertexShader(VertexShader *shader);
+	virtual void SetPixelShader(PixelShader *shader);
 
 	//virtual Effect* CreateEffect(const char *name);
 	//virtual void ApplyEffect(Effect *effect);

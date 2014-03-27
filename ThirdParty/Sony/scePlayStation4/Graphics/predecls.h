@@ -45,6 +45,8 @@ namespace Graphics {
 
 class Texture;
 class RenderTarget;
+class VertexShader;
+class PixelShader;
 
 struct DisplayBuffer;
 

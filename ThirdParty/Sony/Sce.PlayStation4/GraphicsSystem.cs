@@ -114,6 +114,16 @@ namespace Sce.PlayStation4
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
                     EntryPoint="_ZN8Graphics14GraphicsSystem13SetBlendStateEPKc")]
                 internal static extern void SetBlendState_0(global::System.IntPtr instance, global::System.IntPtr name);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics14GraphicsSystem15SetVertexShaderEPNS_12VertexShaderE")]
+                internal static extern void SetVertexShader_0(global::System.IntPtr instance, global::System.IntPtr shader);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics14GraphicsSystem14SetPixelShaderEPNS_11PixelShaderE")]
+                internal static extern void SetPixelShader_0(global::System.IntPtr instance, global::System.IntPtr shader);
             }
 
             public global::System.IntPtr __Instance { get; protected set; }
@@ -228,6 +238,18 @@ namespace Sce.PlayStation4
                 var arg0 = Marshal.StringToHGlobalAnsi(name);
                 Internal.SetBlendState_0(__Instance, arg0);
                 Marshal.FreeHGlobal(arg0);
+            }
+
+            public virtual void SetVertexShader(Graphics.VertexShader shader)
+            {
+                var arg0 = shader == (Graphics.VertexShader) null ? global::System.IntPtr.Zero : shader.__Instance;
+                Internal.SetVertexShader_0(__Instance, arg0);
+            }
+
+            public virtual void SetPixelShader(Graphics.PixelShader shader)
+            {
+                var arg0 = shader == (Graphics.PixelShader) null ? global::System.IntPtr.Zero : shader.__Instance;
+                Internal.SetPixelShader_0(__Instance, arg0);
             }
         }
     }

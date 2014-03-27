@@ -2,7 +2,8 @@
 #include "graphicsSystem.h"
 
 #include "texture.h"
-//#include "Effect.h"
+#include "vertexShader.h"
+#include "pixelShader.h"
 #include "renderTarget.h"
 #include "../allocator.h"
 #include "displayBuffer.h"
@@ -499,11 +500,14 @@ void GraphicsSystem::prepareBackBuffer()
 	// Setup the viewport to match the entire screen.
 	// The z-scale and z-offset values are used to specify the transformation
 	// from clip-space to screen-space
-	
+
 	_applyRenderTarget(&backBuffer->renderTarget);
 	
 	// Clear the gpu mapped vertex memory.
 	//backBuffer->userOffset = 0;
+
+	// We always use the vertex and pixel shader stages.
+	gfxc.setActiveShaderStages(Gnm::kActiveShaderStagesVsPs);
 
 	_currentRenderTarget = NULL;
 }
@@ -841,3 +845,15 @@ void GraphicsSystem::ApplyEffect(Effect *effect)
 	}
 }
 */
+
+void GraphicsSystem::SetVertexShader(VertexShader *shader)
+{
+	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
+	gfxc.setVsShader(shader->_shader, shader->_shaderModifier, shader->_fsMem);
+}
+
+void GraphicsSystem::SetPixelShader(PixelShader *shader)
+{
+	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
+	gfxc.setPsShader(shader->_shader);
+}
