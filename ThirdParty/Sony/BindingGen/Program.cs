@@ -50,6 +50,12 @@ namespace BindingGen
             options.Headers.Add(@"Audio\SamplerVoice.h");
             options.Headers.Add(@"Audio\SoundSystem.h");
             options.Headers.Add(@"Graphics\Texture.h");
+            options.Headers.Add(@"Graphics\RenderTarget.h");
+            options.Headers.Add(@"Graphics\GraphicsSystem.h");
+            options.Headers.Add(@"Graphics\TextureFormat.h");
+            options.Headers.Add(@"Graphics\VertexShader.h");
+            options.Headers.Add(@"Graphics\PixelShader.h");
+            options.Headers.Add(@"Graphics\VertexBuffer.h");
 
             // Make sure any system headers needed is available.
             var orbisSDK = System.Environment.GetEnvironmentVariable("SCE_ORBIS_SDK_DIR");

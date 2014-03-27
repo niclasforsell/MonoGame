@@ -10,43 +10,64 @@ namespace Sce.PlayStation4
 {
     namespace Graphics
     {
-        public unsafe partial class Texture : IDisposable
+        public unsafe partial class VertexShader : IDisposable
         {
-            [StructLayout(LayoutKind.Explicit, Size = 16)]
+            [StructLayout(LayoutKind.Explicit, Size = 40)]
             public struct Internal
             {
                 [FieldOffset(8)]
-                internal global::System.IntPtr _texture;
+                internal global::System.IntPtr _shader;
+
+                [FieldOffset(16)]
+                internal void* _binary;
+
+                [FieldOffset(24)]
+                internal void* _fsMem;
+
+                [FieldOffset(32)]
+                internal uint _shaderModifier;
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics7TextureD2Ev")]
+                    EntryPoint="_ZN8Graphics12VertexShaderC2EPKv")]
+                internal static extern void ctor_0(global::System.IntPtr instance, void* data);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics12VertexShaderC2ERKS0_")]
+                internal static extern void ctor_1(global::System.IntPtr instance, global::System.IntPtr _0);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics12VertexShaderD2Ev")]
                 internal static extern void dtor_0(global::System.IntPtr instance);
-
-                [SuppressUnmanagedCodeSecurity]
-                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics7Texture7SetDataEjPhj")]
-                internal static extern void SetData_0(global::System.IntPtr instance, uint level, byte* data, uint bytes);
             }
 
             public global::System.IntPtr __Instance { get; protected set; }
 
-            internal Texture(Texture.Internal* native)
+            internal VertexShader(VertexShader.Internal* native)
                 : this(new global::System.IntPtr(native))
             {
             }
 
-            internal Texture(Texture.Internal native)
+            internal VertexShader(VertexShader.Internal native)
                 : this(&native)
             {
             }
 
-            public Texture(global::System.IntPtr native)
+            public VertexShader(global::System.IntPtr native)
             {
                 __Instance = native;
             }
 
-            ~Texture()
+            public VertexShader(void* data)
+            {
+                __Instance = Marshal.AllocHGlobal(40);
+                var arg0 = data;
+                Internal.ctor_0(__Instance, arg0);
+            }
+
+            ~VertexShader()
             {
                 Dispose(false);
             }
@@ -61,14 +82,6 @@ namespace Sce.PlayStation4
             {
                 Internal.dtor_0(__Instance);
                 Marshal.FreeHGlobal(__Instance);
-            }
-
-            public void SetData(uint level, byte* data, uint bytes)
-            {
-                var arg0 = level;
-                var arg1 = data;
-                var arg2 = bytes;
-                Internal.SetData_0(__Instance, arg0, arg1, arg2);
             }
         }
     }

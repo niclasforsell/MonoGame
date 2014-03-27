@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var buffer = _buffers[i];
                 if (buffer != null)
                 {
-#if DIRECTX
+#if DIRECTX || PLAYSTATION4
                     buffer.PlatformApply(device, _stage, i);
 #elif OPENGL || PSM
                     buffer.PlatformApply(device, shaderProgram);
