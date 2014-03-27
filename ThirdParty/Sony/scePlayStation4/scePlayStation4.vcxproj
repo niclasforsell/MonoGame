@@ -85,18 +85,22 @@
   <ItemGroup>
     <ClCompile Include="allocator.cpp" />
     <ClCompile Include="Graphics\graphicsSystem.cpp" />
+    <ClCompile Include="Graphics\pixelShader.cpp" />
     <ClCompile Include="Graphics\renderTarget.cpp" />
     <ClCompile Include="Graphics\texture.cpp" />
+    <ClCompile Include="Graphics\vertexShader.cpp" />
     <ClCompile Include="prx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allocator.h" />
     <ClInclude Include="Graphics\displayBuffer.h" />
     <ClInclude Include="Graphics\graphicsSystem.h" />
+    <ClInclude Include="Graphics\pixelShader.h" />
     <ClInclude Include="Graphics\predecls.h" />
     <ClInclude Include="Graphics\renderTarget.h" />
     <ClInclude Include="Graphics\texture.h" />
     <ClInclude Include="Graphics\textureFormat.h" />
+    <ClInclude Include="Graphics\vertexShader.h" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
