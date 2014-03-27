@@ -11,6 +11,7 @@ PlayStation(R)4 Programmer Tool Runtime Library Release 01.500.111
 #include <kernel.h>
 #include <audioout.h>
 #include <user_service.h>
+#include "../allocator.h"
 
 namespace Audio {
 
@@ -105,7 +106,7 @@ public:
 		scePthreadMutexattrDestroy( &mutexAttr);
 
 
-		m_aPortInfo = (AudioOutPortInfo*)malloc(index * sizeof(AudioOutPortInfo));
+		m_aPortInfo = (AudioOutPortInfo*)Allocator::Get()->allocate(index * sizeof(AudioOutPortInfo));
 		m_numPorts  = index;
 		index = 0;
 
@@ -132,7 +133,7 @@ public:
 					break;
 				}
 				m_aPortInfo[index].bufferSize  = m_aPortInfo[index].numChannels * numGrains * 2 * sizeof(float);
-				m_aPortInfo[index].buffer      = (float*)malloc(m_aPortInfo[index].bufferSize);
+				m_aPortInfo[index].buffer      = (float*)Allocator::Get()->allocate(m_aPortInfo[index].bufferSize);
 				index++;
 			}
 		}
@@ -186,10 +187,10 @@ public:
 
 		for( int i = 0; i < m_numPorts; i++){
 			close(i);
-			free( m_aPortInfo[i].buffer);
+			Allocator::Get()->release( m_aPortInfo[i].buffer);
 		}
 
-		free(m_aPortInfo);
+		Allocator::Get()->release(m_aPortInfo);
 
 		m_isCreated = false;
 

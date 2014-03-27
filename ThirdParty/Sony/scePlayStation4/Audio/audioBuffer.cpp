@@ -79,10 +79,10 @@ AudioBuffer::~AudioBuffer(void)
 		_waveformData = NULL;
 	}
 
-    if (_waveformInfo)
+	if (_waveformInfo)
 	{
-        Allocator::Get()->release(_waveformInfo);
-        _waveformInfo = NULL;
+		Allocator::Get()->release(_waveformInfo);
+		_waveformInfo = NULL;
 	}
 
 	if (_loopedWaveformInfo)

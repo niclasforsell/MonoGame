@@ -2,6 +2,7 @@
 #include "audioOut.h"
 #include "audioBuffer.h"
 #include "samplerVoice.h"
+#include "../allocator.h"
 
 #include <ngs2.h>
 #include <libsysmodule.h>
@@ -20,7 +21,7 @@ SoundSystem* SoundSystem::Instance()
 
 static int32_t bufferAlloc(SceNgs2ContextBufferInfo *bufferInfo)
 {
-	bufferInfo->hostBuffer = malloc(bufferInfo->hostBufferSize);
+	bufferInfo->hostBuffer = Allocator::Get()->allocate(bufferInfo->hostBufferSize);
 	printf("# Allocate (%p,%zd[byte])\n", bufferInfo->hostBuffer, bufferInfo->hostBufferSize);
 	return (bufferInfo->hostBuffer)? SCE_OK : SCE_NGS2_ERROR_EMPTY_BUFFER;
 }
@@ -28,7 +29,7 @@ static int32_t bufferAlloc(SceNgs2ContextBufferInfo *bufferInfo)
 static int32_t bufferFree(SceNgs2ContextBufferInfo *bufferInfo)
 {
 	printf("# Free (%p,%zd[byte])\n", bufferInfo->hostBuffer, bufferInfo->hostBufferSize);
-	free(bufferInfo->hostBuffer);
+	Allocator::Get()->release(bufferInfo->hostBuffer);
 	return SCE_OK;
 }
 
