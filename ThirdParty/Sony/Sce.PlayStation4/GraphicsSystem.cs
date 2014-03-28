@@ -10,12 +10,6 @@ namespace Sce.PlayStation4
 {
     namespace Graphics
     {
-        public enum ShaderStage : uint
-        {
-            ShaderStage_Vertex = 0,
-            ShaderStage_Pixel = 1
-        }
-
         public unsafe partial class GraphicsSystem : IDisposable
         {
             [StructLayout(LayoutKind.Explicit, Size = 80)]
@@ -73,21 +67,6 @@ namespace Sce.PlayStation4
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics14GraphicsSystem18CreateRenderTargetENS_13TextureFormatEjj")]
-                internal static extern global::System.IntPtr CreateRenderTarget_0(global::System.IntPtr instance, Graphics.TextureFormat format, uint width, uint height);
-
-                [SuppressUnmanagedCodeSecurity]
-                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics14GraphicsSystem19GetRenderTargetDataEPNS_12RenderTargetEPhj")]
-                internal static extern void GetRenderTargetData_0(global::System.IntPtr instance, global::System.IntPtr target, byte* data, uint bytes);
-
-                [SuppressUnmanagedCodeSecurity]
-                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics14GraphicsSystem13CreateTextureENS_13TextureFormatEjjj")]
-                internal static extern global::System.IntPtr CreateTexture_0(global::System.IntPtr instance, Graphics.TextureFormat format, uint width, uint height, uint mips);
-
-                [SuppressUnmanagedCodeSecurity]
-                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
                     EntryPoint="_ZN8Graphics14GraphicsSystem15SetRenderTargetEPNS_12RenderTargetE")]
                 internal static extern void SetRenderTarget_0(global::System.IntPtr instance, global::System.IntPtr renderTarget);
 
@@ -100,6 +79,16 @@ namespace Sce.PlayStation4
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
                     EntryPoint="_ZN8Graphics14GraphicsSystem7PresentEv")]
                 internal static extern void Present_0(global::System.IntPtr instance);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics14GraphicsSystem21DrawIndexedPrimitivesENS_13PrimitiveTypeEiii")]
+                internal static extern void DrawIndexedPrimitives_0(global::System.IntPtr instance, Graphics.PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics14GraphicsSystem14DrawPrimitivesENS_13PrimitiveTypeEii")]
+                internal static extern void DrawPrimitives_0(global::System.IntPtr instance, Graphics.PrimitiveType primitiveType, int vertexStart, int vertexCount);
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
@@ -125,6 +114,11 @@ namespace Sce.PlayStation4
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
                     EntryPoint="_ZN8Graphics14GraphicsSystem15SetVertexBufferEPNS_12VertexBufferE")]
                 internal static extern void SetVertexBuffer_0(global::System.IntPtr instance, global::System.IntPtr buffer);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics14GraphicsSystem14SetIndexBufferEPNS_11IndexBufferE")]
+                internal static extern void SetIndexBuffer_0(global::System.IntPtr instance, global::System.IntPtr buffer);
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
@@ -187,35 +181,6 @@ namespace Sce.PlayStation4
                 Internal.Initialize_0(__Instance);
             }
 
-            public virtual Graphics.RenderTarget CreateRenderTarget(Graphics.TextureFormat format, uint width, uint height)
-            {
-                var arg0 = format;
-                var arg1 = width;
-                var arg2 = height;
-                var __ret = Internal.CreateRenderTarget_0(__Instance, arg0, arg1, arg2);
-                if (__ret == global::System.IntPtr.Zero) return null;
-                return new Graphics.RenderTarget(__ret);
-            }
-
-            public virtual void GetRenderTargetData(Graphics.RenderTarget target, byte* data, uint bytes)
-            {
-                var arg0 = target == (Graphics.RenderTarget) null ? global::System.IntPtr.Zero : target.__Instance;
-                var arg1 = data;
-                var arg2 = bytes;
-                Internal.GetRenderTargetData_0(__Instance, arg0, arg1, arg2);
-            }
-
-            public virtual Graphics.Texture CreateTexture(Graphics.TextureFormat format, uint width, uint height, uint mips)
-            {
-                var arg0 = format;
-                var arg1 = width;
-                var arg2 = height;
-                var arg3 = mips;
-                var __ret = Internal.CreateTexture_0(__Instance, arg0, arg1, arg2, arg3);
-                if (__ret == global::System.IntPtr.Zero) return null;
-                return new Graphics.Texture(__ret);
-            }
-
             public virtual void SetRenderTarget(Graphics.RenderTarget renderTarget)
             {
                 var arg0 = renderTarget == (Graphics.RenderTarget) null ? global::System.IntPtr.Zero : renderTarget.__Instance;
@@ -230,6 +195,18 @@ namespace Sce.PlayStation4
             public virtual void Present()
             {
                 Internal.Present_0(__Instance);
+            }
+
+            public virtual void DrawIndexedPrimitives(Graphics.PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
+            {
+                var arg0 = primitiveType;
+                Internal.DrawIndexedPrimitives_0(__Instance, arg0, baseVertex, startIndex, primitiveCount);
+            }
+
+            public virtual void DrawPrimitives(Graphics.PrimitiveType primitiveType, int vertexStart, int vertexCount)
+            {
+                var arg0 = primitiveType;
+                Internal.DrawPrimitives_0(__Instance, arg0, vertexStart, vertexCount);
             }
 
             public virtual void SetTexture(int slot, Graphics.Texture texture)
@@ -260,6 +237,12 @@ namespace Sce.PlayStation4
             {
                 var arg0 = buffer == (Graphics.VertexBuffer) null ? global::System.IntPtr.Zero : buffer.__Instance;
                 Internal.SetVertexBuffer_0(__Instance, arg0);
+            }
+
+            public virtual void SetIndexBuffer(Graphics.IndexBuffer buffer)
+            {
+                var arg0 = buffer == (Graphics.IndexBuffer) null ? global::System.IntPtr.Zero : buffer.__Instance;
+                Internal.SetIndexBuffer_0(__Instance, arg0);
             }
 
             public virtual void SetVertexShader(Graphics.VertexShader shader)

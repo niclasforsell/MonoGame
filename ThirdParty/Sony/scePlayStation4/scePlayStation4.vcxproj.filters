@@ -30,6 +30,9 @@
     <ClCompile Include="Graphics\vertexBuffer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\indexBuffer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
     <ClCompile Include="game.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -72,9 +75,6 @@
     <ClInclude Include="Graphics\renderTarget.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\textureFormat.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\pixelShader.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -84,6 +84,15 @@
     <ClInclude Include="Graphics\vertexBuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\indexBuffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
     <ClInclude Include="game.h" />
+    <ClInclude Include="Graphics\graphicsHelpers.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\graphicsEnums.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

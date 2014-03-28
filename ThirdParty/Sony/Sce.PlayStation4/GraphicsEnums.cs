@@ -10,6 +10,22 @@ namespace Sce.PlayStation4
 {
     namespace Graphics
     {
+        public enum VertexElement : uint
+        {
+            VertexElement_Single = 0,
+            VertexElement_Vector2 = 1,
+            VertexElement_Vector3 = 2,
+            VertexElement_Vector4 = 3,
+            VertexElement_Color = 4,
+            VertexElement_Byte4 = 5,
+            VertexElement_Short2 = 6,
+            VertexElement_Short4 = 7,
+            VertexElement_NormalizedShort2 = 8,
+            VertexElement_NormalizedShort4 = 9,
+            VertexElement_HalfVector2 = 10,
+            VertexElement_HalfVector4 = 11
+        }
+
         public enum TextureFormat : uint
         {
             TextureFormat_Color = 0,
@@ -32,6 +48,26 @@ namespace Sce.PlayStation4
             TextureFormat_HalfVector2 = 17,
             TextureFormat_HalfVector4 = 18,
             TextureFormat_HdrBlendable = 19
+        }
+
+        public enum IndexElement : uint
+        {
+            IndexElement_SixteenBits = 0,
+            IndexElement_ThirtyTwoBits = 1
+        }
+
+        public enum ShaderStage : uint
+        {
+            ShaderStage_Vertex = 0,
+            ShaderStage_Pixel = 1
+        }
+
+        public enum PrimitiveType : uint
+        {
+            PrimitiveType_TriangleList = 0,
+            PrimitiveType_TriangleStrip = 1,
+            PrimitiveType_LineList = 2,
+            PrimitiveType_LineStrip = 3
         }
     }
 }

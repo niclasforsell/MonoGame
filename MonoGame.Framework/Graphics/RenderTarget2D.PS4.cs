@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount,
             RenderTargetUsage usage, bool shared)
         {
-            _target = graphicsDevice._system.CreateRenderTarget((TextureFormat)preferredFormat, (uint)width, (uint)height);
+            _target = new RenderTarget((TextureFormat)preferredFormat, width, height);
         }
 
         private void PlatformGraphicsDeviceResetting()

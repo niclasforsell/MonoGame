@@ -15,7 +15,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformConstruct()
         {
-            //_buffer = new Sce.PlayStation4.Graphics.VertexBuffer((uint)VertexDeclaration.VertexStride, (uint)VertexCount);
+            // Convert the elements over
+            var elements = VertexDeclaration.GetVertexElements();
+            var psElements = new int[elements.Length];
+            for (var i=0; i < elements.Length; i++)            
+                psElements[i] = (int)elements[i].VertexElementFormat;
+
+            unsafe
+            {
+                fixed (int* ptr = psElements)
+                    _buffer = new Sce.PlayStation4.Graphics.VertexBuffer(ptr, psElements.Length, VertexDeclaration.VertexStride, VertexCount);
+            }
         }
 
         private void PlatformGraphicsDeviceResetting()

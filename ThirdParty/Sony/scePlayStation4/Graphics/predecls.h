@@ -5,15 +5,6 @@
 
 struct _SceKernelEqueue;
 
-/*
-typedef int32_t ControllerHandle;
-
-struct SceSaveDataMountPoint;
-struct SceSaveDataMount;
-struct SceSaveDataDirName;
-struct ScePadColor;
-*/
-
 namespace sce {
 
 	namespace Gnm {
@@ -32,15 +23,6 @@ namespace sce {
 	}
 }
 
-/*
-class PS4GamePadState;
-class AudioOut;
-class ScePadData;
-class Effect;
-class GamePadManager;
-class PS4GamePadState;
-*/
-
 namespace Graphics {
 
 class Texture;
@@ -48,9 +30,8 @@ class RenderTarget;
 class VertexShader;
 class PixelShader;
 class VertexBuffer;
+class IndexBuffer;
 
 struct DisplayBuffer;
 
 }
-
-#include "textureFormat.h"

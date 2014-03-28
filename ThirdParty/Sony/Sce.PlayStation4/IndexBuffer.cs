@@ -10,58 +10,62 @@ namespace Sce.PlayStation4
 {
     namespace Graphics
     {
-        public unsafe partial class Texture : IDisposable
+        public unsafe partial class IndexBuffer : IDisposable
         {
-            [StructLayout(LayoutKind.Explicit, Size = 16)]
+            [StructLayout(LayoutKind.Explicit, Size = 24)]
             public struct Internal
             {
                 [FieldOffset(8)]
-                internal global::System.IntPtr _texture;
+                internal void* _indexData;
+
+                [FieldOffset(16)]
+                internal uint _indexCount;
+
+                [FieldOffset(20)]
+                internal int _indexSize;
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics7TextureC2ENS_13TextureFormatEiii")]
-                internal static extern void ctor_2(global::System.IntPtr instance, Graphics.TextureFormat format, int width, int height, int mips);
+                    EntryPoint="_ZN8Graphics11IndexBufferC2ENS_12IndexElementEj")]
+                internal static extern void ctor_2(global::System.IntPtr instance, Graphics.IndexElement type, uint indexCount);
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics7TextureD2Ev")]
+                    EntryPoint="_ZN8Graphics11IndexBufferD2Ev")]
                 internal static extern void dtor_0(global::System.IntPtr instance);
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics7Texture7SetDataEjPhj")]
-                internal static extern void SetData_0(global::System.IntPtr instance, uint level, byte* data, uint bytes);
+                    EntryPoint="_ZN8Graphics11IndexBuffer7SetDataEjPhj")]
+                internal static extern void SetData_0(global::System.IntPtr instance, uint offsetInBytes, byte* data, uint bytes);
             }
 
             public global::System.IntPtr __Instance { get; protected set; }
 
-            internal Texture(Texture.Internal* native)
+            internal IndexBuffer(IndexBuffer.Internal* native)
                 : this(new global::System.IntPtr(native))
             {
             }
 
-            internal Texture(Texture.Internal native)
+            internal IndexBuffer(IndexBuffer.Internal native)
                 : this(&native)
             {
             }
 
-            public Texture(global::System.IntPtr native)
+            public IndexBuffer(global::System.IntPtr native)
             {
                 __Instance = native;
             }
 
-            public Texture(Graphics.TextureFormat format, int width, int height, int mips)
+            public IndexBuffer(Graphics.IndexElement type, uint indexCount)
             {
-                __Instance = Marshal.AllocHGlobal(16);
-                var arg0 = format;
-                var arg1 = width;
-                var arg2 = height;
-                var arg3 = mips;
-                Internal.ctor_2(__Instance, arg0, arg1, arg2, arg3);
+                __Instance = Marshal.AllocHGlobal(24);
+                var arg0 = type;
+                var arg1 = indexCount;
+                Internal.ctor_2(__Instance, arg0, arg1);
             }
 
-            ~Texture()
+            ~IndexBuffer()
             {
                 Dispose(false);
             }
@@ -78,9 +82,9 @@ namespace Sce.PlayStation4
                 Marshal.FreeHGlobal(__Instance);
             }
 
-            public void SetData(uint level, byte* data, uint bytes)
+            public virtual void SetData(uint offsetInBytes, byte* data, uint bytes)
             {
-                var arg0 = level;
+                var arg0 = offsetInBytes;
                 var arg1 = data;
                 var arg2 = bytes;
                 Internal.SetData_0(__Instance, arg0, arg1, arg2);
