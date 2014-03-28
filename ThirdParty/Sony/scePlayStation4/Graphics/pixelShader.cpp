@@ -18,10 +18,10 @@ PixelShader::PixelShader(const void *data)
 	Gnmx::parseShader(&shaderInfo, data, Gnmx::kPixelShader);
 
 	_binary = Allocator::Get()->allocate(shaderInfo.m_gpuShaderCodeSize, Gnm::kAlignmentOfShaderInBytes, SCE_KERNEL_WC_GARLIC);
-	auto shaderHeader = Allocator::Get()->allocate(shaderInfo.m_vsShader->computeSize(), Gnm::kAlignmentOfBufferInBytes);
+	auto shaderHeader = Allocator::Get()->allocate(shaderInfo.m_psShader->computeSize(), Gnm::kAlignmentOfBufferInBytes);
 
 	memcpy(_binary, shaderInfo.m_gpuShaderCode, shaderInfo.m_gpuShaderCodeSize);
-	memcpy(shaderHeader, shaderInfo.m_vsShader, shaderInfo.m_vsShader->computeSize());
+	memcpy(shaderHeader, shaderInfo.m_psShader, shaderInfo.m_psShader->computeSize());
 
 	_shader = static_cast<Gnmx::PsShader*>(shaderHeader);
 	_shader->patchShaderGpuAddress(_binary);
