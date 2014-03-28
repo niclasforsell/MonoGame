@@ -53,6 +53,8 @@
     <Compile Include="CppSharp\Runtime\StdVector.cs" />
     <Compile Include="CppSharp\Runtime\SymbolResolver.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="GamePad.cs" />
+    <Compile Include="GamePadState.cs" />
     <Compile Include="GraphicsEnums.cs" />
     <Compile Include="GraphicsSystem.cs" />
     <Compile Include="IndexBuffer.cs" />
@@ -62,6 +64,7 @@
     <Compile Include="SoundSystem.cs" />
     <Compile Include="RenderTarget.cs" />
     <Compile Include="Texture.cs" />
+    <Compile Include="UserService.cs" />
     <Compile Include="VertexBuffer.cs" />
     <Compile Include="VertexShader.cs" />
   </ItemGroup>
