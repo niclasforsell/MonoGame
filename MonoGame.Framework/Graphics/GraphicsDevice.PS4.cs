@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-            _system.Clear(color.X, color.Y, color.Z, color.W);
+            _system.Clear((Sce.PlayStation4.Graphics.ClearOptions)options, color.X, color.Y, color.Z, color.W, depth, stencil);
         }
 
         private void PlatformDispose()

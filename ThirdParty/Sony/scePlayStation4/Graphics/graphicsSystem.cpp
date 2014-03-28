@@ -12,6 +12,8 @@
 
 #include "../allocator.h"
 
+#include "defaultShaders.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <kernel.h>
@@ -43,8 +45,8 @@ GraphicsSystem::GraphicsSystem()
 	_videoOutHandle = 0;
 	_frameIndex = 0;
 
-	//_effect = NULL;
-	//_effectDirty = false;
+	_clearPS = new PixelShader(clear_p);
+	_clearVS = new VertexShader(clear_vv);
 }
 
 GraphicsSystem::~GraphicsSystem()
@@ -300,8 +302,6 @@ void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget)
 	clip.init();
 	clip.setClipSpace(sce::Gnm::kClipControlClipSpaceDX);
 	gfxc.setClipControl(clip);
-
-	//_effectDirty = true;
 }
 
 void GraphicsSystem::SetRenderTarget(RenderTarget *renderTarget)
@@ -322,20 +322,41 @@ void GraphicsSystem::SetRenderTarget(RenderTarget *renderTarget)
 	_applyRenderTarget(rtNativeHandle);
 }
 
-void GraphicsSystem::Clear(float r, float g, float b, float a)
+void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, float a, float depth, int stencil)
 {
-	//printf("Clear!\n");
-
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
-	// If we've set a different render target, clear that instead
-	// of the back buffer.
-	sce::Gnm::RenderTarget *renTar = _currentRenderTarget ? _currentRenderTarget->_renderTarget : &backBuffer->renderTarget;
+	// Setup the clear shader.
+	//gfxc.setActiveShaderStages(Gnm::kActiveShaderStagesVsPs);
+	SetVertexShader(_clearVS);
+	SetPixelShader(_clearPS);
+	float color[4] = {r, g, b, a};
+	SetShaderConstants(ShaderStage_Pixel, &color, sizeof(color));
 
-	// Clear the color and the depth target
-	//Toolkit::SurfaceUtil::clearRenderTarget(gfxc, renTar, Vector4(r, g, b, a));
-	//Toolkit::SurfaceUtil::clearDepthTarget(gfxc, &backBuffer->depthTarget, 1.f);
+	// Clobber some states.
+	sce::Gnm::PrimitiveSetup prim;
+	prim.init();
+	prim.setCullFace(sce::Gnm::kPrimitiveSetupCullFaceNone);
+	gfxc.setPrimitiveSetup(prim);
+	sce::Gnm::ClipControl clip;
+	clip.init();
+	clip.setClipSpace(sce::Gnm::kClipControlClipSpaceDX);
+	gfxc.setClipControl(clip);
+	sce::Gnm::DepthStencilControl depthControl;
+	depthControl.init();
+	depthControl.setDepthEnable(false);
+	depthControl.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncNever);
+	gfxc.setDepthStencilControl(depthControl);
+	Gnm::BlendControl blendControl;
+	blendControl.init();
+	blendControl.setBlendEnable(false);
+	gfxc.setBlendControl(0, blendControl);
+
+	// We do the draw using a rect primitive and a vertex
+	// shader that generates the position from ids.
+	gfxc.setPrimitiveType(sce::Gnm::PrimitiveType::kPrimitiveTypeRectList);	
+	gfxc.drawIndexAuto(3);
 }
 
 void GraphicsSystem::SetVertexBuffer(VertexBuffer *buffer)
@@ -375,47 +396,6 @@ void GraphicsSystem::DrawPrimitives(PrimitiveType primitiveType, int vertexStart
 	gfxc.setPrimitiveType(ToPrimitiveType(primitiveType));	
 	gfxc.drawIndexAuto(vertexCount, vertexStart, 0);	
 }
-
-/*
-void GraphicsSystem::DrawIndexedSprites(uint32_t vertCount, void *vertexData, uint32_t idxCount, const void *idxData)
-{
-	//printf("Drawing Indexed Sprites\n");
-
-	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
-	Gnmx::GfxContext &gfxc = backBuffer->context;
-
-	uint32_t vertexStride = 24;
-
-	// Copy the incoming data to GPU mapped memory. 
-	uint8_t* baseVert = (uint8_t*)backBuffer->userData + backBuffer->userOffset;
-	{
-		uint32_t totalBytes = vertCount * vertexStride;
-		memcpy(baseVert, vertexData, totalBytes);
-		backBuffer->userOffset += totalBytes;
-	}
-	uint8_t* baseIndex = (uint8_t*)backBuffer->userData + backBuffer->userOffset;
-	{
-		uint32_t totalBytes = idxCount * 2;
-		memcpy(baseIndex, idxData, totalBytes);
-		backBuffer->userOffset += totalBytes;
-	}
-
-	if (backBuffer->userOffset > DisplayBuffer::MaxBufferSize)
-	{
-		printf("BUFFER OVERFLOW!\n");
-		abort();
-	}
-
-	backBuffer->userBuffer[0].initAsVertexBuffer(baseVert + 0, Gnm::kDataFormatR32G32B32Float, vertexStride, vertCount);
-	backBuffer->userBuffer[1].initAsVertexBuffer(baseVert + 12, Gnm::kDataFormatR8G8B8A8Unorm, vertexStride, vertCount);
-	backBuffer->userBuffer[2].initAsVertexBuffer(baseVert + 16, Gnm::kDataFormatR32G32Float, vertexStride, vertCount);
-	gfxc.setVertexBuffers(sce::Gnm::ShaderStage::kShaderStageVs, 0, 3, backBuffer->userBuffer);
-
-	gfxc.setIndexSize(sce::Gnm::IndexSize::kIndexSize16);
-	gfxc.setPrimitiveType(sce::Gnm::PrimitiveType::kPrimitiveTypeTriList);	
-	gfxc.drawIndex(idxCount, baseIndex);
-}
-*/
 
 void GraphicsSystem::Present()
 {

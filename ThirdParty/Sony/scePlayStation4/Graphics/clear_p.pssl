@@ -1,0 +1,6 @@
+float4 Color : register(c0);
+
+float4 main() : S_TARGET_OUTPUT
+{
+	return Color;
+}

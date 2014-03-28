@@ -34,9 +34,10 @@ private:
 	uint32_t _frameIndex;
 	RenderTarget *_currentRenderTarget;
 
-	void prepareBackBuffer();
+	PixelShader *_clearPS;
+	VertexShader *_clearVS;
 
-	//void _applyEffect(sce::Gnmx::GfxContext &gfxc);
+	void prepareBackBuffer();
 
 	void _applyRenderTarget(sce::Gnm::RenderTarget *renderTarget);
 	void _setSamplerState(int slot);
@@ -50,7 +51,7 @@ public:
 
 	virtual void SetRenderTarget(RenderTarget *renderTarget);
 
-	virtual void Clear(float r, float g, float b, float a);
+	virtual void Clear(ClearOptions options, float r, float g, float b, float a, float depth, int stencil);
 	virtual void Present();
 
     virtual void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount);
