@@ -10,17 +10,17 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private void PlatformSetSamplerState(int index)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         private void PlatformClear()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         private void PlatformDirty()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }
