@@ -9,6 +9,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Game = Microsoft.Xna.Framework.Game;
 using Microsoft.Xna.Framework.Audio;
+using SoundSystem = Sce.PlayStation4.Audio.SoundSystem;
+using UserService = Sce.PlayStation4.UserService;
 
 namespace Microsoft.Xna.Framework
 {
@@ -53,10 +55,9 @@ namespace Microsoft.Xna.Framework
         {
             _window.Initialize(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight);
 
-//            UserService.Initialize();
-//            GamePadManager.Initialize();
+            SoundSystem.Instance.Initialize();
+            UserService.Initialize();
 //            SaveDataSystem.Initialize();
-//            SoundSystem.Instance.Initialize();
             Sce.PlayStation4.Game.SetManagedCollect(CollectAndWait);
 
             base.BeforeInitialize();
@@ -84,13 +85,13 @@ namespace Microsoft.Xna.Framework
         
         public override void Exit()
         {
+            UserService.Terminate();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-//            UserService.Update();
-//            GamePadManager.Update(dt);
+            UserService.Update(dt);
 
 //            if (AudioEngine.Instance != null)
 //                AudioEngine.Instance.Update(dt);

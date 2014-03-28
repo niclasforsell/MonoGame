@@ -34,6 +34,13 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="userService.cpp" />
+    <ClCompile Include="Input\gamePad.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\gamePadState.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -41,6 +48,9 @@
     </Filter>
     <Filter Include="Audio">
       <UniqueIdentifier>{bb92b6eb-3b5b-42ce-b62a-9c766bc2cc7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{cbc8235f-fea0-4c9e-b7c0-f92f9a7446c4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -96,6 +106,16 @@
     </ClInclude>
     <ClInclude Include="Graphics\defaultShaders.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="userService.h" />
+    <ClInclude Include="Input\predecls.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\gamePad.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\gamePadState.h">
+      <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

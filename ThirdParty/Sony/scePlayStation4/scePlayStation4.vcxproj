@@ -95,7 +95,10 @@
     <ClCompile Include="Graphics\texture.cpp" />
     <ClCompile Include="Graphics\vertexBuffer.cpp" />
     <ClCompile Include="Graphics\vertexShader.cpp" />
+    <ClCompile Include="Input\gamePad.cpp" />
+    <ClCompile Include="Input\gamePadState.cpp" />
     <ClCompile Include="prx.cpp" />
+    <ClCompile Include="userService.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allocator.h" />
@@ -117,6 +120,10 @@
     <ClInclude Include="Graphics\texture.h" />
     <ClInclude Include="Graphics\vertexBuffer.h" />
     <ClInclude Include="Graphics\vertexShader.h" />
+    <ClInclude Include="Input\gamePad.h" />
+    <ClInclude Include="Input\gamePadState.h" />
+    <ClInclude Include="Input\predecls.h" />
+    <ClInclude Include="userService.h" />
   </ItemGroup>
   <ItemGroup>
     <PSSL Include="Graphics\clear_p.pssl">
