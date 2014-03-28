@@ -34,9 +34,10 @@ private:
 	uint32_t _frameIndex;
 	RenderTarget *_currentRenderTarget;
 
-	void prepareBackBuffer();
+	PixelShader *_clearPS;
+	VertexShader *_clearVS;
 
-	//void _applyEffect(sce::Gnmx::GfxContext &gfxc);
+	void prepareBackBuffer();
 
 	void _applyRenderTarget(sce::Gnm::RenderTarget *renderTarget);
 	void _setSamplerState(int slot);

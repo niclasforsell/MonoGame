@@ -12,7 +12,7 @@ namespace Sce.PlayStation4
     {
         public unsafe partial class GraphicsSystem : IDisposable
         {
-            [StructLayout(LayoutKind.Explicit, Size = 80)]
+            [StructLayout(LayoutKind.Explicit, Size = 96)]
             public struct Internal
             {
                 [FieldOffset(8)]
@@ -44,6 +44,12 @@ namespace Sce.PlayStation4
 
                 [FieldOffset(72)]
                 internal global::System.IntPtr _currentRenderTarget;
+
+                [FieldOffset(80)]
+                internal global::System.IntPtr _clearPS;
+
+                [FieldOffset(88)]
+                internal global::System.IntPtr _clearVS;
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
@@ -155,7 +161,7 @@ namespace Sce.PlayStation4
 
             public GraphicsSystem()
             {
-                __Instance = Marshal.AllocHGlobal(80);
+                __Instance = Marshal.AllocHGlobal(96);
                 Internal.ctor_0(__Instance);
             }
 

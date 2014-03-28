@@ -94,5 +94,16 @@
     <ClInclude Include="Graphics\graphicsEnums.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\defaultShaders.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <PSSL Include="Graphics\clear_p.pssl">
+      <Filter>Graphics</Filter>
+    </PSSL>
+    <PSSL Include="Graphics\clear_vv.pssl">
+      <Filter>Graphics</Filter>
+    </PSSL>
   </ItemGroup>
 </Project>

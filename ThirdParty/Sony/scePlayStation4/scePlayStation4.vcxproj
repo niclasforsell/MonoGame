@@ -105,6 +105,7 @@
     <ClInclude Include="Audio\predecls.h" />
     <ClInclude Include="Audio\samplerVoice.h" />
     <ClInclude Include="Audio\soundSystem.h" />
+    <ClInclude Include="Graphics\defaultShaders.h" />
     <ClInclude Include="Graphics\displayBuffer.h" />
     <ClInclude Include="Graphics\graphicsEnums.h" />
     <ClInclude Include="Graphics\graphicsHelpers.h" />
@@ -118,6 +119,14 @@
     <ClInclude Include="Graphics\vertexShader.h" />
   </ItemGroup>
   <ItemGroup>
+    <PSSL Include="Graphics\clear_p.pssl">
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
+      </Profile>
+    </PSSL>
+    <PSSL Include="Graphics\clear_vv.pssl">
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
+      </Profile>
+    </PSSL>
   </ItemGroup>
   <Import Project="$(SolutionDir)\SceGnm.targets" Condition="Exists('$(SolutionDir)\SceGnm.Development.props')" />
   <Import Project="$(SCE_ORBIS_SDK_DIR)\host_tools\msbuild\SceGnm.targets" Condition="!Exists('$(SolutionDir)\SceGnm.Development.props')" />
