@@ -65,7 +65,7 @@ int GamePad::Enable(SceUserServiceUserId userId)
 	assert(activeUsers < PLAYER_MAX);
 
 	auto handle = scePadOpen(userId, SCE_PAD_PORT_TYPE_STANDARD, 0, NULL);
-	assert(handle == SCE_OK);
+	assert(handle >= 0);
 
 	auto playerIndex = activeUsers;
 	padHandles[playerIndex] = handle;
@@ -90,6 +90,7 @@ int GamePad::Disable(SceUserServiceUserId userId)
 		padHandles[i] = -1;
 		padStates[i].Deactivate();
 		padUsers[i] = -1;
+		activeUsers--;
 
 		return i;
 	}
