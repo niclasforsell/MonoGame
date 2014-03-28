@@ -10,22 +10,6 @@ namespace Sce.PlayStation4
 {
     namespace Graphics
     {
-        public enum VertexElement : uint
-        {
-            VertexElement_Single = 0,
-            VertexElement_Vector2 = 1,
-            VertexElement_Vector3 = 2,
-            VertexElement_Vector4 = 3,
-            VertexElement_Color = 4,
-            VertexElement_Byte4 = 5,
-            VertexElement_Short2 = 6,
-            VertexElement_Short4 = 7,
-            VertexElement_NormalizedShort2 = 8,
-            VertexElement_NormalizedShort4 = 9,
-            VertexElement_HalfVector2 = 10,
-            VertexElement_HalfVector4 = 11
-        }
-
         public unsafe partial class VertexBuffer : IDisposable
         {
             [StructLayout(LayoutKind.Explicit, Size = 32)]

@@ -75,9 +75,6 @@
     <ClInclude Include="Graphics\renderTarget.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\textureFormat.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\pixelShader.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -91,5 +88,11 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="game.h" />
+    <ClInclude Include="Graphics\graphicsHelpers.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\graphicsEnums.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -35,5 +35,3 @@ class IndexBuffer;
 struct DisplayBuffer;
 
 }
-
-#include "textureFormat.h"

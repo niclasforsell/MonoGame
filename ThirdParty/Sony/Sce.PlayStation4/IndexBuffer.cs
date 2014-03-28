@@ -10,12 +10,6 @@ namespace Sce.PlayStation4
 {
     namespace Graphics
     {
-        public enum IndexElement : uint
-        {
-            IndexElement_SixteenBits = 0,
-            IndexElement_ThirtyTwoBits = 1
-        }
-
         public unsafe partial class IndexBuffer : IDisposable
         {
             [StructLayout(LayoutKind.Explicit, Size = 24)]

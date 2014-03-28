@@ -20,6 +20,11 @@ namespace Sce.PlayStation4
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                    EntryPoint="_ZN8Graphics7TextureC2ENS_13TextureFormatEiii")]
+                internal static extern void ctor_2(global::System.IntPtr instance, Graphics.TextureFormat format, int width, int height, int mips);
+
+                [SuppressUnmanagedCodeSecurity]
+                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
                     EntryPoint="_ZN8Graphics7TextureD2Ev")]
                 internal static extern void dtor_0(global::System.IntPtr instance);
 
@@ -44,6 +49,16 @@ namespace Sce.PlayStation4
             public Texture(global::System.IntPtr native)
             {
                 __Instance = native;
+            }
+
+            public Texture(Graphics.TextureFormat format, int width, int height, int mips)
+            {
+                __Instance = Marshal.AllocHGlobal(16);
+                var arg0 = format;
+                var arg1 = width;
+                var arg2 = height;
+                var arg3 = mips;
+                Internal.ctor_2(__Instance, arg0, arg1, arg2, arg3);
             }
 
             ~Texture()

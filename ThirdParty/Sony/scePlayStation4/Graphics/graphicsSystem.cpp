@@ -8,6 +8,7 @@
 #include "displayBuffer.h"
 #include "vertexBuffer.h"
 #include "indexBuffer.h"
+#include "graphicsHelpers.h"
 
 #include "../allocator.h"
 
@@ -362,6 +363,22 @@ void GraphicsSystem::SetIndexBuffer(IndexBuffer *buffer)
 	gfxc.setIndexBuffer(buffer->_indexData);
 }
 
+void GraphicsSystem::DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
+{
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+	Gnmx::GfxContext &gfxc = backBuffer->context;
+
+	auto type = ToPrimitiveType(primitiveType);
+    //auto vertexCount = GetElementCountArray(primitiveType, primitiveCount);
+
+	gfxc.setPrimitiveType(type);	
+	//gfxc.drawIndex(primitiveCount, startIndex);	
+}
+
+void GraphicsSystem::DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
+{
+
+}
 
 /*
 void GraphicsSystem::DrawIndexedSprites(uint32_t vertCount, void *vertexData, uint32_t idxCount, const void *idxData)
@@ -516,130 +533,6 @@ void GraphicsSystem::prepareBackBuffer()
 	_currentRenderTarget = NULL;
 }
 
-sce::Gnm::DataFormat GraphicsSystem::GetFormat(TextureFormat format)
-{
-	switch (format)
-	{
-	default:
-	case TextureFormat_Color:
-		return Gnm::kDataFormatR8G8B8A8Unorm;
-	case TextureFormat_Bgr565:
-		return Gnm::kDataFormatB5G6R5Unorm;
-	case TextureFormat_Bgra5551:
-		return Gnm::kDataFormatB5G5R5A1Unorm;
-	case TextureFormat_Bgra4444:
-		return Gnm::kDataFormatB4G4R4A4Unorm;
-	case TextureFormat_Dxt1:
-		return Gnm::kDataFormatBc1Unorm;
-	case TextureFormat_Dxt3:
-		return Gnm::kDataFormatBc2Unorm;
-	case TextureFormat_Dxt5:
-		return Gnm::kDataFormatBc3Unorm;
-	case TextureFormat_NormalizedByte2:
-		return Gnm::kDataFormatR8G8Snorm;
-	case TextureFormat_NormalizedByte4:
-		return Gnm::kDataFormatR8G8B8A8Snorm;
-	case TextureFormat_Rgba1010102:
-		return Gnm::kDataFormatR10G10B10A2Unorm;
-	case TextureFormat_Rg32:
-		return Gnm::kDataFormatR16G16Unorm;
-	case TextureFormat_Rgba64:
-		return Gnm::kDataFormatR16G16B16A16Unorm;
-	case TextureFormat_Alpha8:
-		return Gnm::kDataFormatA8Unorm;
-	case TextureFormat_Single:
-		return Gnm::kDataFormatR32Float;
-	case TextureFormat_Vector2:
-		return Gnm::kDataFormatR32G32Float;
-	case TextureFormat_Vector4:
-		return Gnm::kDataFormatR32G32B32A32Float;
-	case TextureFormat_HalfSingle:
-		return Gnm::kDataFormatR16Float;
-	case TextureFormat_HalfVector2:
-		return Gnm::kDataFormatR16G16Float;
-	case TextureFormat_HalfVector4:
-		return Gnm::kDataFormatR16G16B16A16Float;
-	case TextureFormat_HdrBlendable:
-		return Gnm::kDataFormatR16G16B16A16Float;
-	};
-}
-
-RenderTarget* GraphicsSystem::CreateRenderTarget(TextureFormat format_, uint32_t width, uint32_t height)
-{
-	sce::Gnm::RenderTarget *renderTarget = new sce::Gnm::RenderTarget();
-
-	Gnm::TileMode tileMode;
-	auto format = GetFormat(format_);
-	GpuAddress::computeSurfaceTileMode(&tileMode, GpuAddress::kSurfaceTypeColorTarget, format, 1);
-
-	Gnm::SizeAlign renTargetSizeAlign = renderTarget->init(
-		width, height, 1,
-		format,
-		tileMode,
-		Gnm::kNumSamples1,
-		Gnm::kNumFragments1,
-		NULL, NULL);
-
-	void *rtData = Allocator::Get()->allocate(renTargetSizeAlign, SCE_KERNEL_WC_GARLIC);
-	renderTarget->setAddresses(rtData, 0, 0);
-
-	return new RenderTarget(renderTarget);
-}
-
-void GraphicsSystem::GetRenderTargetData(RenderTarget *target, unsigned char *data, uint32_t bytes)
-{
-	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
-	Gnmx::GfxContext &gfxc = backBuffer->context;
-
-	gfxc.waitForGraphicsWrites(
-		target->_renderTarget->getBaseAddress256ByteBlocks(), 
-		target->_renderTarget->getSizeInBytes()>>8,
-		Gnm::kWaitTargetSlotCb0, Gnm::kCacheActionWriteBackAndInvalidateL1andL2, Gnm::kExtendedCacheActionFlushAndInvalidateCbCache,
-		Gnm::kStallCommandBufferParserEnable);
-
-	// TODO: This blows!
-	/*
-	GpuAddress::TilingParameters tilingParameters;
-	tilingParameters.m_tileMode = target->_renderTarget->getTileMode();
-	tilingParameters.m_elemFormat = target->_renderTarget->getDataFormat();
-	tilingParameters.m_linearWidth = target->_renderTarget->getWidth();
-	tilingParameters.m_linearHeight = target->_renderTarget->getHeight();
-	tilingParameters.m_linearDepth = 1;
-	tilingParameters.m_numElementsPerPixel = 1;
-	tilingParameters.m_baseTiledPitch = 0;
-	tilingParameters.m_mipLevel = 0;
-	tilingParameters.m_arraySlice = 0;
-	tilingParameters.m_surfaceFlags.m_value = 0;
-	tilingParameters.m_surfaceFlags.m_prt = 1;
-
-	GpuAddress::detileSurface(data, target->_texture->getBaseAddress(), &tilingParameters);
-	*/
-}
-
-Texture* GraphicsSystem::CreateTexture(TextureFormat format, uint32_t width, uint32_t height, uint32_t mips)
-{
-	sce::Gnm::Texture *texture = new sce::Gnm::Texture();
-
-	Gnm::SizeAlign textureSizeAlign = texture->initAs2d(
-		width, height, mips,
-		GetFormat(format),
-		Gnm::kTileModeDisplay_LinearAligned,
-		Gnm::kNumSamples1);
-
-	// Allocate the texture data using the alignment returned by initAs2d
-	void *textureData = Allocator::Get()->allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
-	if( !textureData )
-	{
-		printf("Cannot allocate the texture data\n");
-		delete texture;
-		return NULL;
-	}
-
-	texture->setBaseAddress(textureData);
-
-	return new Texture(texture);
-}
-
 void GraphicsSystem::SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
@@ -649,75 +542,6 @@ void GraphicsSystem::SetViewport(int left, int top, int width, int height, float
 
 	gfxc.setupScreenViewport(left, top, left + width, top + height, 1.0f, 0.0f);
 }
-
-/*
-Texture* GraphicsSystem::CreateTextureFromPng(unsigned char *data, uint32_t bytes)
-{
-	ScePngDecParseParam parseParam;
-	parseParam.pngMemAddr = data;
-	parseParam.pngMemSize = bytes;
-	parseParam.reserved0 = 0;
-
-	ScePngDecImageInfo imageInfo;
-	int ret = scePngDecParseHeader(&parseParam, &imageInfo);
-	if (ret < 0) 
-	{
-		printf("Error: scePngDecParseHeader(), ret 0x%08x\n", ret);
-		return NULL;
-	}
-
-	Texture* texture = CreateTexture(imageInfo.imageWidth, imageInfo.imageHeight, 1);
-	if (texture == NULL)
-		return NULL;
-
-	ScePngDecCreateParam createParam;
-	createParam.thisSize = sizeof(createParam);
-	createParam.attribute = imageInfo.bitDepth >> 4;
-	createParam.maxImageWidth = imageInfo.imageWidth;
-	int memorySize = scePngDecQueryMemorySize(&createParam);
-	if (memorySize < 0) 
-	{
-		printf("Error: scePngDecQueryMemorySize(), ret 0x%08x\n", memorySize);
-		return NULL;
-	}
-
-	// allocate memory for PNG decoder
-	// create PNG decoder
-	void *decoderBuffer = new char[memorySize];	
-	ScePngDecHandle	handle;
-	ret = scePngDecCreate(&createParam, decoderBuffer, memorySize, &handle);
-	if (ret < 0) 
-	{
-		printf("Error: scePngDecCreate(), ret 0x%08x\n", ret);
-		return NULL;
-	}
-
-	//void *image = texture->_texture.
-	
-	// decode PNG image
-	ScePngDecDecodeParam decodeParam;
-	decodeParam.pngMemAddr	= data;
-	decodeParam.pngMemSize	= bytes;
-	decodeParam.imageMemAddr = texture->_texture->getBaseAddress();
-	decodeParam.imageMemSize = imageInfo.imageWidth * imageInfo.imageHeight * 4;
-	decodeParam.imagePitch	= 0;
-	decodeParam.pixelFormat	= SCE_PNG_DEC_PIXEL_FORMAT_R8G8B8A8;
-	decodeParam.alphaValue	= 255;
-	ret = scePngDecDecode(handle, &decodeParam, NULL);
-	if (ret < 0) 
-	{
-		printf("Error: scePngDecDecode(), ret 0x%08x\n", ret);
-		scePngDecDelete(handle);
-		return NULL;
-	}
-
-	// Cleanup
-	scePngDecDelete(handle);
-	delete [] decoderBuffer;
-
-	return texture;
-}
-*/
 
 void GraphicsSystem::_setSamplerState(int slot)
 {

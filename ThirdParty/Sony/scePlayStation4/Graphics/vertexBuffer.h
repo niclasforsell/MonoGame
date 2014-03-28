@@ -1,29 +1,9 @@
 #pragma once
 
 #include "predecls.h"
+#include "graphicsEnums.h"
 
 namespace Graphics {
-
-
-enum VertexElement
-{
-	// NOTE: This should match up with the MonoGame 
-	// VertexElementFormat enum for easy interop!
-
-	VertexElement_Single,
-    VertexElement_Vector2,
-    VertexElement_Vector3,
-    VertexElement_Vector4,
-    VertexElement_Color,
-    VertexElement_Byte4,
-    VertexElement_Short2,
-    VertexElement_Short4,
-    VertexElement_NormalizedShort2,
-    VertexElement_NormalizedShort4,
-    VertexElement_HalfVector2,
-    VertexElement_HalfVector4
-};
-
 
 class __declspec(dllexport) VertexBuffer
 {

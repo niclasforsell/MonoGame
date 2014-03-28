@@ -1,6 +1,7 @@
 #pragma once
 
 #include "predecls.h"
+#include "graphicsEnums.h"
 
 namespace Graphics {
 
@@ -18,10 +19,8 @@ private:
 	RenderTarget() { }
 	RenderTarget( const RenderTarget & ) { }
 
-protected:
-	RenderTarget(sce::Gnm::RenderTarget *renderTarget);
-
 public:
+	RenderTarget(TextureFormat format, int32_t width, int32_t height);
 	virtual ~RenderTarget();
 
 };

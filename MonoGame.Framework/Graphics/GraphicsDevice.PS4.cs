@@ -90,7 +90,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
-            throw new NotImplementedException();
+            PlatformApplyState(true);
+            _system.DrawIndexedPrimitives((Sce.PlayStation4.Graphics.PrimitiveType)primitiveType, baseVertex, startIndex, primitiveCount);
         }
 
         private void PlatformDrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, VertexDeclaration vertexDeclaration, int vertexCount) where T : struct
@@ -100,7 +101,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
         {
-            throw new NotImplementedException();
+            PlatformApplyState(true);
+            _system.DrawPrimitives((Sce.PlayStation4.Graphics.PrimitiveType)primitiveType, vertexStart, vertexCount);
         }
 
         private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct

@@ -1,18 +1,9 @@
 #pragma once
 
 #include "predecls.h"
+#include "graphicsEnums.h"
 
 namespace Graphics {
-
-
-enum IndexElement
-{
-	// NOTE: This should match up with the MonoGame 
-	// IndexElementSize enum for easy interop!
-
-	IndexElement_SixteenBits,
-	IndexElement_ThirtyTwoBits
-};
 
 
 class __declspec(dllexport) IndexBuffer
