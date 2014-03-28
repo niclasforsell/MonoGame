@@ -74,4 +74,12 @@ enum PrimitiveType
 	PrimitiveType_LineStrip,
 };
 
+
+enum ClearOptions
+{
+	ClearOptions_Target = 1,
+    ClearOptions_DepthBuffer = 2,
+    ClearOptions_Stencil = 4        
+};
+
 } // namespace Graphics

@@ -50,7 +50,7 @@ public:
 
 	virtual void SetRenderTarget(RenderTarget *renderTarget);
 
-	virtual void Clear(float r, float g, float b, float a);
+	virtual void Clear(ClearOptions options, float r, float g, float b, float a, float depth, int stencil);
 	virtual void Present();
 
     virtual void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount);

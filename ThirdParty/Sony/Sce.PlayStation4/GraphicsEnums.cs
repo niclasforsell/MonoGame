@@ -69,5 +69,13 @@ namespace Sce.PlayStation4
             PrimitiveType_LineList = 2,
             PrimitiveType_LineStrip = 3
         }
+
+        [Flags]
+        public enum ClearOptions : uint
+        {
+            ClearOptions_Target = 1,
+            ClearOptions_DepthBuffer = 2,
+            ClearOptions_Stencil = 4
+        }
     }
 }

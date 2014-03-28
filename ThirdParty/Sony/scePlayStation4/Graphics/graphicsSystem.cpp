@@ -322,7 +322,7 @@ void GraphicsSystem::SetRenderTarget(RenderTarget *renderTarget)
 	_applyRenderTarget(rtNativeHandle);
 }
 
-void GraphicsSystem::Clear(float r, float g, float b, float a)
+void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, float a, float depth, int stencil)
 {
 	//printf("Clear!\n");
 

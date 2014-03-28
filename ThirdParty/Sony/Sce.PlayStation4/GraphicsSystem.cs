@@ -72,8 +72,8 @@ namespace Sce.PlayStation4
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN8Graphics14GraphicsSystem5ClearEffff")]
-                internal static extern void Clear_0(global::System.IntPtr instance, float r, float g, float b, float a);
+                    EntryPoint="_ZN8Graphics14GraphicsSystem5ClearENS_12ClearOptionsEfffffi")]
+                internal static extern void Clear_0(global::System.IntPtr instance, Graphics.ClearOptions options, float r, float g, float b, float a, float depth, int stencil);
 
                 [SuppressUnmanagedCodeSecurity]
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
@@ -187,9 +187,10 @@ namespace Sce.PlayStation4
                 Internal.SetRenderTarget_0(__Instance, arg0);
             }
 
-            public virtual void Clear(float r, float g, float b, float a)
+            public virtual void Clear(Graphics.ClearOptions options, float r, float g, float b, float a, float depth, int stencil)
             {
-                Internal.Clear_0(__Instance, r, g, b, a);
+                var arg0 = options;
+                Internal.Clear_0(__Instance, arg0, r, g, b, a, depth, stencil);
             }
 
             public virtual void Present()
