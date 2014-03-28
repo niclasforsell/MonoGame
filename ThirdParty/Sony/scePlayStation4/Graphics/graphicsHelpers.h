@@ -72,4 +72,19 @@ static inline sce::Gnm::PrimitiveType ToPrimitiveType(PrimitiveType type)
     }
 }
 
+static inline uint32_t ToPrimitiveElementCount(PrimitiveType primitiveType, uint32_t primitiveCount)
+{
+    switch (primitiveType)
+    {
+        case PrimitiveType_TriangleList:
+            return primitiveCount * 3;
+        case PrimitiveType_TriangleStrip:
+            return 3 + (primitiveCount - 1);
+        case PrimitiveType_LineList:
+            return primitiveCount * 2;
+        case PrimitiveType_LineStrip:
+            return primitiveCount + 1;
+    }
+}
+
 } // namespace Graphics

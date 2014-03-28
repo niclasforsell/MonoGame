@@ -14,16 +14,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <unistd.h>
-//#include <scebase.h>
 #include <kernel.h>
 
 #include <video_out.h>
-#include <user_service.h>
 #include <gnm.h>
 #include <gnmx.h>
-#include <libsysmodule.h>
-#include <png_dec.h>
 
 
 using namespace sce;
@@ -42,8 +37,6 @@ public:
 
 GraphicsSystem::GraphicsSystem()
 {
-	sceSysmoduleLoadModule(SCE_SYSMODULE_PNG_DEC);
-
 	_backBufferIndex = 0;
 	memset(_surfaceAddresses, 0, sizeof(_surfaceAddresses));
 
@@ -368,16 +361,19 @@ void GraphicsSystem::DrawIndexedPrimitives(PrimitiveType primitiveType, int base
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
-	auto type = ToPrimitiveType(primitiveType);
-    //auto vertexCount = GetElementCountArray(primitiveType, primitiveCount);
+	gfxc.setPrimitiveType(ToPrimitiveType(primitiveType));	
 
-	gfxc.setPrimitiveType(type);	
-	//gfxc.drawIndex(primitiveCount, startIndex);	
+	auto indexCount = ToPrimitiveElementCount(primitiveType, primitiveCount);
+	gfxc.drawIndexOffset(startIndex, indexCount, baseVertex, 0);	
 }
 
 void GraphicsSystem::DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
 {
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+	Gnmx::GfxContext &gfxc = backBuffer->context;
 
+	gfxc.setPrimitiveType(ToPrimitiveType(primitiveType));	
+	gfxc.drawIndexAuto(vertexCount, vertexStart, 0);	
 }
 
 /*
