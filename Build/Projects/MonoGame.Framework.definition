@@ -1358,19 +1358,19 @@
     <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect_p.sb">
       <Platforms>PlayStation4</Platforms>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_VSBasic.sb">
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_VSBasicNoFog.sb">
       <Platforms>PlayStation4</Platforms>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_PSBasic.sb">
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_PSBasicNoFog.sb">
       <Platforms>PlayStation4</Platforms>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_VSBasicVc.sb">
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_VSBasicVcNoFog.sb">
       <Platforms>PlayStation4</Platforms>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_VSBasicTx.sb">
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_VSBasicTxNoFog.sb">
       <Platforms>PlayStation4</Platforms>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_PSBasicTx.sb">
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_PSBasicTxNoFog.sb">
       <Platforms>PlayStation4</Platforms>
     </EmbeddedResource>
 	<!--
