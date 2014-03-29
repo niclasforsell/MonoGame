@@ -13,5 +13,5 @@ namespace sce {
 }
 
 namespace Input {
-
+	struct GamePadState;
 }

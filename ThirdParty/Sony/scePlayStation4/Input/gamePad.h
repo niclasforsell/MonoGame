@@ -1,7 +1,6 @@
 #pragma once
 
 #include "predecls.h"
-#include "gamePadState.h"
 
 namespace Input {
 

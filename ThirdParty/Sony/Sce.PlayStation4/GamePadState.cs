@@ -10,7 +10,7 @@ namespace Sce.PlayStation4
 {
     namespace Input
     {
-        public unsafe partial class GamePadState : IDisposable
+        public unsafe partial struct GamePadState
         {
             [StructLayout(LayoutKind.Explicit, Size = 36)]
             public struct Internal
@@ -46,19 +46,7 @@ namespace Sce.PlayStation4
                 [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
                     EntryPoint="_ZN5Input12GamePadStateC2ERKS0_")]
                 internal static extern void ctor_1(global::System.IntPtr instance, global::System.IntPtr _0);
-
-                [SuppressUnmanagedCodeSecurity]
-                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN5Input12GamePadState8ActivateEv")]
-                internal static extern void Activate1_0(global::System.IntPtr instance);
-
-                [SuppressUnmanagedCodeSecurity]
-                [DllImport("scePlayStation4.prx", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
-                    EntryPoint="_ZN5Input12GamePadState10DeactivateEv")]
-                internal static extern void Deactivate1_0(global::System.IntPtr instance);
             }
-
-            public global::System.IntPtr __Instance { get; protected set; }
 
             internal GamePadState(GamePadState.Internal* native)
                 : this(new global::System.IntPtr(native))
@@ -70,170 +58,120 @@ namespace Sce.PlayStation4
             {
             }
 
-            public GamePadState(global::System.IntPtr native)
+            public GamePadState(global::System.IntPtr native) : this()
             {
-                __Instance = native;
+                var __ptr = (Internal*)native.ToPointer();
+                IsConnected = __ptr->IsConnected;
+                PacketNumber = __ptr->PacketNumber;
+                LeftStickX = __ptr->LeftStickX;
+                LeftStickY = __ptr->LeftStickY;
+                RightStickX = __ptr->RightStickX;
+                RightStickY = __ptr->RightStickY;
+                LeftTrigger = __ptr->LeftTrigger;
+                RightTrigger = __ptr->RightTrigger;
+                Buttons = __ptr->Buttons;
             }
 
-            ~GamePadState()
+            internal Internal ToInternal()
             {
-                Dispose(false);
+                var __native = new Sce.PlayStation4.Input.GamePadState.Internal();
+                var __ptr = &__native;
+                __native.IsConnected = IsConnected;
+                __native.PacketNumber = PacketNumber;
+                __native.LeftStickX = LeftStickX;
+                __native.LeftStickY = LeftStickY;
+                __native.RightStickX = RightStickX;
+                __native.RightStickY = RightStickY;
+                __native.LeftTrigger = LeftTrigger;
+                __native.RightTrigger = RightTrigger;
+                __native.Buttons = Buttons;
+                return __native;
             }
 
-            public void Dispose()
+            internal void FromInternal(Internal* native)
             {
-                Dispose(disposing: true);
-                GC.SuppressFinalize(this);
+                var __ptr = native;
+                IsConnected = __ptr->IsConnected;
+                PacketNumber = __ptr->PacketNumber;
+                LeftStickX = __ptr->LeftStickX;
+                LeftStickY = __ptr->LeftStickY;
+                RightStickX = __ptr->RightStickX;
+                RightStickY = __ptr->RightStickY;
+                LeftTrigger = __ptr->LeftTrigger;
+                RightTrigger = __ptr->RightTrigger;
+                Buttons = __ptr->Buttons;
             }
 
-            protected virtual void Dispose(bool disposing)
+            public bool IsConnected
             {
-                Marshal.FreeHGlobal(__Instance);
-            }
-
-            public void Activate1()
-            {
-                Internal.Activate1_0(__Instance);
-            }
-
-            public void Deactivate1()
-            {
-                Internal.Deactivate1_0(__Instance);
-            }
-
-            public bool IsConnected1
-            {
-                get
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    return __ptr->IsConnected;
-                }
+                get;
 
                 set
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    __ptr->IsConnected = value;
-                }
+                ;
             }
 
-            public int PacketNumber1
+            public int PacketNumber
             {
-                get
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    return __ptr->PacketNumber;
-                }
+                get;
 
                 set
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    __ptr->PacketNumber = value;
-                }
+                ;
             }
 
-            public float LeftStickX1
+            public float LeftStickX
             {
-                get
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    return __ptr->LeftStickX;
-                }
+                get;
 
                 set
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    __ptr->LeftStickX = value;
-                }
+                ;
             }
 
-            public float LeftStickY1
+            public float LeftStickY
             {
-                get
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    return __ptr->LeftStickY;
-                }
+                get;
 
                 set
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    __ptr->LeftStickY = value;
-                }
+                ;
             }
 
-            public float RightStickX1
+            public float RightStickX
             {
-                get
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    return __ptr->RightStickX;
-                }
+                get;
 
                 set
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    __ptr->RightStickX = value;
-                }
+                ;
             }
 
-            public float RightStickY1
+            public float RightStickY
             {
-                get
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    return __ptr->RightStickY;
-                }
+                get;
 
                 set
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    __ptr->RightStickY = value;
-                }
+                ;
             }
 
-            public float LeftTrigger1
+            public float LeftTrigger
             {
-                get
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    return __ptr->LeftTrigger;
-                }
+                get;
 
                 set
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    __ptr->LeftTrigger = value;
-                }
+                ;
             }
 
-            public float RightTrigger1
+            public float RightTrigger
             {
-                get
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    return __ptr->RightTrigger;
-                }
+                get;
 
                 set
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    __ptr->RightTrigger = value;
-                }
+                ;
             }
 
-            public uint Buttons1
+            public uint Buttons
             {
-                get
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    return __ptr->Buttons;
-                }
+                get;
 
                 set
-                {
-                    var __ptr = (Internal*)__Instance.ToPointer();
-                    __ptr->Buttons = value;
-                }
+                ;
             }
         }
     }

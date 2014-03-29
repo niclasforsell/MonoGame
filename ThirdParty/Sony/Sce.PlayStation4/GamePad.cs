@@ -102,7 +102,7 @@ namespace Sce.PlayStation4
             public static Input.GamePadState GetState(int playerIndex)
             {
                 var __ret = Internal.GetState_0(playerIndex);
-                if (__ret == global::System.IntPtr.Zero) return null;
+                if (__ret == global::System.IntPtr.Zero) return new Input.GamePadState();
                 return new Input.GamePadState(__ret);
             }
 
