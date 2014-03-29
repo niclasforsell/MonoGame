@@ -262,7 +262,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new Exception("Wrong MGFX file version!");
 
 			var profile = reader.ReadByte ();
-#if DIRECTX
+
+#if PLAYSTATION4
+            if (profile != 2)
+#elif DIRECTX
             if (profile != 1)
 #else
 			if (profile != 0)
@@ -455,8 +458,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					{						
                         case EffectParameterType.Bool:
                         case EffectParameterType.Int32:
-#if DIRECTX
-                            // Under DirectX we properly store integers and booleans
+#if !OPENGL
+                            // For most platforms we properly store integers and booleans
                             // in an integer type.
                             //
                             // MojoShader on the otherhand stores everything in float
