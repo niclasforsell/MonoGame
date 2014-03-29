@@ -11,12 +11,12 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private void PlatformInitialize()
         {
-            throw new NotImplementedException();
+            _dirty = false;
         }
 
         private void PlatformClear()
         {
-            throw new NotImplementedException();
+            _dirty = true;
         }
 
         internal void PlatformApply(GraphicsDevice device, ShaderStage stage, int slot)
