@@ -105,6 +105,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 _pixelShaderDirty = false;
             }
 
+            _vertexConstantBuffers.SetConstantBuffers(this);
+            _pixelConstantBuffers.SetConstantBuffers(this);
+
             Textures.SetTextures(this);
             SamplerStates.PlatformSetSamplers(this);
         }
