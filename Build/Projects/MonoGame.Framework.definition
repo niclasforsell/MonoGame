@@ -1351,6 +1351,48 @@
       <Platforms>PSMobile</Platforms>
     </ShaderProgram>
 
-  
+	<!-- PlayStation 4 Stock Effects -->
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect_vv.sb">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect_p.sb">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_VSBasic.sb">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_PSBasic.sb">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_VSBasicVc.sb">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_VSBasicTx.sb">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_PSBasicTx.sb">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+	<!--
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ps4.mgfxo">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.ps4.mgfxo">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ps4.mgfxo">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.ps4.mgfxo">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.ps4.mgfxo">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.ps4.mgfxo">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
+	-->
+
   </Files>
 </Project>
