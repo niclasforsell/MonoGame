@@ -32,7 +32,7 @@ namespace BindingGen
             options.GenerateProperties = true;
             options.GenerateFunctionTemplates = true;
             //options.GenerateVirtualTables = true;
-            options.GenerateFinalizers = true;
+            //options.GenerateFinalizers = true;
 
             options.GenerateLibraryNamespace = true;
             options.LibraryName = "Sce.PlayStation4";           
@@ -84,6 +84,8 @@ namespace BindingGen
         {
             // Force it to skip generation of anything in the predecls header.
             lib.IgnoreHeadersWithName("predecls");
+
+            lib.SetClassAsValueType("Input::GamePadState");
         }
 
         public void Postprocess(Driver driver, ASTContext lib)

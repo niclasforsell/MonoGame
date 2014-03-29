@@ -33,16 +33,16 @@ namespace Microsoft.Xna.Framework.Input
             var state = PSGamePad.GetState((int)playerIndex);
             return new GamePadState
             {
-                IsConnected = state.IsConnected1,
-                PacketNumber = state.PacketNumber1,
-                Buttons = new GamePadButtons((Buttons)state.Buttons1),
-                DPad = new GamePadDPad((Buttons)state.Buttons1),
+                IsConnected = state.IsConnected,
+                PacketNumber = state.PacketNumber,
+                Buttons = new GamePadButtons((Buttons)state.Buttons),
+                DPad = new GamePadDPad((Buttons)state.Buttons),
                 ThumbSticks = new GamePadThumbSticks
                 {
-                    Left = new Vector2(state.LeftStickX1, state.LeftStickY1),
-                    Right = new Vector2(state.RightStickX1, state.RightStickY1),
+                    Left = new Vector2(state.LeftStickX, state.LeftStickY),
+                    Right = new Vector2(state.RightStickX, state.RightStickY),
                 },
-                Triggers = new GamePadTriggers(state.LeftTrigger1, state.RightTrigger1),
+                Triggers = new GamePadTriggers(state.LeftTrigger, state.RightTrigger),
             };
         }
 

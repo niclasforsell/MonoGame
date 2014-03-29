@@ -4,12 +4,8 @@
 
 namespace Input {
 
-struct __declspec(dllexport) GamePadState
+struct GamePadState
 {
-	void Activate();
-	void Deactivate();
-	void SetState(ScePadData* data);
-
 	bool IsConnected;
 	int PacketNumber;
 
