@@ -53,10 +53,10 @@ enum DepthFormat
 	// NOTE: This should match up with the MonoGame 
 	// DepthFormat enum for easy interop!
 
-	None = -1,
-	Depth16 = 54,
-	Depth24 = 51,
-	Depth24Stencil8 = 48,		
+	DepthFormat_None = -1,
+	DepthFormat_Depth16 = 54,
+	DepthFormat_Depth24 = 51,
+	DepthFormat_Depth24Stencil8 = 48,		
 };
 
 enum IndexElement

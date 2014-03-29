@@ -53,7 +53,7 @@ GraphicsSystem::~GraphicsSystem()
 {
 }
 
-void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, TextureFormat backbufferFormat, DepthFormat depthFormat)
+void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, TextureFormat backbufferFormat, DepthFormat depthFormat_)
 {
 	//printf("Initialize!\n");
 
@@ -90,7 +90,6 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 	}
 
 
-	static const sce::Gnm::ZFormat kZFormat				= sce::Gnm::kZFormat32Float;
 	static const sce::Gnm::StencilFormat kStencilFormat	= sce::Gnm::kStencil8;
 	_displayBuffers = new DisplayBuffer[kDisplayBufferCount];
 
@@ -154,7 +153,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 
 		// Compute the tiling mode for the render target
 		Gnm::TileMode tileMode;
-		Gnm::DataFormat format = Gnm::kDataFormatB8G8R8A8Unorm;
+		auto format = ToSwapchainDataFormat(backbufferFormat);
 		if( !GpuAddress::computeSurfaceTileMode(&tileMode,
 			GpuAddress::kSurfaceTypeColorTargetDisplayable, format, 1) )
 		{
@@ -183,62 +182,65 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		}
 		_displayBuffers[i].renderTarget.setAddresses(_surfaceAddresses[i], 0, 0);
 
-		// Compute the tiling mode for the depth buffer
-		Gnm::DataFormat depthFormat = Gnm::DataFormat::build(kZFormat);
-		Gnm::TileMode depthTileMode;
-		if( !GpuAddress::computeSurfaceTileMode(&depthTileMode,
-			GpuAddress::kSurfaceTypeDepthOnlyTarget, depthFormat, 1) )
+		// Compute the tiling mode for the depth buffer		
+		if (_displayBuffers[i].hasDepthTarget = depthFormat_ != DepthFormat_None)
 		{
-			printf("Cannot compute the tile mode for the depth stencil surface\n");
-			return; // SCE_KERNEL_ERROR_UNKNOWN;
-		}
-
-		// Initialize the depth buffer descriptor
-		Gnm::SizeAlign stencilSizeAlign;
-		Gnm::SizeAlign htileSizeAlign;
-		Gnm::SizeAlign depthTargetSizeAlign = _displayBuffers[i].depthTarget.init(
-			backbufferWidth,
-			backbufferHeight,
-			depthFormat.getZFormat(),
-			kStencilFormat,
-			depthTileMode,
-			Gnm::kNumFragments1,
-			kStencilFormat != Gnm::kStencilInvalid ? &stencilSizeAlign : NULL,
-			kHtileEnabled ? &htileSizeAlign : NULL);
-
-		// Initialize the HTILE buffer, if enabled
-		if( kHtileEnabled )
-		{
-			void *htileMemory = Allocator::Get()->allocate(htileSizeAlign, SCE_KERNEL_WC_GARLIC);
-			if( !htileMemory )
+			auto depthFormat = ToDataFormat(depthFormat_);
+			Gnm::TileMode depthTileMode;
+			if( !GpuAddress::computeSurfaceTileMode(&depthTileMode,
+				GpuAddress::kSurfaceTypeDepthOnlyTarget, depthFormat, 1) )
 			{
-				printf("Cannot allocate the HTILE buffer\n");
-				return; // SCE_KERNEL_ERROR_ENOMEM;
+				printf("Cannot compute the tile mode for the depth stencil surface\n");
+				return; // SCE_KERNEL_ERROR_UNKNOWN;
 			}
 
-			_displayBuffers[i].depthTarget.setHtileAddress(htileMemory);
-		}
+			// Initialize the depth buffer descriptor
+			Gnm::SizeAlign stencilSizeAlign;
+			Gnm::SizeAlign htileSizeAlign;
+			Gnm::SizeAlign depthTargetSizeAlign = _displayBuffers[i].depthTarget.init(
+				backbufferWidth,
+				backbufferHeight,
+				depthFormat.getZFormat(),
+				kStencilFormat,
+				depthTileMode,
+				Gnm::kNumFragments1,
+				kStencilFormat != Gnm::kStencilInvalid ? &stencilSizeAlign : NULL,
+				kHtileEnabled ? &htileSizeAlign : NULL);
 
-		// Initialize the stencil buffer, if enabled
-		void *stencilMemory = NULL;
-		if( kStencilFormat != Gnm::kStencilInvalid )
-		{
-			stencilMemory = Allocator::Get()->allocate(stencilSizeAlign, SCE_KERNEL_WC_GARLIC);
-			if( !stencilMemory )
+			// Initialize the HTILE buffer, if enabled
+			if( kHtileEnabled )
 			{
-				printf("Cannot allocate the stencil buffer\n");
+				void *htileMemory = Allocator::Get()->allocate(htileSizeAlign, SCE_KERNEL_WC_GARLIC);
+				if( !htileMemory )
+				{
+					printf("Cannot allocate the HTILE buffer\n");
+					return; // SCE_KERNEL_ERROR_ENOMEM;
+				}
+
+				_displayBuffers[i].depthTarget.setHtileAddress(htileMemory);
+			}
+
+			// Initialize the stencil buffer, if enabled
+			void *stencilMemory = NULL;
+			if( kStencilFormat != Gnm::kStencilInvalid )
+			{
+				stencilMemory = Allocator::Get()->allocate(stencilSizeAlign, SCE_KERNEL_WC_GARLIC);
+				if( !stencilMemory )
+				{
+					printf("Cannot allocate the stencil buffer\n");
+					return; // SCE_KERNEL_ERROR_ENOMEM;
+				}
+			}
+
+			// Allocate the depth buffer
+			void *depthMemory = Allocator::Get()->allocate(depthTargetSizeAlign, SCE_KERNEL_WC_GARLIC);
+			if( !depthMemory )
+			{
+				printf("Cannot allocate the depth buffer\n");
 				return; // SCE_KERNEL_ERROR_ENOMEM;
 			}
+			_displayBuffers[i].depthTarget.setAddresses(depthMemory, stencilMemory);
 		}
-
-		// Allocate the depth buffer
-		void *depthMemory = Allocator::Get()->allocate(depthTargetSizeAlign, SCE_KERNEL_WC_GARLIC);
-		if( !depthMemory )
-		{
-			printf("Cannot allocate the depth buffer\n");
-			return; // SCE_KERNEL_ERROR_ENOMEM;
-		}
-		_displayBuffers[i].depthTarget.setAddresses(depthMemory, stencilMemory);
 
 		_displayBuffers[i].state = (volatile uint32_t*) Allocator::Get()->allocate(4, 8, SCE_KERNEL_WB_ONION);
 		if( !_displayBuffers[i].state )
@@ -248,12 +250,6 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		}
 
 		_displayBuffers[i].state[0] = kDisplayBufferIdle;
-		
-		/*
-		// Allocate enough space for 4000 verts and index data.
-		_displayBuffers[i].userData = Allocator::Get()->allocate(DisplayBuffer::MaxBufferSize, Gnm::kAlignmentOfBufferInBytes, SCE_KERNEL_WC_GARLIC);
-		_displayBuffers[i].userOffset = 0;
-		*/
 	}
 
 	// Initialization the VideoOut buffer descriptor

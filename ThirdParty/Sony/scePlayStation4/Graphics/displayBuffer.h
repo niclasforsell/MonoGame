@@ -14,6 +14,7 @@ typedef struct DisplayBuffer
 	void							*dcbBuffer;
 	void							*ccbBuffer;
 	sce::Gnm::RenderTarget			renderTarget;
+	bool							hasDepthTarget;
 	sce::Gnm::DepthRenderTarget		depthTarget;
 	volatile uint32_t				*state;
 
