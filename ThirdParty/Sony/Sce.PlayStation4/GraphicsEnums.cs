@@ -50,6 +50,14 @@ namespace Sce.PlayStation4
             TextureFormat_HdrBlendable = 19
         }
 
+        public enum DepthFormat
+        {
+            None = -1,
+            Depth16 = 54,
+            Depth24 = 51,
+            Depth24Stencil8 = 48
+        }
+
         public enum IndexElement : uint
         {
             IndexElement_SixteenBits = 0,

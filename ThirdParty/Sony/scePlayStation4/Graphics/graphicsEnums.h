@@ -48,6 +48,17 @@ enum TextureFormat
     TextureFormat_HdrBlendable = 19,
 };
 
+enum DepthFormat
+{
+	// NOTE: This should match up with the MonoGame 
+	// DepthFormat enum for easy interop!
+
+	None = -1,
+	Depth16 = 54,
+	Depth24 = 51,
+	Depth24Stencil8 = 48,		
+};
+
 enum IndexElement
 {
 	// NOTE: This should match up with the MonoGame 

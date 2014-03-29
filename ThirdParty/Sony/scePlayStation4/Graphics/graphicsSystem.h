@@ -10,8 +10,6 @@ class __declspec(dllexport) GraphicsSystem
 {
 private:
 
-	static const uint32_t kDisplayBufferWidth				= 1280;
-	static const uint32_t kDisplayBufferHeight				= 720;
 	static const uint32_t kDisplayBufferCount				= 2;
 	static const bool kHtileEnabled							= true;
 	
@@ -47,7 +45,7 @@ public:
 	GraphicsSystem();
 	virtual ~GraphicsSystem();
 
-	virtual void Initialize();
+	virtual void Initialize(int backbufferWidth, int backbufferHeight, TextureFormat backbufferFormat, DepthFormat depthFormat);
 
 	virtual void SetRenderTarget(RenderTarget *renderTarget);
 

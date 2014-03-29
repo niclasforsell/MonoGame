@@ -53,7 +53,7 @@ GraphicsSystem::~GraphicsSystem()
 {
 }
 
-void GraphicsSystem::Initialize()
+void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, TextureFormat backbufferFormat, DepthFormat depthFormat)
 {
 	//printf("Initialize!\n");
 
@@ -164,8 +164,8 @@ void GraphicsSystem::Initialize()
 
 		// Initialize the render target descriptor
 		Gnm::SizeAlign sizeAlign = _displayBuffers[i].renderTarget.init(
-			kDisplayBufferWidth,
-			kDisplayBufferHeight,
+			backbufferWidth,
+			backbufferHeight,
 			1,
 			format,
 			tileMode,
@@ -197,8 +197,8 @@ void GraphicsSystem::Initialize()
 		Gnm::SizeAlign stencilSizeAlign;
 		Gnm::SizeAlign htileSizeAlign;
 		Gnm::SizeAlign depthTargetSizeAlign = _displayBuffers[i].depthTarget.init(
-			kDisplayBufferWidth,
-			kDisplayBufferHeight,
+			backbufferWidth,
+			backbufferHeight,
 			depthFormat.getZFormat(),
 			kStencilFormat,
 			depthTileMode,
@@ -352,6 +352,11 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 	blendControl.init();
 	blendControl.setBlendEnable(false);
 	gfxc.setBlendControl(0, blendControl);
+
+	if (options & ClearOptions_Target)
+		gfxc.setRenderTargetMask(0x000F);
+	else
+		gfxc.setRenderTargetMask(0x0000);
 
 	// We do the draw using a rect primitive and a vertex
 	// shader that generates the position from ids.

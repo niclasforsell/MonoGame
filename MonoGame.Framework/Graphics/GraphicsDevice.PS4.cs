@@ -18,7 +18,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformInitialize()
         {
-            _system.Initialize();
+            _system.Initialize( PresentationParameters.BackBufferWidth, 
+                                PresentationParameters.BackBufferHeight, 
+                                (TextureFormat)PresentationParameters.BackBufferFormat,
+                                (Sce.PlayStation4.Graphics.DepthFormat)PresentationParameters.DepthStencilFormat);
+            _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
         }
 
         private void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
@@ -35,6 +39,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformPresent()
         {
             _system.Present();
+            
+            // Restore the viewport after present.
+            _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
         }
 
         private void PlatformSetViewport(ref Viewport viewport)
