@@ -89,7 +89,6 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		return;
 	}
 
-
 	auto kStencilFormat = depthFormat_ == DepthFormat_Depth24Stencil8 ? Gnm::kStencil8 : Gnm::kStencilInvalid;
 	_displayBuffers = new DisplayBuffer[kDisplayBufferCount];
 
@@ -539,20 +538,96 @@ void GraphicsSystem::SetViewport(int left, int top, int width, int height, float
 	gfxc.setupScreenViewport(left, top, left + width, top + height, 1.0f, 0.0f);
 }
 
-void GraphicsSystem::_setSamplerState(int slot)
+void GraphicsSystem::SetSamplerState(int slot, uint32_t desc0, uint32_t desc1, uint32_t desc2, uint32_t desc3)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
 	Gnm::Sampler sampler;
-	sampler.init();
-	sampler.setLodRange(0, 0);
-	sampler.setLodBias(0.0f, 0.0f);
-	sampler.setMipFilterMode(Gnm::kMipFilterModePoint);
-	sampler.setAnisotropyRatio(Gnm::kAnisotropyRatio4);
-	sampler.setWrapMode(Gnm::kWrapModeClampLastTexel, Gnm::kWrapModeClampLastTexel, Gnm::kWrapModeClampLastTexel);
-	sampler.setXyFilterMode(Gnm::kFilterModePoint, Gnm::kFilterModePoint);
+	sampler.m_regs[0] = desc0;
+	sampler.m_regs[1] = desc1;
+	sampler.m_regs[2] = desc2;
+	sampler.m_regs[3] = desc3;
+
 	gfxc.setSamplers(Gnm::kShaderStagePs, slot, 1, &sampler);
+}
+
+void GraphicsSystem::CreateSamplerState(	TextureFilter filter, 
+											TextureAddressMode addressU, 
+											TextureAddressMode addressV, 
+											TextureAddressMode addressW,
+											int maxAnisotropy,
+											int maxMipLevel,
+											float mipMapLevelOfDetailBias,
+											uint32_t &desc0,
+											uint32_t &desc1,
+											uint32_t &desc2,
+											uint32_t &desc3)
+{
+	Gnm::Sampler sampler;
+	sampler.init();
+
+	sampler.setWrapMode(ToWrapMode(addressU), ToWrapMode(addressV), ToWrapMode(addressW));
+
+	switch (filter)
+    {
+		default:
+		case TextureFilter_Linear:
+			sampler.setXyFilterMode(Gnm::kFilterModeBilinear, Gnm::kFilterModeBilinear);
+			sampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+			break;
+		case TextureFilter_Point:
+			sampler.setXyFilterMode(Gnm::kFilterModePoint, Gnm::kFilterModePoint);
+			sampler.setMipFilterMode(Gnm::kMipFilterModePoint);
+			break;
+		case TextureFilter_Anisotropic:
+			sampler.setXyFilterMode(Gnm::kFilterModeAnisoBilinear, Gnm::kFilterModeAnisoBilinear);
+			sampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+			break;
+		case TextureFilter_LinearMipPoint:
+			sampler.setXyFilterMode(Gnm::kFilterModeBilinear, Gnm::kFilterModeBilinear);
+			sampler.setMipFilterMode(Gnm::kMipFilterModePoint);
+			break;
+		case TextureFilter_PointMipLinear:
+			sampler.setXyFilterMode(Gnm::kFilterModePoint, Gnm::kFilterModePoint);
+			sampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+			break;
+		case TextureFilter_MinLinearMagPointMipLinear:
+			sampler.setXyFilterMode(Gnm::kFilterModePoint, Gnm::kFilterModeBilinear);
+			sampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+			break;
+		case TextureFilter_MinLinearMagPointMipPoint:
+			sampler.setXyFilterMode(Gnm::kFilterModePoint, Gnm::kFilterModeBilinear);
+			sampler.setMipFilterMode(Gnm::kMipFilterModePoint);
+			break;
+		case TextureFilter_MinPointMagLinearMipLinear:
+			sampler.setXyFilterMode(Gnm::kFilterModeBilinear, Gnm::kFilterModePoint);
+			sampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+			break;
+		case TextureFilter_MinPointMagLinearMipPoint:
+			sampler.setXyFilterMode(Gnm::kFilterModeBilinear, Gnm::kFilterModePoint);
+			sampler.setMipFilterMode(Gnm::kMipFilterModePoint);
+			break;
+    }
+
+	sampler.setLodRange(0, maxMipLevel);
+	sampler.setLodBias(mipMapLevelOfDetailBias, 0.0f);
+
+	if (maxAnisotropy >= 16)
+		sampler.setAnisotropyRatio(Gnm::kAnisotropyRatio16);
+	else if (maxAnisotropy >= 8)
+		sampler.setAnisotropyRatio(Gnm::kAnisotropyRatio8);
+	else if (maxAnisotropy >= 4)
+		sampler.setAnisotropyRatio(Gnm::kAnisotropyRatio4);
+	else if (maxAnisotropy >= 2)
+		sampler.setAnisotropyRatio(Gnm::kAnisotropyRatio2);
+	else 
+		sampler.setAnisotropyRatio(Gnm::kAnisotropyRatio1);
+
+	desc0 = sampler.m_regs[0];
+	desc1 = sampler.m_regs[1];
+	desc2 = sampler.m_regs[2];
+	desc3 = sampler.m_regs[3];
 }
 
 void GraphicsSystem::SetTexture(int slot, Texture* texture)
@@ -562,8 +637,6 @@ void GraphicsSystem::SetTexture(int slot, Texture* texture)
 
 	sce::Gnm::Texture *tex = texture != NULL ? texture->_texture : NULL;
 	gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, tex);
-
-	_setSamplerState(slot);
 }
 
 void GraphicsSystem::SetTextureRT(int slot, RenderTarget* target)
@@ -585,8 +658,6 @@ void GraphicsSystem::SetTextureRT(int slot, RenderTarget* target)
 
 	//_effectDirty = true;
 	gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, target->_texture);
-	
-	_setSamplerState(slot);
 }
 
 void GraphicsSystem::SetBlendState(const char* name)

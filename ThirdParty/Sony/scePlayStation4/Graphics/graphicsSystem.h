@@ -38,7 +38,6 @@ private:
 	void prepareBackBuffer();
 
 	void _applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sce::Gnm::DepthRenderTarget *depthTarget);
-	void _setSamplerState(int slot);
 
 public:
 
@@ -57,6 +56,7 @@ public:
 
 	virtual void SetTexture(int slot, Texture* texture);
 	virtual void SetTextureRT(int slot, RenderTarget* target);
+	virtual void SetSamplerState(int slot, uint32_t desc0, uint32_t desc1, uint32_t desc2, uint32_t desc3);
 
 	virtual void SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth);
 
@@ -68,6 +68,19 @@ public:
 	virtual void SetVertexShader(VertexShader *shader);
 	virtual void SetPixelShader(PixelShader *shader);
 	virtual void SetShaderConstants(ShaderStage stage, void *data, uint32_t sizeInBytes);
+
+	static void CreateSamplerState(	TextureFilter filter, 
+									TextureAddressMode addressU, 
+									TextureAddressMode addressV, 
+									TextureAddressMode addressW,
+									int maxAnisotropy,
+									int maxMipLevel,
+									float mipMapLevelOfDetailBias,
+									uint32_t &desc0,
+									uint32_t &desc1,
+									uint32_t &desc2,
+									uint32_t &desc3);
+
 };
 
 } // namespace Graphics

@@ -85,12 +85,37 @@ enum PrimitiveType
 	PrimitiveType_LineStrip,
 };
 
-
 enum ClearOptions
 {
 	ClearOptions_Target = 1,
     ClearOptions_DepthBuffer = 2,
     ClearOptions_Stencil = 4        
+};
+
+enum TextureFilter
+{
+	// NOTE: This should match up with the MonoGame 
+	// TextureFilter enum for easy interop!
+
+	TextureFilter_Linear,
+	TextureFilter_Point,
+	TextureFilter_Anisotropic,
+	TextureFilter_LinearMipPoint,
+	TextureFilter_PointMipLinear,
+	TextureFilter_MinLinearMagPointMipLinear,
+	TextureFilter_MinLinearMagPointMipPoint,
+	TextureFilter_MinPointMagLinearMipLinear,
+	TextureFilter_MinPointMagLinearMipPoint,
+};
+
+enum TextureAddressMode
+{
+	// NOTE: This should match up with the MonoGame 
+	// TextureAddressMode enum for easy interop!
+
+	TextureAddressMode_Wrap,
+	TextureAddressMode_Clamp,
+	TextureAddressMode_Mirror,
 };
 
 } // namespace Graphics

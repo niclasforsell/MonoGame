@@ -112,4 +112,18 @@ static inline uint32_t ToPrimitiveElementCount(PrimitiveType primitiveType, uint
     }
 }
 
+static inline Gnm::WrapMode ToWrapMode(TextureAddressMode mode)
+{
+    switch (mode)
+    {
+		default:
+        case TextureAddressMode_Wrap:
+            return Gnm::kWrapModeWrap;
+        case TextureAddressMode_Clamp:
+            return Gnm::kWrapModeClampLastTexel;
+        case TextureAddressMode_Mirror:
+            return Gnm::kWrapModeMirror;
+    }
+}
+
 } // namespace Graphics
