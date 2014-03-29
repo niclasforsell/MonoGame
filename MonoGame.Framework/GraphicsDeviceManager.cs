@@ -80,8 +80,14 @@ namespace Microsoft.Xna.Framework
 #if !WINRT
         private bool _wantFullScreen = false;
 #endif
+
+#if PLAYSTATION4
+        public static readonly int DefaultBackBufferWidth = 1920;
+        public static readonly int DefaultBackBufferHeight = 1080;
+#else
         public static readonly int DefaultBackBufferHeight = 480;
         public static readonly int DefaultBackBufferWidth = 800;
+#endif
 
         public GraphicsDeviceManager(Game game)
         {
@@ -92,7 +98,7 @@ namespace Microsoft.Xna.Framework
 
             _supportedOrientations = DisplayOrientation.Default;
 
-#if WINDOWS || MONOMAC || LINUX
+#if WINDOWS || MONOMAC || LINUX || PLAYSTATION4
             _preferredBackBufferHeight = DefaultBackBufferHeight;
             _preferredBackBufferWidth = DefaultBackBufferWidth;
 #else
@@ -221,7 +227,14 @@ namespace Microsoft.Xna.Framework
             if (_graphicsDevice == null)
                 return;
 
-#if WINDOWS_PHONE
+#if PLAYSTATION4
+            _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
+            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+            _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
+            _graphicsDevice.PresentationParameters.IsFullScreen = true;
+#elif WINDOWS_PHONE
             // Display orientation is always portrait on WP8
             _graphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
 #elif WINDOWS_STOREAPP
@@ -322,6 +335,15 @@ namespace Microsoft.Xna.Framework
             var presentationParameters = new PresentationParameters();
             presentationParameters.DepthStencilFormat = DepthFormat.Depth24;
 
+#if PLAYSTATION4
+            presentationParameters.BackBufferFormat = _preferredBackBufferFormat;
+            presentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+            presentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+            presentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
+            presentationParameters.IsFullScreen = true;
+#endif
+
 #if WINDOWS || WINRT
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
@@ -418,7 +440,7 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-#if WINRT
+#if WINRT || PLAYSTATION4
                 return true;
 #else
                 if (_graphicsDevice != null)
@@ -429,8 +451,8 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-#if WINRT
-                // Just ignore this as it is not relevant on Windows 8
+#if WINRT || PLAYSTATION4
+                // Just ignore this as it is not relevant on these platforms.
 #else
                 _wantFullScreen = value;
                 if (_graphicsDevice != null)

@@ -15,7 +15,8 @@ namespace Microsoft.Xna.Framework.Graphics
             SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount,
             RenderTargetUsage usage, bool shared)
         {
-            _target = new RenderTarget((TextureFormat)preferredFormat, width, height);
+            _target = new RenderTarget( (TextureFormat)preferredFormat, width, height, 
+                                        (Sce.PlayStation4.Graphics.DepthFormat)preferredDepthFormat);
         }
 
         private void PlatformGraphicsDeviceResetting()

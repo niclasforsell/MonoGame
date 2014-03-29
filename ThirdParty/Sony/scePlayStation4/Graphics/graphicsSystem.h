@@ -10,8 +10,6 @@ class __declspec(dllexport) GraphicsSystem
 {
 private:
 
-	static const uint32_t kDisplayBufferWidth				= 1280;
-	static const uint32_t kDisplayBufferHeight				= 720;
 	static const uint32_t kDisplayBufferCount				= 2;
 	static const bool kHtileEnabled							= true;
 	
@@ -39,15 +37,14 @@ private:
 
 	void prepareBackBuffer();
 
-	void _applyRenderTarget(sce::Gnm::RenderTarget *renderTarget);
-	void _setSamplerState(int slot);
+	void _applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sce::Gnm::DepthRenderTarget *depthTarget);
 
 public:
 
 	GraphicsSystem();
 	virtual ~GraphicsSystem();
 
-	virtual void Initialize();
+	virtual void Initialize(int backbufferWidth, int backbufferHeight, TextureFormat backbufferFormat, DepthFormat depthFormat);
 
 	virtual void SetRenderTarget(RenderTarget *renderTarget);
 
@@ -59,6 +56,7 @@ public:
 
 	virtual void SetTexture(int slot, Texture* texture);
 	virtual void SetTextureRT(int slot, RenderTarget* target);
+	virtual void SetSamplerState(int slot, uint32_t desc0, uint32_t desc1, uint32_t desc2, uint32_t desc3);
 
 	virtual void SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth);
 
@@ -70,6 +68,19 @@ public:
 	virtual void SetVertexShader(VertexShader *shader);
 	virtual void SetPixelShader(PixelShader *shader);
 	virtual void SetShaderConstants(ShaderStage stage, void *data, uint32_t sizeInBytes);
+
+	static void CreateSamplerState(	TextureFilter filter, 
+									TextureAddressMode addressU, 
+									TextureAddressMode addressV, 
+									TextureAddressMode addressW,
+									int maxAnisotropy,
+									int maxMipLevel,
+									float mipMapLevelOfDetailBias,
+									uint32_t &desc0,
+									uint32_t &desc1,
+									uint32_t &desc2,
+									uint32_t &desc3);
+
 };
 
 } // namespace Graphics

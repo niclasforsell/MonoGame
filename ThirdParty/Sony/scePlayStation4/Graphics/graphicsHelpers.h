@@ -56,6 +56,31 @@ static inline sce::Gnm::DataFormat ToDataFormat(TextureFormat format)
 	};
 }
 
+static inline sce::Gnm::DataFormat ToSwapchainDataFormat(TextureFormat format)
+{
+	switch (format)
+	{
+	default:
+	case TextureFormat_Color:
+		return Gnm::kDataFormatB8G8R8A8Unorm;
+	case TextureFormat_Rgba1010102:
+		return Gnm::kDataFormatB10G10R10A2Unorm;
+	};
+}
+
+static inline sce::Gnm::DataFormat ToDataFormat(DepthFormat format)
+{
+	switch (format)
+	{
+	default:
+	case DepthFormat_Depth24:
+	case DepthFormat_Depth24Stencil8:
+		return Gnm::DataFormat::build(Gnm::kZFormat32Float);
+	case DepthFormat_Depth16:
+		return Gnm::DataFormat::build(Gnm::kZFormat16);
+	};
+}
+
 static inline sce::Gnm::PrimitiveType ToPrimitiveType(PrimitiveType type)
 {
     switch (type)
@@ -84,6 +109,20 @@ static inline uint32_t ToPrimitiveElementCount(PrimitiveType primitiveType, uint
             return primitiveCount * 2;
         case PrimitiveType_LineStrip:
             return primitiveCount + 1;
+    }
+}
+
+static inline Gnm::WrapMode ToWrapMode(TextureAddressMode mode)
+{
+    switch (mode)
+    {
+		default:
+        case TextureAddressMode_Wrap:
+            return Gnm::kWrapModeWrap;
+        case TextureAddressMode_Clamp:
+            return Gnm::kWrapModeClampLastTexel;
+        case TextureAddressMode_Mirror:
+            return Gnm::kWrapModeMirror;
     }
 }
 

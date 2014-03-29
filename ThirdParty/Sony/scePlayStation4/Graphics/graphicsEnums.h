@@ -48,6 +48,17 @@ enum TextureFormat
     TextureFormat_HdrBlendable = 19,
 };
 
+enum DepthFormat
+{
+	// NOTE: This should match up with the MonoGame 
+	// DepthFormat enum for easy interop!
+
+	DepthFormat_None = -1,
+	DepthFormat_Depth16 = 54,
+	DepthFormat_Depth24 = 51,
+	DepthFormat_Depth24Stencil8 = 48,		
+};
+
 enum IndexElement
 {
 	// NOTE: This should match up with the MonoGame 
@@ -74,12 +85,37 @@ enum PrimitiveType
 	PrimitiveType_LineStrip,
 };
 
-
 enum ClearOptions
 {
 	ClearOptions_Target = 1,
     ClearOptions_DepthBuffer = 2,
     ClearOptions_Stencil = 4        
+};
+
+enum TextureFilter
+{
+	// NOTE: This should match up with the MonoGame 
+	// TextureFilter enum for easy interop!
+
+	TextureFilter_Linear,
+	TextureFilter_Point,
+	TextureFilter_Anisotropic,
+	TextureFilter_LinearMipPoint,
+	TextureFilter_PointMipLinear,
+	TextureFilter_MinLinearMagPointMipLinear,
+	TextureFilter_MinLinearMagPointMipPoint,
+	TextureFilter_MinPointMagLinearMipLinear,
+	TextureFilter_MinPointMagLinearMipPoint,
+};
+
+enum TextureAddressMode
+{
+	// NOTE: This should match up with the MonoGame 
+	// TextureAddressMode enum for easy interop!
+
+	TextureAddressMode_Wrap,
+	TextureAddressMode_Clamp,
+	TextureAddressMode_Mirror,
 };
 
 } // namespace Graphics

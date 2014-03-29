@@ -53,7 +53,7 @@ GraphicsSystem::~GraphicsSystem()
 {
 }
 
-void GraphicsSystem::Initialize()
+void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, TextureFormat backbufferFormat, DepthFormat depthFormat_)
 {
 	//printf("Initialize!\n");
 
@@ -89,9 +89,7 @@ void GraphicsSystem::Initialize()
 		return;
 	}
 
-
-	static const sce::Gnm::ZFormat kZFormat				= sce::Gnm::kZFormat32Float;
-	static const sce::Gnm::StencilFormat kStencilFormat	= sce::Gnm::kStencil8;
+	auto kStencilFormat = depthFormat_ == DepthFormat_Depth24Stencil8 ? Gnm::kStencil8 : Gnm::kStencilInvalid;
 	_displayBuffers = new DisplayBuffer[kDisplayBufferCount];
 
 	for(uint32_t i=0; i<kDisplayBufferCount; ++i)
@@ -154,7 +152,7 @@ void GraphicsSystem::Initialize()
 
 		// Compute the tiling mode for the render target
 		Gnm::TileMode tileMode;
-		Gnm::DataFormat format = Gnm::kDataFormatB8G8R8A8Unorm;
+		auto format = ToSwapchainDataFormat(backbufferFormat);
 		if( !GpuAddress::computeSurfaceTileMode(&tileMode,
 			GpuAddress::kSurfaceTypeColorTargetDisplayable, format, 1) )
 		{
@@ -164,8 +162,8 @@ void GraphicsSystem::Initialize()
 
 		// Initialize the render target descriptor
 		Gnm::SizeAlign sizeAlign = _displayBuffers[i].renderTarget.init(
-			kDisplayBufferWidth,
-			kDisplayBufferHeight,
+			backbufferWidth,
+			backbufferHeight,
 			1,
 			format,
 			tileMode,
@@ -183,62 +181,65 @@ void GraphicsSystem::Initialize()
 		}
 		_displayBuffers[i].renderTarget.setAddresses(_surfaceAddresses[i], 0, 0);
 
-		// Compute the tiling mode for the depth buffer
-		Gnm::DataFormat depthFormat = Gnm::DataFormat::build(kZFormat);
-		Gnm::TileMode depthTileMode;
-		if( !GpuAddress::computeSurfaceTileMode(&depthTileMode,
-			GpuAddress::kSurfaceTypeDepthOnlyTarget, depthFormat, 1) )
+		// Compute the tiling mode for the depth buffer		
+		if (_displayBuffers[i].hasDepthTarget = depthFormat_ != DepthFormat_None)
 		{
-			printf("Cannot compute the tile mode for the depth stencil surface\n");
-			return; // SCE_KERNEL_ERROR_UNKNOWN;
-		}
-
-		// Initialize the depth buffer descriptor
-		Gnm::SizeAlign stencilSizeAlign;
-		Gnm::SizeAlign htileSizeAlign;
-		Gnm::SizeAlign depthTargetSizeAlign = _displayBuffers[i].depthTarget.init(
-			kDisplayBufferWidth,
-			kDisplayBufferHeight,
-			depthFormat.getZFormat(),
-			kStencilFormat,
-			depthTileMode,
-			Gnm::kNumFragments1,
-			kStencilFormat != Gnm::kStencilInvalid ? &stencilSizeAlign : NULL,
-			kHtileEnabled ? &htileSizeAlign : NULL);
-
-		// Initialize the HTILE buffer, if enabled
-		if( kHtileEnabled )
-		{
-			void *htileMemory = Allocator::Get()->allocate(htileSizeAlign, SCE_KERNEL_WC_GARLIC);
-			if( !htileMemory )
+			auto depthFormat = ToDataFormat(depthFormat_);
+			Gnm::TileMode depthTileMode;
+			if( !GpuAddress::computeSurfaceTileMode(&depthTileMode,
+				GpuAddress::kSurfaceTypeDepthOnlyTarget, depthFormat, 1) )
 			{
-				printf("Cannot allocate the HTILE buffer\n");
-				return; // SCE_KERNEL_ERROR_ENOMEM;
+				printf("Cannot compute the tile mode for the depth stencil surface\n");
+				return; // SCE_KERNEL_ERROR_UNKNOWN;
 			}
 
-			_displayBuffers[i].depthTarget.setHtileAddress(htileMemory);
-		}
+			// Initialize the depth buffer descriptor
+			Gnm::SizeAlign stencilSizeAlign;
+			Gnm::SizeAlign htileSizeAlign;
+			Gnm::SizeAlign depthTargetSizeAlign = _displayBuffers[i].depthTarget.init(
+				backbufferWidth,
+				backbufferHeight,
+				depthFormat.getZFormat(),
+				kStencilFormat,
+				depthTileMode,
+				Gnm::kNumFragments1,
+				kStencilFormat != Gnm::kStencilInvalid ? &stencilSizeAlign : NULL,
+				kHtileEnabled ? &htileSizeAlign : NULL);
 
-		// Initialize the stencil buffer, if enabled
-		void *stencilMemory = NULL;
-		if( kStencilFormat != Gnm::kStencilInvalid )
-		{
-			stencilMemory = Allocator::Get()->allocate(stencilSizeAlign, SCE_KERNEL_WC_GARLIC);
-			if( !stencilMemory )
+			// Initialize the HTILE buffer, if enabled
+			if( kHtileEnabled )
 			{
-				printf("Cannot allocate the stencil buffer\n");
+				void *htileMemory = Allocator::Get()->allocate(htileSizeAlign, SCE_KERNEL_WC_GARLIC);
+				if( !htileMemory )
+				{
+					printf("Cannot allocate the HTILE buffer\n");
+					return; // SCE_KERNEL_ERROR_ENOMEM;
+				}
+
+				_displayBuffers[i].depthTarget.setHtileAddress(htileMemory);
+			}
+
+			// Initialize the stencil buffer, if enabled
+			void *stencilMemory = NULL;
+			if( kStencilFormat != Gnm::kStencilInvalid )
+			{
+				stencilMemory = Allocator::Get()->allocate(stencilSizeAlign, SCE_KERNEL_WC_GARLIC);
+				if( !stencilMemory )
+				{
+					printf("Cannot allocate the stencil buffer\n");
+					return; // SCE_KERNEL_ERROR_ENOMEM;
+				}
+			}
+
+			// Allocate the depth buffer
+			void *depthMemory = Allocator::Get()->allocate(depthTargetSizeAlign, SCE_KERNEL_WC_GARLIC);
+			if( !depthMemory )
+			{
+				printf("Cannot allocate the depth buffer\n");
 				return; // SCE_KERNEL_ERROR_ENOMEM;
 			}
+			_displayBuffers[i].depthTarget.setAddresses(depthMemory, stencilMemory);
 		}
-
-		// Allocate the depth buffer
-		void *depthMemory = Allocator::Get()->allocate(depthTargetSizeAlign, SCE_KERNEL_WC_GARLIC);
-		if( !depthMemory )
-		{
-			printf("Cannot allocate the depth buffer\n");
-			return; // SCE_KERNEL_ERROR_ENOMEM;
-		}
-		_displayBuffers[i].depthTarget.setAddresses(depthMemory, stencilMemory);
 
 		_displayBuffers[i].state = (volatile uint32_t*) Allocator::Get()->allocate(4, 8, SCE_KERNEL_WB_ONION);
 		if( !_displayBuffers[i].state )
@@ -248,12 +249,6 @@ void GraphicsSystem::Initialize()
 		}
 
 		_displayBuffers[i].state[0] = kDisplayBufferIdle;
-		
-		/*
-		// Allocate enough space for 4000 verts and index data.
-		_displayBuffers[i].userData = Allocator::Get()->allocate(DisplayBuffer::MaxBufferSize, Gnm::kAlignmentOfBufferInBytes, SCE_KERNEL_WC_GARLIC);
-		_displayBuffers[i].userOffset = 0;
-		*/
 	}
 
 	// Initialization the VideoOut buffer descriptor
@@ -283,12 +278,12 @@ void GraphicsSystem::Initialize()
 	prepareBackBuffer();
 }
 
-void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget)
+void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sce::Gnm::DepthRenderTarget *depthTarget)
 {
 	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
 	
 	gfxc.setRenderTarget(0, renderTarget);
-	gfxc.setDepthRenderTarget(NULL);
+	gfxc.setDepthRenderTarget(depthTarget);
 	gfxc.setRenderTargetMask(0xF);
 
 	SetViewport(0, 0, renderTarget->getWidth(), renderTarget->getHeight(), 0.0f, 1.0f);
@@ -304,22 +299,29 @@ void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget)
 	gfxc.setClipControl(clip);
 }
 
-void GraphicsSystem::SetRenderTarget(RenderTarget *renderTarget)
+void GraphicsSystem::SetRenderTarget(RenderTarget *renderTarget_)
 {
 	//printf("SettingRenderTarget to 0x%08X\n", renderTarget);
 
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 
-	sce::Gnm::RenderTarget *rtNativeHandle;
+	sce::Gnm::RenderTarget *renderTarget;
+	sce::Gnm::DepthRenderTarget *depthTarget;
 
-	if (renderTarget)
-		rtNativeHandle = renderTarget->_renderTarget;
+	if (renderTarget_)
+	{
+		renderTarget = renderTarget_->_renderTarget;
+		depthTarget = renderTarget_->_depthTarget;
+	}
 	else
-		rtNativeHandle = &backBuffer->renderTarget;
+	{
+		renderTarget = &backBuffer->renderTarget;
+		depthTarget = backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL;
+	}
 
-	_currentRenderTarget = renderTarget;
+	_currentRenderTarget = renderTarget_;
 
-	_applyRenderTarget(rtNativeHandle);
+	_applyRenderTarget(renderTarget, depthTarget);
 }
 
 void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, float a, float depth, int stencil)
@@ -328,13 +330,34 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
 	// Setup the clear shader.
-	//gfxc.setActiveShaderStages(Gnm::kActiveShaderStagesVsPs);
 	SetVertexShader(_clearVS);
 	SetPixelShader(_clearPS);
 	float color[4] = {r, g, b, a};
 	SetShaderConstants(ShaderStage_Pixel, &color, sizeof(color));
 
-	// Clobber some states.
+	// Are we clearing the color target?
+	if (options & ClearOptions_Target)
+		gfxc.setRenderTargetMask(0xFFFFFFFF);
+	else
+		gfxc.setRenderTargetMask(0x0000);
+
+	// Are we clearing depth?
+	auto clearDepth = (options & ClearOptions_DepthBuffer) != 0;
+	sce::Gnm::DepthStencilControl depthControl;
+	depthControl.init();
+	depthControl.setDepthEnable(false);
+	depthControl.setDepthControl(clearDepth ? Gnm::kDepthControlZWriteEnable : Gnm::kDepthControlZWriteDisable, Gnm::kCompareFuncNever);
+	gfxc.setDepthStencilControl(depthControl);
+
+	// Are we clearing stencil?
+	auto clearStencil = (options & ClearOptions_Stencil) != 0;
+	sce::Gnm::StencilControl stencilControl;
+	stencilControl.init();
+	stencilControl.m_writeMask = 0xFF;
+	stencilControl.m_opVal = (uint8_t)stencil;
+	gfxc.setStencil(stencilControl);
+
+	// Clobber some more states.
 	sce::Gnm::PrimitiveSetup prim;
 	prim.init();
 	prim.setCullFace(sce::Gnm::kPrimitiveSetupCullFaceNone);
@@ -343,11 +366,6 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 	clip.init();
 	clip.setClipSpace(sce::Gnm::kClipControlClipSpaceDX);
 	gfxc.setClipControl(clip);
-	sce::Gnm::DepthStencilControl depthControl;
-	depthControl.init();
-	depthControl.setDepthEnable(false);
-	depthControl.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncNever);
-	gfxc.setDepthStencilControl(depthControl);
 	Gnm::BlendControl blendControl;
 	blendControl.init();
 	blendControl.setBlendEnable(false);
@@ -498,7 +516,8 @@ void GraphicsSystem::prepareBackBuffer()
 	// The z-scale and z-offset values are used to specify the transformation
 	// from clip-space to screen-space
 
-	_applyRenderTarget(&backBuffer->renderTarget);
+	_applyRenderTarget(	&backBuffer->renderTarget, 
+						backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL);
 	
 	// Clear the gpu mapped vertex memory.
 	//backBuffer->userOffset = 0;
@@ -519,20 +538,96 @@ void GraphicsSystem::SetViewport(int left, int top, int width, int height, float
 	gfxc.setupScreenViewport(left, top, left + width, top + height, 1.0f, 0.0f);
 }
 
-void GraphicsSystem::_setSamplerState(int slot)
+void GraphicsSystem::SetSamplerState(int slot, uint32_t desc0, uint32_t desc1, uint32_t desc2, uint32_t desc3)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
 	Gnm::Sampler sampler;
-	sampler.init();
-	sampler.setLodRange(0, 0);
-	sampler.setLodBias(0.0f, 0.0f);
-	sampler.setMipFilterMode(Gnm::kMipFilterModePoint);
-	sampler.setAnisotropyRatio(Gnm::kAnisotropyRatio4);
-	sampler.setWrapMode(Gnm::kWrapModeClampLastTexel, Gnm::kWrapModeClampLastTexel, Gnm::kWrapModeClampLastTexel);
-	sampler.setXyFilterMode(Gnm::kFilterModePoint, Gnm::kFilterModePoint);
+	sampler.m_regs[0] = desc0;
+	sampler.m_regs[1] = desc1;
+	sampler.m_regs[2] = desc2;
+	sampler.m_regs[3] = desc3;
+
 	gfxc.setSamplers(Gnm::kShaderStagePs, slot, 1, &sampler);
+}
+
+void GraphicsSystem::CreateSamplerState(	TextureFilter filter, 
+											TextureAddressMode addressU, 
+											TextureAddressMode addressV, 
+											TextureAddressMode addressW,
+											int maxAnisotropy,
+											int maxMipLevel,
+											float mipMapLevelOfDetailBias,
+											uint32_t &desc0,
+											uint32_t &desc1,
+											uint32_t &desc2,
+											uint32_t &desc3)
+{
+	Gnm::Sampler sampler;
+	sampler.init();
+
+	sampler.setWrapMode(ToWrapMode(addressU), ToWrapMode(addressV), ToWrapMode(addressW));
+
+	switch (filter)
+    {
+		default:
+		case TextureFilter_Linear:
+			sampler.setXyFilterMode(Gnm::kFilterModeBilinear, Gnm::kFilterModeBilinear);
+			sampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+			break;
+		case TextureFilter_Point:
+			sampler.setXyFilterMode(Gnm::kFilterModePoint, Gnm::kFilterModePoint);
+			sampler.setMipFilterMode(Gnm::kMipFilterModePoint);
+			break;
+		case TextureFilter_Anisotropic:
+			sampler.setXyFilterMode(Gnm::kFilterModeAnisoBilinear, Gnm::kFilterModeAnisoBilinear);
+			sampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+			break;
+		case TextureFilter_LinearMipPoint:
+			sampler.setXyFilterMode(Gnm::kFilterModeBilinear, Gnm::kFilterModeBilinear);
+			sampler.setMipFilterMode(Gnm::kMipFilterModePoint);
+			break;
+		case TextureFilter_PointMipLinear:
+			sampler.setXyFilterMode(Gnm::kFilterModePoint, Gnm::kFilterModePoint);
+			sampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+			break;
+		case TextureFilter_MinLinearMagPointMipLinear:
+			sampler.setXyFilterMode(Gnm::kFilterModePoint, Gnm::kFilterModeBilinear);
+			sampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+			break;
+		case TextureFilter_MinLinearMagPointMipPoint:
+			sampler.setXyFilterMode(Gnm::kFilterModePoint, Gnm::kFilterModeBilinear);
+			sampler.setMipFilterMode(Gnm::kMipFilterModePoint);
+			break;
+		case TextureFilter_MinPointMagLinearMipLinear:
+			sampler.setXyFilterMode(Gnm::kFilterModeBilinear, Gnm::kFilterModePoint);
+			sampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+			break;
+		case TextureFilter_MinPointMagLinearMipPoint:
+			sampler.setXyFilterMode(Gnm::kFilterModeBilinear, Gnm::kFilterModePoint);
+			sampler.setMipFilterMode(Gnm::kMipFilterModePoint);
+			break;
+    }
+
+	sampler.setLodRange(0, maxMipLevel);
+	sampler.setLodBias(mipMapLevelOfDetailBias, 0.0f);
+
+	if (maxAnisotropy >= 16)
+		sampler.setAnisotropyRatio(Gnm::kAnisotropyRatio16);
+	else if (maxAnisotropy >= 8)
+		sampler.setAnisotropyRatio(Gnm::kAnisotropyRatio8);
+	else if (maxAnisotropy >= 4)
+		sampler.setAnisotropyRatio(Gnm::kAnisotropyRatio4);
+	else if (maxAnisotropy >= 2)
+		sampler.setAnisotropyRatio(Gnm::kAnisotropyRatio2);
+	else 
+		sampler.setAnisotropyRatio(Gnm::kAnisotropyRatio1);
+
+	desc0 = sampler.m_regs[0];
+	desc1 = sampler.m_regs[1];
+	desc2 = sampler.m_regs[2];
+	desc3 = sampler.m_regs[3];
 }
 
 void GraphicsSystem::SetTexture(int slot, Texture* texture)
@@ -542,8 +637,6 @@ void GraphicsSystem::SetTexture(int slot, Texture* texture)
 
 	sce::Gnm::Texture *tex = texture != NULL ? texture->_texture : NULL;
 	gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, tex);
-
-	_setSamplerState(slot);
 }
 
 void GraphicsSystem::SetTextureRT(int slot, RenderTarget* target)
@@ -565,8 +658,6 @@ void GraphicsSystem::SetTextureRT(int slot, RenderTarget* target)
 
 	//_effectDirty = true;
 	gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, target->_texture);
-	
-	_setSamplerState(slot);
 }
 
 void GraphicsSystem::SetBlendState(const char* name)

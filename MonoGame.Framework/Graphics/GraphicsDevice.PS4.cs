@@ -18,12 +18,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformInitialize()
         {
-            _system.Initialize();
+            _system.Initialize( PresentationParameters.BackBufferWidth, 
+                                PresentationParameters.BackBufferHeight, 
+                                (TextureFormat)PresentationParameters.BackBufferFormat,
+                                (Sce.PlayStation4.Graphics.DepthFormat)PresentationParameters.DepthStencilFormat);
+            _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
         }
 
         private void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
             _system.Clear((Sce.PlayStation4.Graphics.ClearOptions)options, color.X, color.Y, color.Z, color.W, depth, stencil);
+
+            // Clear clobbers a bunch of state, so just make it 
+            // all dirty and it will get re-applied on the next draw.
+            _depthStencilStateDirty = true;
+            _blendStateDirty = true;
+            _pixelShaderDirty = true;
+            _vertexShaderDirty = true;
+            _rasterizerStateDirty = true;
+            _scissorRectangleDirty = true;
         }
 
         private void PlatformDispose()
@@ -35,6 +48,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformPresent()
         {
             _system.Present();
+            
+            // Restore the viewport after present.
+            _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
         }
 
         private void PlatformSetViewport(ref Viewport viewport)
@@ -60,13 +76,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_vertexBufferDirty)
             {
-                _system.SetVertexBuffer(_vertexBuffer._buffer);
+                if (_vertexBuffer != null)
+                    _system.SetVertexBuffer(_vertexBuffer._buffer);
                 _vertexBufferDirty = false;
             }
 
             if (_indexBufferDirty)
             {
-                _system.SetIndexBuffer(_indexBuffer._buffer);
+                if (_indexBuffer != null)
+                    _system.SetIndexBuffer(_indexBuffer._buffer);
                 _indexBufferDirty = false;
             }
 
@@ -85,7 +103,10 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _system.SetPixelShader(_pixelShader._pixelShader);
                 _pixelShaderDirty = false;
-            }            
+            }
+
+            Textures.SetTextures(this);
+            SamplerStates.PlatformSetSamplers(this);
         }
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
