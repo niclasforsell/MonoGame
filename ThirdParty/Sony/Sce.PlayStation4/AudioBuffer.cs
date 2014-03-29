@@ -83,11 +83,6 @@ namespace Sce.PlayStation4
                 Internal.ctor_1(__Instance, arg0, arg1, numChannels, blockAlign, isMSADPCM);
             }
 
-            ~AudioBuffer()
-            {
-                Dispose(false);
-            }
-
             public void Dispose()
             {
                 Dispose(disposing: true);

@@ -61,11 +61,6 @@ namespace Sce.PlayStation4
                 Internal.ctor_0(__Instance, arg0);
             }
 
-            ~PixelShader()
-            {
-                Dispose(false);
-            }
-
             public void Dispose()
             {
                 Dispose(disposing: true);

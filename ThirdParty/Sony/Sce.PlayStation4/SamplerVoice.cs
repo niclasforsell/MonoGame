@@ -139,11 +139,6 @@ namespace Sce.PlayStation4
                 Internal.ctor_0(__Instance, id, arg1, arg2, arg3);
             }
 
-            ~SamplerVoice()
-            {
-                Dispose(false);
-            }
-
             public void Dispose()
             {
                 Dispose(disposing: true);

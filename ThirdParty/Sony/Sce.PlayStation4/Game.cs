@@ -60,11 +60,6 @@ namespace Sce.PlayStation4
             __Instance = native;
         }
 
-        ~Game()
-        {
-            Dispose(false);
-        }
-
         public void Dispose()
         {
             Dispose(disposing: true);

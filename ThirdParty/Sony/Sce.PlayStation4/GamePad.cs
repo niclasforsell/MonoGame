@@ -68,11 +68,6 @@ namespace Sce.PlayStation4
                 __Instance = Marshal.AllocHGlobal(1);
             }
 
-            ~GamePad()
-            {
-                Dispose(false);
-            }
-
             public void Dispose()
             {
                 Dispose(disposing: true);

@@ -32,7 +32,7 @@ namespace BindingGen
             options.GenerateProperties = true;
             options.GenerateFunctionTemplates = true;
             //options.GenerateVirtualTables = true;
-            options.GenerateFinalizers = true;
+            //options.GenerateFinalizers = true;
 
             options.GenerateLibraryNamespace = true;
             options.LibraryName = "Sce.PlayStation4";           

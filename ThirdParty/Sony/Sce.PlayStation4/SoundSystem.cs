@@ -108,11 +108,6 @@ namespace Sce.PlayStation4
                 __Instance = native;
             }
 
-            ~SoundSystem()
-            {
-                Dispose(false);
-            }
-
             public void Dispose()
             {
                 Dispose(disposing: true);

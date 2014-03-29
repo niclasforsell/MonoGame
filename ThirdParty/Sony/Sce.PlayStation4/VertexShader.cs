@@ -67,11 +67,6 @@ namespace Sce.PlayStation4
                 Internal.ctor_0(__Instance, arg0);
             }
 
-            ~VertexShader()
-            {
-                Dispose(false);
-            }
-
             public void Dispose()
             {
                 Dispose(disposing: true);

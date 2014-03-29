@@ -61,11 +61,6 @@ namespace Sce.PlayStation4
                 Internal.ctor_2(__Instance, arg0, arg1, arg2, arg3);
             }
 
-            ~Texture()
-            {
-                Dispose(false);
-            }
-
             public void Dispose()
             {
                 Dispose(disposing: true);

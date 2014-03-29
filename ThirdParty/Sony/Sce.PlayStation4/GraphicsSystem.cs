@@ -165,11 +165,6 @@ namespace Sce.PlayStation4
                 Internal.ctor_0(__Instance);
             }
 
-            ~GraphicsSystem()
-            {
-                Dispose(false);
-            }
-
             public void Dispose()
             {
                 Dispose(disposing: true);

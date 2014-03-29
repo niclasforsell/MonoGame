@@ -80,11 +80,6 @@ namespace Sce.PlayStation4
             Internal.ctor_0(__Instance);
         }
 
-        ~UserService()
-        {
-            Dispose(false);
-        }
-
         public void Dispose()
         {
             Dispose(disposing: true);
