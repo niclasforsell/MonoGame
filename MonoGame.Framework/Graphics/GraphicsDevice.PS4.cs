@@ -51,6 +51,18 @@ namespace Microsoft.Xna.Framework.Graphics
             
             // Restore the viewport after present.
             _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+
+            // Reapply all the render states.
+            Textures.Dirty();
+            SamplerStates.Dirty();
+            _depthStencilStateDirty = true;
+            _blendStateDirty = true;
+            _indexBufferDirty = true;
+            _vertexBufferDirty = true;
+            _pixelShaderDirty = true;
+            _vertexShaderDirty = true;
+            _rasterizerStateDirty = true;
+            _scissorRectangleDirty = true;
         }
 
         private void PlatformSetViewport(ref Viewport viewport)
