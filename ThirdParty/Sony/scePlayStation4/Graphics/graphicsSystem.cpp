@@ -90,7 +90,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 	}
 
 
-	static const sce::Gnm::StencilFormat kStencilFormat	= sce::Gnm::kStencil8;
+	auto kStencilFormat = depthFormat_ == DepthFormat_Depth24Stencil8 ? Gnm::kStencil8 : Gnm::kStencilInvalid;
 	_displayBuffers = new DisplayBuffer[kDisplayBufferCount];
 
 	for(uint32_t i=0; i<kDisplayBufferCount; ++i)
@@ -279,12 +279,12 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 	prepareBackBuffer();
 }
 
-void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget)
+void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sce::Gnm::DepthRenderTarget *depthTarget)
 {
 	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
 	
 	gfxc.setRenderTarget(0, renderTarget);
-	gfxc.setDepthRenderTarget(NULL);
+	gfxc.setDepthRenderTarget(depthTarget);
 	gfxc.setRenderTargetMask(0xF);
 
 	SetViewport(0, 0, renderTarget->getWidth(), renderTarget->getHeight(), 0.0f, 1.0f);
@@ -300,22 +300,29 @@ void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget)
 	gfxc.setClipControl(clip);
 }
 
-void GraphicsSystem::SetRenderTarget(RenderTarget *renderTarget)
+void GraphicsSystem::SetRenderTarget(RenderTarget *renderTarget_)
 {
 	//printf("SettingRenderTarget to 0x%08X\n", renderTarget);
 
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 
-	sce::Gnm::RenderTarget *rtNativeHandle;
+	sce::Gnm::RenderTarget *renderTarget;
+	sce::Gnm::DepthRenderTarget *depthTarget;
 
-	if (renderTarget)
-		rtNativeHandle = renderTarget->_renderTarget;
+	if (renderTarget_)
+	{
+		renderTarget = renderTarget_->_renderTarget;
+		depthTarget = renderTarget_->_depthTarget;
+	}
 	else
-		rtNativeHandle = &backBuffer->renderTarget;
+	{
+		renderTarget = &backBuffer->renderTarget;
+		depthTarget = backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL;
+	}
 
-	_currentRenderTarget = renderTarget;
+	_currentRenderTarget = renderTarget_;
 
-	_applyRenderTarget(rtNativeHandle);
+	_applyRenderTarget(renderTarget, depthTarget);
 }
 
 void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, float a, float depth, int stencil)
@@ -499,7 +506,8 @@ void GraphicsSystem::prepareBackBuffer()
 	// The z-scale and z-offset values are used to specify the transformation
 	// from clip-space to screen-space
 
-	_applyRenderTarget(&backBuffer->renderTarget);
+	_applyRenderTarget(	&backBuffer->renderTarget, 
+						backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL);
 	
 	// Clear the gpu mapped vertex memory.
 	//backBuffer->userOffset = 0;

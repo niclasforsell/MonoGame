@@ -7,7 +7,7 @@
 using namespace Graphics;
 
 
-RenderTarget::RenderTarget(TextureFormat format_, int32_t width, int32_t height)
+RenderTarget::RenderTarget(TextureFormat format_, int32_t width, int32_t height, DepthFormat depthFormat_)
 {
 	_renderTarget = new sce::Gnm::RenderTarget();
 
@@ -29,10 +29,51 @@ RenderTarget::RenderTarget(TextureFormat format_, int32_t width, int32_t height)
 	_texture = new sce::Gnm::Texture();
 	_texture->initFromRenderTarget(_renderTarget, false);
 	_texture->setResourceMemoryType(sce::Gnm::kResourceMemoryTypeRO);
+
+	_depthTarget = NULL;
+	_hasStencil = depthFormat_ == DepthFormat_Depth24Stencil8;
+	if (depthFormat_ == DepthFormat_None)
+		return;
+
+	_depthTarget = new sce::Gnm::DepthRenderTarget();
+
+	auto kStencilFormat = _hasStencil ? Gnm::kStencil8 : Gnm::kStencilInvalid;
+	auto depthFormat = ToDataFormat(depthFormat_);
+	Gnm::TileMode depthTileMode;
+	GpuAddress::computeSurfaceTileMode(&depthTileMode, GpuAddress::kSurfaceTypeDepthOnlyTarget, depthFormat, 1);
+
+	// Initialize the depth buffer descriptor
+	Gnm::SizeAlign stencilSizeAlign;
+	Gnm::SizeAlign htileSizeAlign;
+	auto depthTargetSizeAlign = _depthTarget->init(
+		width,
+		height,
+		depthFormat.getZFormat(),
+		kStencilFormat,
+		depthTileMode,
+		Gnm::kNumFragments1,
+		kStencilFormat != Gnm::kStencilInvalid ? &stencilSizeAlign : NULL,
+		NULL);
+
+	// Initialize the stencil buffer, if enabled
+	void *stencilMemory = NULL;
+	if( kStencilFormat != Gnm::kStencilInvalid )
+		stencilMemory = Allocator::Get()->allocate(stencilSizeAlign, SCE_KERNEL_WC_GARLIC);
+
+	// Allocate the depth buffer
+	void *depthMemory = Allocator::Get()->allocate(depthTargetSizeAlign, SCE_KERNEL_WC_GARLIC);
+	_depthTarget->setAddresses(depthMemory, stencilMemory);
 }
 
 RenderTarget::~RenderTarget()
 {
+	if (_depthTarget)
+	{
+		Allocator::Get()->release(_depthTarget->getStencilReadAddress());
+		Allocator::Get()->release(_depthTarget->getZReadAddress());
+		delete _depthTarget;
+	}
+
 	Allocator::Get()->release(_renderTarget->getBaseAddress());
 	delete _renderTarget;
 	delete _texture;

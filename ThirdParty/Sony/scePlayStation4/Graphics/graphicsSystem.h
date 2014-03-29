@@ -37,7 +37,7 @@ private:
 
 	void prepareBackBuffer();
 
-	void _applyRenderTarget(sce::Gnm::RenderTarget *renderTarget);
+	void _applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sce::Gnm::DepthRenderTarget *depthTarget);
 	void _setSamplerState(int slot);
 
 public:
