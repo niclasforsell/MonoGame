@@ -16,6 +16,7 @@ VertexBuffer::VertexBuffer(int32_t *elements, int32_t elementCount, int32_t vert
 	_bufferData = Allocator::Get()->allocate(sizeInBytes, Gnm::kAlignmentOfBufferInBytes, SCE_KERNEL_WC_GARLIC);
 
 	_buffers = (Gnm::Buffer*)Allocator::Get()->allocate(sizeof(Gnm::Buffer) * elementCount);
+	_bufferCount = elementCount;
 
 	auto offset = 0;
 	for (auto i=0; i < elementCount; i++)
