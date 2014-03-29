@@ -48,7 +48,22 @@ namespace Microsoft.Xna.Framework.Input
 
         public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
         {
-            throw new NotImplementedException();
+            // Make sure the player index is in range.
+            var index = (int)playerIndex;
+            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
+                throw new InvalidOperationException();
+
+            PSGamePad.SetVibration((int)playerIndex, leftMotor, rightMotor);
+        }
+
+        public static bool SetColor(PlayerIndex playerIndex, Color color)
+        {
+            // Make sure the player index is in range.
+            var index = (int)playerIndex;
+            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
+                throw new InvalidOperationException();
+
+            PSGamePad.SetColor((int)playerIndex, color.R, color.G, color.B);
         }
     }
 }

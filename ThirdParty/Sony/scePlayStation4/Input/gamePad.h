@@ -17,6 +17,7 @@ public:
 	static GamePadState* GetState(int playerIndex);
 
 	static void SetColor(int playerIndex, uint8_t r, uint8_t g, uint8_t b);
+	static void SetVibration(int playerIndex, float smallMotor, float largeMotor);
 };
 
 } // namespace Input
