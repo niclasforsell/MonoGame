@@ -331,13 +331,34 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
 	// Setup the clear shader.
-	//gfxc.setActiveShaderStages(Gnm::kActiveShaderStagesVsPs);
 	SetVertexShader(_clearVS);
 	SetPixelShader(_clearPS);
 	float color[4] = {r, g, b, a};
 	SetShaderConstants(ShaderStage_Pixel, &color, sizeof(color));
 
-	// Clobber some states.
+	// Are we clearing the color target?
+	if (options & ClearOptions_Target)
+		gfxc.setRenderTargetMask(0xFFFFFFFF);
+	else
+		gfxc.setRenderTargetMask(0x0000);
+
+	// Are we clearing depth?
+	auto clearDepth = (options & ClearOptions_DepthBuffer) != 0;
+	sce::Gnm::DepthStencilControl depthControl;
+	depthControl.init();
+	depthControl.setDepthEnable(false);
+	depthControl.setDepthControl(clearDepth ? Gnm::kDepthControlZWriteEnable : Gnm::kDepthControlZWriteDisable, Gnm::kCompareFuncNever);
+	gfxc.setDepthStencilControl(depthControl);
+
+	// Are we clearing stencil?
+	auto clearStencil = (options & ClearOptions_Stencil) != 0;
+	sce::Gnm::StencilControl stencilControl;
+	stencilControl.init();
+	stencilControl.m_writeMask = 0xFF;
+	stencilControl.m_opVal = (uint8_t)stencil;
+	gfxc.setStencil(stencilControl);
+
+	// Clobber some more states.
 	sce::Gnm::PrimitiveSetup prim;
 	prim.init();
 	prim.setCullFace(sce::Gnm::kPrimitiveSetupCullFaceNone);
@@ -346,20 +367,10 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 	clip.init();
 	clip.setClipSpace(sce::Gnm::kClipControlClipSpaceDX);
 	gfxc.setClipControl(clip);
-	sce::Gnm::DepthStencilControl depthControl;
-	depthControl.init();
-	depthControl.setDepthEnable(false);
-	depthControl.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncNever);
-	gfxc.setDepthStencilControl(depthControl);
 	Gnm::BlendControl blendControl;
 	blendControl.init();
 	blendControl.setBlendEnable(false);
 	gfxc.setBlendControl(0, blendControl);
-
-	if (options & ClearOptions_Target)
-		gfxc.setRenderTargetMask(0x000F);
-	else
-		gfxc.setRenderTargetMask(0x0000);
 
 	// We do the draw using a rect primitive and a vertex
 	// shader that generates the position from ids.
