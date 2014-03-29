@@ -175,3 +175,19 @@ void GamePad::SetColor(int playerIndex, uint8_t r, uint8_t g, uint8_t b)
 
 	scePadSetLightBar(padHandles[playerIndex], &color);
 }
+
+void GamePad::SetVibration(int playerIndex, float smallMotor, float largeMotor)
+{
+	assert(playerIndex >= 0);
+	assert(playerIndex < PLAYER_MAX);
+
+	if (!padStates[playerIndex]->IsConnected)
+		return;
+
+	auto vibParams = ScePadVibrationParam();
+	vibParams.largeMotor = largeMotor * 255;
+	vibParams.smallMotor = smallMotor * 255;
+
+	scePadSetVibration(padHandles[playerIndex], &vibParams);
+}
+
