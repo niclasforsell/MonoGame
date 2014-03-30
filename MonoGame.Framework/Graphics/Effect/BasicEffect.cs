@@ -562,16 +562,19 @@ namespace Microsoft.Xna.Framework.Graphics
             writer.Write((byte)2); // profile
 
             // Constant Buffers
-            writer.Write((byte)2);
+            writer.Write((byte)1);
             {
                 // VSBasicNoFog
-                writer.Write((short)(4 * 4 * 4)); // size in bytes
-                writer.Write((byte)1); // parameter count
+                writer.Write((short)(5 * 4 * 4)); // size in bytes
+                writer.Write((byte)2); // parameter count
                 {
-                    writer.Write((byte)4); // parameter index
+                    writer.Write((byte)3); // parameter index
                     writer.Write((ushort)0); // parameter offset
+                    writer.Write((byte)4); // parameter index
+                    writer.Write((ushort)(4*4)); // parameter offset
                 }
 
+                /*
                 // PSBasicNoFog
                 writer.Write((short)(4 * 4)); // size in bytes
                 writer.Write((byte)1); // parameter count
@@ -579,6 +582,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     writer.Write((byte)3); // parameter index
                     writer.Write((ushort)0); // parameter offset
                 }
+                */
             }
 
             // Shaders
@@ -599,10 +603,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 writer.Write((int)PSBasicNoFog.Length); // shader length
                 writer.Write(PSBasicNoFog);
                 writer.Write((byte)0); // sampler count
-                writer.Write((byte)1); // constant buffer count
-                {
-                    writer.Write((byte)1); // constant buffer index
-                }
+                writer.Write((byte)0); // constant buffer count
 
                 writer.Write(true); // is vertex shader
                 var VSBasicVcNoFog = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect_VSBasicVcNoFog.sb");
