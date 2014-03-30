@@ -610,7 +610,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 writer.Write((int)VSBasicVcNoFog.Length); // shader length
                 writer.Write(VSBasicVcNoFog);
                 writer.Write((byte)0); // sampler count
-                writer.Write((byte)0); // constant buffer count
+                writer.Write((byte)1); // constant buffer count
+                {
+                    writer.Write((byte)0); // constant buffer index
+                }
             }
 
             // Parameters
