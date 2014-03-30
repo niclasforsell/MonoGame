@@ -94,6 +94,9 @@ public:
 											CS_OUT uint32_t &depth0);
 
 	virtual void SetDepthStencilState(uint32_t depth0);
+
+
+	virtual void SetBlendState(uint32_t blend0);
 };
 
 } // namespace Graphics

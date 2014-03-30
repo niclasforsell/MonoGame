@@ -386,7 +386,6 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 	gfxc.setPrimitiveSetup(prim);
 	Gnm::BlendControl blendControl;
 	blendControl.init();
-	blendControl.setBlendEnable(false);
 	gfxc.setBlendControl(0, blendControl);
 
 	// We do the draw using a rect primitive and a vertex
@@ -418,13 +417,7 @@ void GraphicsSystem::DrawIndexedPrimitives(PrimitiveType primitiveType, int base
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
-	Gnm::BlendControl blendControl;
-	blendControl.init();
-	blendControl.setBlendEnable(false);
-	gfxc.setBlendControl(0, blendControl);
-
 	gfxc.setPrimitiveType(ToPrimitiveType(primitiveType));	
-
 	auto indexCount = ToPrimitiveElementCount(primitiveType, primitiveCount);
 	gfxc.drawIndexOffset(startIndex, indexCount, baseVertex, 0);	
 }
@@ -778,8 +771,7 @@ void GraphicsSystem::SetDepthStencilState(uint32_t depth0)
 	gfxc.setStencil(stencilControl);
 }
 
-/*
-void GraphicsSystem::SetBlendState(const char* name)
+void GraphicsSystem::SetBlendState(uint32_t blend0)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
@@ -787,6 +779,7 @@ void GraphicsSystem::SetBlendState(const char* name)
 	Gnm::BlendControl blendControl;
 	blendControl.init();
 
+	/*
 	if (strcmp(name, "BlendState.Opaque") == 0)
 		blendControl.setBlendEnable(false);
 
@@ -809,10 +802,10 @@ void GraphicsSystem::SetBlendState(const char* name)
 		blendControl.setColorEquation(Gnm::kBlendMultiplierSrcAlpha, Gnm::kBlendFuncReverseSubtract, Gnm::kBlendMultiplierOne);
 		blendControl.setAlphaEquation(Gnm::kBlendMultiplierOne, Gnm::kBlendFuncReverseSubtract, Gnm::kBlendMultiplierOne);
 	}
+	*/
 
 	gfxc.setBlendControl(0, blendControl);
 }
-*/
 
 void GraphicsSystem::SetVertexShader(VertexShader *shader)
 {

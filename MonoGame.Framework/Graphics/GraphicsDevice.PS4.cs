@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_blendStateDirty)
             {
-                //_blendState.PlatformApplyState(this);
+                _blendState.PlatformApplyState(this);
                 _blendStateDirty = false;
             }
             if (_depthStencilStateDirty)
