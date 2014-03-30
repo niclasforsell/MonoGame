@@ -45,24 +45,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     if (sampler._dirty)
                     {
-                        unsafe
-                        {
-                            fixed (uint *desc0 = &sampler._desc0)
-                            fixed (uint* desc1 = &sampler._desc1)
-                            fixed (uint* desc2 = &sampler._desc2)
-                            fixed (uint* desc3 = &sampler._desc3)
-                            {
-                                PSGraphicsDevice.CreateSamplerState(
-                                    (PSTextureFilter)sampler.Filter,
-                                    (PSTextureAddressMode)sampler.AddressU,
-                                    (PSTextureAddressMode)sampler.AddressU,
-                                    (PSTextureAddressMode)sampler.AddressU,
-                                    sampler.MaxAnisotropy,
-                                    sampler.MaxMipLevel,
-                                    sampler.MipMapLevelOfDetailBias,
-                                    desc0, desc1, desc2, desc3);
-                            }
-                        }
+                        PSGraphicsDevice.CreateSamplerState(
+                            (PSTextureFilter)sampler.Filter,
+                            (PSTextureAddressMode)sampler.AddressU,
+                            (PSTextureAddressMode)sampler.AddressU,
+                            (PSTextureAddressMode)sampler.AddressU,
+                            sampler.MaxAnisotropy,
+                            sampler.MaxMipLevel,
+                            sampler.MipMapLevelOfDetailBias,
+                            out sampler._desc0, out sampler._desc1, out sampler._desc2, out sampler._desc3);
 
                         sampler._dirty = false;
                     }

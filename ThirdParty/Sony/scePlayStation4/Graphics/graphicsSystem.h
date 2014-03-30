@@ -76,10 +76,10 @@ public:
 									int maxAnisotropy,
 									int maxMipLevel,
 									float mipMapLevelOfDetailBias,
-									uint32_t &desc0,
-									uint32_t &desc1,
-									uint32_t &desc2,
-									uint32_t &desc3);
+									CS_OUT uint32_t &desc0,
+									CS_OUT uint32_t &desc1,
+									CS_OUT uint32_t &desc2,
+									CS_OUT uint32_t &desc3);
 
 };
 

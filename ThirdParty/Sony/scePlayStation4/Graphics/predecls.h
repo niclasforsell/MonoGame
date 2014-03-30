@@ -1,6 +1,8 @@
 #pragma once
 #include <stdint.h>
 
+#define CS_OUT
+
 // Include all pre-declarations used from header files.
 
 struct _SceKernelEqueue;
