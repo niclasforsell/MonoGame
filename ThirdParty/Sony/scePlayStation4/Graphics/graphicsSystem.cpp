@@ -343,21 +343,41 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 	else
 		gfxc.setRenderTargetMask(0x0000);
 
-	// Are we clearing depth?
-	auto clearDepth = (options & ClearOptions_DepthBuffer) != 0;
+	// What else are we clearing?
+	auto clearDepth = (options & ClearOptions_DepthBuffer) == ClearOptions_DepthBuffer;
+	auto clearStencil = (options & ClearOptions_Stencil) == ClearOptions_Stencil;
+
+	Gnm::DbRenderControl dbRenderControl;
+	dbRenderControl.init();
+	dbRenderControl.setDepthClearEnable(clearDepth);
+	dbRenderControl.setStencilClearEnable(clearStencil);
+	gfxc.setDbRenderControl(dbRenderControl);
+
 	sce::Gnm::DepthStencilControl depthControl;
 	depthControl.init();
-	depthControl.setDepthEnable(false);
-	depthControl.setDepthControl(clearDepth ? Gnm::kDepthControlZWriteEnable : Gnm::kDepthControlZWriteDisable, Gnm::kCompareFuncNever);
+	depthControl.setDepthEnable(clearDepth);
+	depthControl.setStencilEnable(clearStencil);
+	depthControl.setStencilFunction(Gnm::kCompareFuncAlways);
+	if (clearDepth)
+		depthControl.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncAlways);
+	else
+		depthControl.setDepthControl(Gnm::kDepthControlZWriteDisable, Gnm::kCompareFuncAlways);
 	gfxc.setDepthStencilControl(depthControl);
 
 	// Are we clearing stencil?
-	auto clearStencil = (options & ClearOptions_Stencil) != 0;
 	sce::Gnm::StencilControl stencilControl;
 	stencilControl.init();
-	stencilControl.m_writeMask = 0xFF;
-	stencilControl.m_opVal = (uint8_t)stencil;
+	if (clearStencil)
+	{
+		stencilControl.m_testVal = 0xFF;
+		stencilControl.m_mask = 0xFF;
+		stencilControl.m_writeMask = 0xFF;
+		stencilControl.m_opVal = 0xFF;
+	}
 	gfxc.setStencil(stencilControl);
+
+	gfxc.setStencilClearValue(stencil);
+	gfxc.setDepthClearValue(depth);
 
 	// Clobber some more states.
 	sce::Gnm::PrimitiveSetup prim;
@@ -409,9 +429,12 @@ void GraphicsSystem::DrawIndexedPrimitives(PrimitiveType primitiveType, int base
 
 	sce::Gnm::DepthStencilControl depthControl;
 	depthControl.init();
-	depthControl.setDepthEnable(false);
-	depthControl.setDepthControl(Gnm::kDepthControlZWriteDisable, Gnm::kCompareFuncNever);
+	depthControl.setDepthEnable(true);
+	depthControl.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncLessEqual);
 	gfxc.setDepthStencilControl(depthControl);
+	Gnm::DbRenderControl dbRenderControl;
+	dbRenderControl.init();
+	gfxc.setDbRenderControl(dbRenderControl);
 
 	gfxc.setPrimitiveType(ToPrimitiveType(primitiveType));	
 
