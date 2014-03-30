@@ -684,17 +684,17 @@ void GraphicsSystem::CreateRasterizerState(	CullMode cullMode,
 {
 	Gnm::PrimitiveSetup prim;
 	prim.init();
-	prim.setFrontFace(Gnm::kPrimitiveSetupFrontFaceCcw);
+	prim.setFrontFace(Gnm::kPrimitiveSetupFrontFaceCw);
 
 	switch (cullMode)
 	{
 		case CullMode_CullClockwiseFace:
-			prim.setCullFace(Gnm::kPrimitiveSetupCullFaceBack);
+			prim.setCullFace(Gnm::kPrimitiveSetupCullFaceFront);
 			break;
 
 		default:
 		case CullMode_CullCounterClockwiseFace:
-			prim.setCullFace(Gnm::kPrimitiveSetupCullFaceFront);
+			prim.setCullFace(Gnm::kPrimitiveSetupCullFaceBack);
 			break;
 
 		case CullMode_None:
