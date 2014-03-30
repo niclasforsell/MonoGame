@@ -93,7 +93,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             if (_depthStencilStateDirty)
             {
-                //_depthStencilState.PlatformApplyState(this);
+                _depthStencilState.PlatformApplyState(this);
                 _depthStencilStateDirty = false;
             }
             if (_rasterizerStateDirty)

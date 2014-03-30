@@ -126,4 +126,28 @@ static inline Gnm::WrapMode ToWrapMode(TextureAddressMode mode)
     }
 }
 
+static inline Gnm::CompareFunc ToCompareFunction(CompareFunction func)
+{
+    switch (func)
+    {
+		default:
+		case CompareFunction_Never:
+			return Gnm::kCompareFuncNever;
+		case CompareFunction_Always:
+			return Gnm::kCompareFuncAlways;
+		case CompareFunction_Less:
+			return Gnm::kCompareFuncLess;
+		case CompareFunction_LessEqual:
+			return Gnm::kCompareFuncLessEqual;
+		case CompareFunction_Equal:
+			return Gnm::kCompareFuncEqual;
+		case CompareFunction_GreaterEqual:
+			return Gnm::kCompareFuncGreaterEqual;
+		case CompareFunction_Greater:
+			return Gnm::kCompareFuncGreater;
+		case CompareFunction_NotEqual:
+			return Gnm::kCompareFuncNotEqual;
+    }
+}
+
 } // namespace Graphics

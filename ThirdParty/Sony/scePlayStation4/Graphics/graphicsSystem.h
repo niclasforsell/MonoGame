@@ -88,6 +88,12 @@ public:
 
 	virtual void SetRasterizerState(uint32_t prim0, uint32_t desc1, float depthBias, float slopeScaleDepthBias);
 
+	static void CreateDepthStencilState(	bool depthBufferEnable,
+											bool depthBufferWriteEnable,
+											CompareFunction depthBufferFunction,
+											CS_OUT uint32_t &depth0);
+
+	virtual void SetDepthStencilState(uint32_t depth0);
 };
 
 } // namespace Graphics

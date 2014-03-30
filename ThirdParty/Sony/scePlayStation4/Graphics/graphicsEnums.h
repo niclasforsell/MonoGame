@@ -137,4 +137,19 @@ enum FillMode
     FillMode_WireFrame
 };
 
+enum CompareFunction
+{
+	// NOTE: This should match up with the MonoGame 
+	// CompareFunction enum for easy interop!
+
+    CompareFunction_Always,
+    CompareFunction_Never,
+    CompareFunction_Less,
+    CompareFunction_LessEqual,
+    CompareFunction_Equal,
+    CompareFunction_GreaterEqual,
+    CompareFunction_Greater,
+    CompareFunction_NotEqual
+};
+
 } // namespace Graphics

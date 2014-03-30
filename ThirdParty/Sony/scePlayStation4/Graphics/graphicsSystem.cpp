@@ -427,15 +427,6 @@ void GraphicsSystem::DrawIndexedPrimitives(PrimitiveType primitiveType, int base
 	stencilControl.init();
 	gfxc.setStencil(stencilControl);
 
-	sce::Gnm::DepthStencilControl depthControl;
-	depthControl.init();
-	depthControl.setDepthEnable(true);
-	depthControl.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncLessEqual);
-	gfxc.setDepthStencilControl(depthControl);
-	Gnm::DbRenderControl dbRenderControl;
-	dbRenderControl.init();
-	gfxc.setDbRenderControl(dbRenderControl);
-
 	gfxc.setPrimitiveType(ToPrimitiveType(primitiveType));	
 
 	auto indexCount = ToPrimitiveElementCount(primitiveType, primitiveCount);
@@ -753,6 +744,37 @@ void GraphicsSystem::SetRasterizerState(uint32_t prim0, uint32_t flag1, float de
 	Gnm::PrimitiveSetup prim;
 	prim.m_reg = prim0;
 	gfxc.setPrimitiveSetup(prim);
+}
+
+void GraphicsSystem::CreateDepthStencilState(	bool depthBufferEnable,
+												bool depthBufferWriteEnable,
+												CompareFunction depthBufferFunction,
+												uint32_t &depth0)
+{
+	Gnm::DepthStencilControl depthControl;
+	depthControl.init();
+	depthControl.setDepthEnable(depthBufferEnable);
+	depthControl.setDepthControl(	depthBufferWriteEnable ? 
+									Gnm::kDepthControlZWriteEnable : Gnm::kDepthControlZWriteDisable, 
+									ToCompareFunction(depthBufferFunction));
+
+	depth0 = depthControl.m_reg;
+}
+
+void GraphicsSystem::SetDepthStencilState(uint32_t depth0)
+{
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+	Gnmx::GfxContext &gfxc = backBuffer->context;
+
+	// TODO: If we kept track of this we could decide
+	// to skip changing it saving a context roll.
+	Gnm::DbRenderControl dbRenderControl;
+	dbRenderControl.init();
+	gfxc.setDbRenderControl(dbRenderControl);
+
+	Gnm::DepthStencilControl depthControl;
+	depthControl.m_reg = depth0;
+	gfxc.setDepthStencilControl(depthControl);
 }
 
 /*
