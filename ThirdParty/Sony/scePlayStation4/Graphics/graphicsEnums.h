@@ -118,4 +118,23 @@ enum TextureAddressMode
 	TextureAddressMode_Mirror,
 };
 
+enum CullMode
+{
+	// NOTE: This should match up with the MonoGame 
+	// CullMode enum for easy interop!
+
+    CullMode_None,
+    CullMode_CullClockwiseFace,
+    CullMode_CullCounterClockwiseFace
+};
+
+enum FillMode
+{
+	// NOTE: This should match up with the MonoGame 
+	// FillMode enum for easy interop!
+
+    FillMode_Solid,
+    FillMode_WireFrame
+};
+
 } // namespace Graphics

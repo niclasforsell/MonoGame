@@ -60,8 +60,6 @@ public:
 
 	virtual void SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth);
 
-	virtual void SetBlendState(const char* name);
-
 	virtual void SetVertexBuffer(VertexBuffer *buffer);
 	virtual void SetIndexBuffer(IndexBuffer *buffer);
 
@@ -80,6 +78,15 @@ public:
 									CS_OUT uint32_t &desc1,
 									CS_OUT uint32_t &desc2,
 									CS_OUT uint32_t &desc3);
+
+	static void CreateRasterizerState(	CullMode cullMode, 
+										FillMode fillMode,
+										bool multiSampleAntiAlias,
+										bool scissorTestEnable,
+										CS_OUT uint32_t &prim0,
+										CS_OUT uint32_t &flag1);
+
+	virtual void SetRasterizerState(uint32_t prim0, uint32_t desc1, float depthBias, float slopeScaleDepthBias);
 
 };
 

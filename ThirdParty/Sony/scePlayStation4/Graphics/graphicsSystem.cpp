@@ -288,11 +288,13 @@ void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sc
 
 	SetViewport(0, 0, renderTarget->getWidth(), renderTarget->getHeight(), 0.0f, 1.0f);
 
+	// Do this now that the depth target changed and won't have to later.
+	if (depthTarget != NULL)
+		gfxc.setPolygonOffsetZFormat(Gnm::kZFormatInvalid);
+	else
+		gfxc.setPolygonOffsetZFormat(depthTarget->getZFormat());
+
 	// Setup some default state.
-	sce::Gnm::PrimitiveSetup prim;
-	prim.init();
-	prim.setCullFace(sce::Gnm::kPrimitiveSetupCullFaceNone);
-	gfxc.setPrimitiveSetup(prim);
 	sce::Gnm::ClipControl clip;
 	clip.init();
 	clip.setClipSpace(sce::Gnm::kClipControlClipSpaceDX);
@@ -362,10 +364,6 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 	prim.init();
 	prim.setCullFace(sce::Gnm::kPrimitiveSetupCullFaceNone);
 	gfxc.setPrimitiveSetup(prim);
-	sce::Gnm::ClipControl clip;
-	clip.init();
-	clip.setClipSpace(sce::Gnm::kClipControlClipSpaceDX);
-	gfxc.setClipControl(clip);
 	Gnm::BlendControl blendControl;
 	blendControl.init();
 	blendControl.setBlendEnable(false);
@@ -399,6 +397,21 @@ void GraphicsSystem::DrawIndexedPrimitives(PrimitiveType primitiveType, int base
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
+
+	Gnm::BlendControl blendControl;
+	blendControl.init();
+	blendControl.setBlendEnable(false);
+	gfxc.setBlendControl(0, blendControl);
+
+	sce::Gnm::StencilControl stencilControl;
+	stencilControl.init();
+	gfxc.setStencil(stencilControl);
+
+	sce::Gnm::DepthStencilControl depthControl;
+	depthControl.init();
+	depthControl.setDepthEnable(false);
+	depthControl.setDepthControl(Gnm::kDepthControlZWriteDisable, Gnm::kCompareFuncNever);
+	gfxc.setDepthStencilControl(depthControl);
 
 	gfxc.setPrimitiveType(ToPrimitiveType(primitiveType));	
 
@@ -656,10 +669,70 @@ void GraphicsSystem::SetTextureRT(int slot, RenderTarget* target)
 		Gnm::kWaitTargetSlotCb0, Gnm::kCacheActionWriteBackAndInvalidateL1andL2, Gnm::kExtendedCacheActionFlushAndInvalidateCbCache,
 		Gnm::kStallCommandBufferParserDisable);
 
+	// TODO: Why were we doing this?
 	//_effectDirty = true;
+
 	gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, target->_texture);
 }
 
+void GraphicsSystem::CreateRasterizerState(	CullMode cullMode,
+											FillMode fillMode,
+											bool multiSampleAntiAlias,
+											bool scissorTestEnable,
+											uint32_t &prim0,
+											uint32_t &flag1)
+{
+	Gnm::PrimitiveSetup prim;
+	prim.init();
+	prim.setFrontFace(Gnm::kPrimitiveSetupFrontFaceCcw);
+
+	switch (cullMode)
+	{
+		case CullMode_CullClockwiseFace:
+			prim.setCullFace(Gnm::kPrimitiveSetupCullFaceBack);
+			break;
+
+		default:
+		case CullMode_CullCounterClockwiseFace:
+			prim.setCullFace(Gnm::kPrimitiveSetupCullFaceFront);
+			break;
+
+		case CullMode_None:
+			prim.setCullFace(Gnm::kPrimitiveSetupCullFaceNone);
+			break;
+	};
+
+	switch (fillMode)
+	{
+		default:
+		case FillMode_Solid:
+			prim.setPolygonMode(Gnm::kPrimitiveSetupPolygonModeFill, Gnm::kPrimitiveSetupPolygonModeFill);
+			break;
+
+		case FillMode_WireFrame:
+			prim.setPolygonMode(Gnm::kPrimitiveSetupPolygonModeLine, Gnm::kPrimitiveSetupPolygonModeLine);
+			break;
+	};	
+
+	prim0 = prim.m_reg;
+	flag1 = (scissorTestEnable ? 1<<0 : 0) | (multiSampleAntiAlias ? 1<<1 : 0);
+}
+
+void GraphicsSystem::SetRasterizerState(uint32_t prim0, uint32_t flag1, float depthBias, float slopeScaleDepthBias)
+{
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+	Gnmx::GfxContext &gfxc = backBuffer->context;
+
+	gfxc.setScanModeControl((flag1 & (1<<1)) ? Gnm::kScanModeControlAaEnable : Gnm::kScanModeControlAaDisable,
+							(flag1 & (1<<0)) ? Gnm::kScanModeControlViewportScissorEnable : Gnm::kScanModeControlViewportScissorDisable);
+	gfxc.setPolygonOffsetFront(slopeScaleDepthBias, depthBias);
+
+	Gnm::PrimitiveSetup prim;
+	prim.m_reg = prim0;
+	gfxc.setPrimitiveSetup(prim);
+}
+
+/*
 void GraphicsSystem::SetBlendState(const char* name)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
@@ -693,6 +766,7 @@ void GraphicsSystem::SetBlendState(const char* name)
 
 	gfxc.setBlendControl(0, blendControl);
 }
+*/
 
 void GraphicsSystem::SetVertexShader(VertexShader *shader)
 {
