@@ -423,10 +423,6 @@ void GraphicsSystem::DrawIndexedPrimitives(PrimitiveType primitiveType, int base
 	blendControl.setBlendEnable(false);
 	gfxc.setBlendControl(0, blendControl);
 
-	sce::Gnm::StencilControl stencilControl;
-	stencilControl.init();
-	gfxc.setStencil(stencilControl);
-
 	gfxc.setPrimitiveType(ToPrimitiveType(primitiveType));	
 
 	auto indexCount = ToPrimitiveElementCount(primitiveType, primitiveCount);
@@ -775,6 +771,11 @@ void GraphicsSystem::SetDepthStencilState(uint32_t depth0)
 	Gnm::DepthStencilControl depthControl;
 	depthControl.m_reg = depth0;
 	gfxc.setDepthStencilControl(depthControl);
+
+	// TODO: Add stencil support!
+	sce::Gnm::StencilControl stencilControl;
+	stencilControl.init();
+	gfxc.setStencil(stencilControl);
 }
 
 /*
