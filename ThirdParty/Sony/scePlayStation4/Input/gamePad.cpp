@@ -76,6 +76,7 @@ void GamePad::Update(float elapsedSeconds)
 		state->RightTrigger = data.analogButtons.r2 / 255.0f;
 
 		auto buttons = data.buttons;
+		state->Buttons = 0;
 		state->Buttons |= (buttons & SCE_PAD_BUTTON_UP) != 0 ? 1 : 0;
 		state->Buttons |= (buttons & SCE_PAD_BUTTON_DOWN) != 0 ? 2 : 0;
 		state->Buttons |= (buttons & SCE_PAD_BUTTON_LEFT) != 0 ? 4 : 0;
