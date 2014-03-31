@@ -10,6 +10,8 @@ using namespace Graphics;
 
 Texture::Texture(TextureFormat format, int32_t width, int32_t height, int32_t mips)
 {
+	assert(mips >= 1);
+
 	_texture = new sce::Gnm::Texture();
 
 	auto textureSizeAlign = _texture->initAs2d(
