@@ -10,12 +10,15 @@ class __declspec(dllexport) GraphicsSystem
 {
 private:
 
+	friend class VertexBuffer;
+	friend class IndexBuffer;
+
 	static const uint32_t kDisplayBufferCount				= 2;
 	static const bool kHtileEnabled							= true;
 	
 	const uint32_t kCueRingEntries							= 16;
-	const uint32_t kDcbSizeInBytes							= 2 * 1024 * 1024;
-	const uint32_t kCcbSizeInBytes							= 2 * 1024 * 1024;
+	const uint32_t kDcbSizeInBytes							= 4 * 1024 * 1024;
+	const uint32_t kCcbSizeInBytes							= 4 * 1024 * 1024;
 
 	enum DisplayBufferState
 	{
@@ -38,6 +41,8 @@ private:
 	void prepareBackBuffer();
 
 	void _applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sce::Gnm::DepthRenderTarget *depthTarget);
+
+	void _discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize);
 
 public:
 

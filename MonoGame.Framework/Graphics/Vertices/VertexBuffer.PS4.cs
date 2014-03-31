@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             unsafe
             {
-                _buffer.SetData((uint)offsetInBytes, (byte*)dataPtr, (uint)dataBytes);
+                _buffer.SetData(GraphicsDevice._system, offsetInBytes, (byte*)dataPtr, dataBytes, (options & SetDataOptions.Discard) != 0);
             }
 
             dataHandle.Free();

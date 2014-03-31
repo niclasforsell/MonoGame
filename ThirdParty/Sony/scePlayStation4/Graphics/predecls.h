@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 
+#define CS_IGNORE
 #define CS_OUT
 
 // Include all pre-declarations used from header files.
@@ -34,6 +35,7 @@ class VertexShader;
 class PixelShader;
 class VertexBuffer;
 class IndexBuffer;
+class GraphicsSystem;
 
 struct DisplayBuffer;
 

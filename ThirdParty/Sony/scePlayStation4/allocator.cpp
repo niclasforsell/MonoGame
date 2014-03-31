@@ -445,6 +445,9 @@ void Allocator::initialize()
 
 void* Allocator::allocate(size_t size, size_t align, SceKernelMemoryType type)
 {
+	assert(size > 0);
+	assert(align > 0);
+
     switch( type )
     {
     case SCE_KERNEL_WB_ONION:

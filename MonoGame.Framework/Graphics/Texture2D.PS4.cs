@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (type != SurfaceType.Texture)
                 return;
 
-            _texture = new Sce.PlayStation4.Graphics.Texture((TextureFormat)format, width, height, (mipmap ? _levelCount : 0));
+            _texture = new Sce.PlayStation4.Graphics.Texture((TextureFormat)format, width, height, (mipmap ? _levelCount : 1));
         }
 
         private void PlatformSetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)

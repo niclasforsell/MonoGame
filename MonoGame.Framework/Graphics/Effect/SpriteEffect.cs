@@ -26,6 +26,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #endregion
 
+#if PLAYSTATION4
+        static internal readonly byte[] Bytecode = GenerateSpriteEffect();
+#else
+
         static internal readonly byte[] Bytecode = LoadEffectResource(
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.dx11.mgfxo"
@@ -35,6 +39,8 @@ namespace Microsoft.Xna.Framework.Graphics
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.ogl.mgfxo"
 #endif
         );
+
+#endif
 
         #region Methods
 
@@ -91,5 +97,103 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         #endregion
+
+#if PLAYSTATION4
+
+        static byte[] GenerateSpriteEffect()
+        {
+            var stream = new System.IO.MemoryStream();
+            var writer = new System.IO.BinaryWriter(stream);
+
+            writer.Write("MGFX".ToCharArray());
+            writer.Write((byte)5); // version
+            writer.Write((byte)2); // profile
+
+            // Constant Buffers
+            writer.Write((byte)1);
+            {
+                // SpriteEffect_vv
+                writer.Write((short)(4 * 4 * 4)); // size in bytes
+                writer.Write((byte)1); // parameter count
+                {
+                    writer.Write((byte)1); // parameter index
+                    writer.Write((ushort)0); // parameter offset
+                }
+            }
+
+            // Shaders
+            writer.Write((byte)2);
+            {
+                writer.Write(true); // is vertex shader
+                var SpriteEffect_vv = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect_vv.sb");
+                writer.Write((int)SpriteEffect_vv.Length); // shader length
+                writer.Write(SpriteEffect_vv);
+                writer.Write((byte)0); // sampler count
+                writer.Write((byte)1); // constant buffer count
+                {
+                    writer.Write((byte)0); // constant buffer index
+                }
+
+                writer.Write(false); // is vertex shader
+                var SpriteEffect_p = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect_p.sb");
+                writer.Write((int)SpriteEffect_p.Length); // shader length
+                writer.Write(SpriteEffect_p);
+                writer.Write((byte)1); // sampler count
+                {
+                    writer.Write((byte)SamplerType.Sampler2D);
+                    writer.Write((byte)0); // texture slot
+                    writer.Write((byte)0); // sampler slot
+                    writer.Write(false); // sampler state
+                    writer.Write((byte)0); // parameter index
+                }
+                writer.Write((byte)0); // constant buffer count
+            }
+
+            // Parameters
+            writer.Write((byte)2);
+            {
+                writer.Write((byte)EffectParameterClass.Object);
+                writer.Write((byte)EffectParameterType.Texture2D);
+                writer.Write("Texture");
+                writer.Write(""); // semantic
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)0); // rowCount
+                writer.Write((byte)0); // columnCount
+                writer.Write((byte)0); // elements
+                writer.Write((byte)0); // struct members
+
+                writer.Write((byte)EffectParameterClass.Matrix);
+                writer.Write((byte)EffectParameterType.Single);
+                writer.Write("MatrixTransform");
+                writer.Write(""); // semantic
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)4); // rowCount
+                writer.Write((byte)4); // columnCount
+                writer.Write((byte)0); // elements
+                writer.Write((byte)0); // struct members
+                writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
+                writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
+                writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
+                writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
+            }
+
+            // Techniques
+            writer.Write((byte)1);
+            {
+                writer.Write("SpriteBatch");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // passes
+                writer.Write("");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)0); // vertex shader index
+                writer.Write((byte)1); // pixel shader index
+                writer.Write(false); // blend state
+                writer.Write(false); // depth stencil state
+                writer.Write(false); // rasterizer state
+            }
+
+            return stream.ToArray();
+        }
+#endif
     }
 }

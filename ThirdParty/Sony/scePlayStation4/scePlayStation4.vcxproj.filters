@@ -118,12 +118,4 @@
       <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <PSSL Include="Graphics\clear_p.pssl">
-      <Filter>Graphics</Filter>
-    </PSSL>
-    <PSSL Include="Graphics\clear_vv.pssl">
-      <Filter>Graphics</Filter>
-    </PSSL>
-  </ItemGroup>
 </Project>

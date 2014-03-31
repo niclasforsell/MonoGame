@@ -11,7 +11,10 @@ class __declspec(dllexport) VertexBuffer
 
 private:
 
-	void *_bufferData;
+	uint8_t *_bufferData;
+	uint32_t _requiredSize;
+	uint32_t _actualSize;
+
 	uint32_t _bufferCount;
 	sce::Gnm::Buffer *_buffers;
 
@@ -25,7 +28,7 @@ public:
 	VertexBuffer(int32_t *elements, int32_t elementCount, int32_t vertexStride, int32_t vertexCount);
 	virtual ~VertexBuffer();
 
-	virtual void SetData(uint32_t offsetInBytes, unsigned char *data, uint32_t bytes);
+	virtual void SetData(GraphicsSystem *system, int32_t offsetInBytes, unsigned char *data, int32_t bytes, bool discard);
 
 };
 

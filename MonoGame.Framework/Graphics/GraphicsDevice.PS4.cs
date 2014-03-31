@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Sce.PlayStation4.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -11,8 +13,13 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal GraphicsSystem _system;
 
+        private readonly Dictionary<int, DynamicVertexBuffer> _userVertexBuffers = new Dictionary<int, DynamicVertexBuffer>();
+        private readonly Dictionary<IndexElementSize, DynamicIndexBuffer> _userIndexBuffers = new Dictionary<IndexElementSize, DynamicIndexBuffer>();
+
+
         private void PlatformSetup()
         {
+            MaxTextureSlots = 16;
             _system = new GraphicsSystem();
         }
 
@@ -150,25 +157,113 @@ namespace Microsoft.Xna.Framework.Graphics
             _system.DrawIndexedPrimitives((Sce.PlayStation4.Graphics.PrimitiveType)primitiveType, baseVertex, startIndex, primitiveCount);
         }
 
-        private void PlatformDrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, VertexDeclaration vertexDeclaration, int vertexCount) where T : struct
-        {
-            throw new NotImplementedException();
-        }
-
         private void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
         {
             PlatformApplyState(true);
             _system.DrawPrimitives((Sce.PlayStation4.Graphics.PrimitiveType)primitiveType, vertexStart, vertexCount);
         }
 
+        private int SetUserVertexBuffer<T>(T[] vertexData, int vertexOffset, int vertexCount, VertexDeclaration vertexDecl)
+            where T : struct
+        {
+            DynamicVertexBuffer buffer;
+
+            if (!_userVertexBuffers.TryGetValue(vertexDecl.HashKey, out buffer) || buffer.VertexCount < vertexCount)
+            {
+                // Dispose the previous buffer if we have one.
+                if (buffer != null)
+                    buffer.Dispose();
+
+                buffer = new DynamicVertexBuffer(this, vertexDecl, Math.Max(vertexCount, 2000), BufferUsage.WriteOnly);
+                _userVertexBuffers[vertexDecl.HashKey] = buffer;
+            }
+
+            var startVertex = buffer.UserOffset;
+
+
+            if ((vertexCount + buffer.UserOffset) < buffer.VertexCount)
+            {
+                buffer.UserOffset += vertexCount;
+                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, vertexCount, vertexDecl.VertexStride, SetDataOptions.NoOverwrite);
+            }
+            else
+            {
+                buffer.UserOffset = vertexCount;
+                buffer.SetData(vertexData, vertexOffset, vertexCount, SetDataOptions.Discard);
+                startVertex = 0;
+            }
+
+            SetVertexBuffer(buffer);
+
+            return startVertex;
+        }
+
+        private int SetUserIndexBuffer<T>(T[] indexData, int indexOffset, int indexCount)
+            where T : struct
+        {
+            DynamicIndexBuffer buffer;
+
+            var indexType = typeof(T);
+            var indexSize = Marshal.SizeOf(indexType);
+            var indexElementSize = indexSize == 2 ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits;
+
+            if (!_userIndexBuffers.TryGetValue(indexElementSize, out buffer) || buffer.IndexCount < indexCount)
+            {
+                if (buffer != null)
+                    buffer.Dispose();
+
+                buffer = new DynamicIndexBuffer(this, indexElementSize, Math.Max(indexCount, 6000), BufferUsage.WriteOnly);
+                _userIndexBuffers[indexElementSize] = buffer;
+            }
+
+            var startIndex = buffer.UserOffset;
+
+            if ((indexCount + buffer.UserOffset) < buffer.IndexCount)
+            {
+                buffer.UserOffset += indexCount;
+                buffer.SetData(startIndex * indexSize, indexData, indexOffset, indexCount, SetDataOptions.NoOverwrite);
+            }
+            else
+            {
+                startIndex = 0;
+                buffer.UserOffset = indexCount;
+                buffer.SetData(indexData, indexOffset, indexCount, SetDataOptions.Discard);
+            }
+
+            Indices = buffer;
+
+            return startIndex;
+        }
+
+        private void PlatformDrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, VertexDeclaration vertexDeclaration, int vertexCount) where T : struct
+        {
+            var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, vertexCount, vertexDeclaration);
+
+            PlatformApplyState(true);
+
+            _system.DrawPrimitives((Sce.PlayStation4.Graphics.PrimitiveType)primitiveType, startVertex, vertexCount);
+        }
+
         private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
-            throw new NotImplementedException();
+            var indexCount = GetElementCountArray(primitiveType, primitiveCount);
+            var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, numVertices, vertexDeclaration);
+            var startIndex = SetUserIndexBuffer(indexData, indexOffset, indexCount);
+
+            PlatformApplyState(true);
+
+            _system.DrawIndexedPrimitives((Sce.PlayStation4.Graphics.PrimitiveType)primitiveType, startVertex, startIndex, primitiveCount);
         }
 
         private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
         {
-            throw new NotImplementedException();
+            var indexCount = GetElementCountArray(primitiveType, primitiveCount);
+            var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, numVertices, vertexDeclaration);
+            var startIndex = SetUserIndexBuffer(indexData, indexOffset, indexCount);
+
+            PlatformApplyState(true);
+
+            _system.DrawIndexedPrimitives((Sce.PlayStation4.Graphics.PrimitiveType)primitiveType, startVertex, startIndex, primitiveCount);
         }
     }
 }
