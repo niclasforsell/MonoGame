@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Input
             if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
                 throw new InvalidOperationException();
 
-            PSGamePad.SetVibration((int)playerIndex, leftMotor, rightMotor);
+            return PSGamePad.SetVibration((int)playerIndex, leftMotor, rightMotor);
         }
 
         public static bool SetColor(PlayerIndex playerIndex, Color color)
@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Input
             if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
                 throw new InvalidOperationException();
 
-            PSGamePad.SetColor((int)playerIndex, color.R, color.G, color.B);
+            return PSGamePad.SetColor((int)playerIndex, color.R, color.G, color.B);
         }
     }
 }
