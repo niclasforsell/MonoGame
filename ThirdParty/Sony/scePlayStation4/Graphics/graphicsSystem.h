@@ -47,30 +47,30 @@ private:
 public:
 
 	GraphicsSystem();
-	virtual ~GraphicsSystem();
+	~GraphicsSystem();
 
-	virtual void Initialize(int backbufferWidth, int backbufferHeight, TextureFormat backbufferFormat, DepthFormat depthFormat);
+	void Initialize(int backbufferWidth, int backbufferHeight, TextureFormat backbufferFormat, DepthFormat depthFormat);
 
-	virtual void SetRenderTarget(RenderTarget *renderTarget);
+	void SetRenderTarget(RenderTarget *renderTarget);
 
-	virtual void Clear(ClearOptions options, float r, float g, float b, float a, float depth, int stencil);
-	virtual void Present();
+	void Clear(ClearOptions options, float r, float g, float b, float a, float depth, int stencil);
+	void Present();
 
-    virtual void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount);
-    virtual void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount);
+    void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount);
+    void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount);
 
-	virtual void SetTexture(int slot, Texture* texture);
-	virtual void SetTextureRT(int slot, RenderTarget* target);
-	virtual void SetSamplerState(int slot, uint32_t desc0, uint32_t desc1, uint32_t desc2, uint32_t desc3);
+	void SetTexture(int slot, Texture* texture);
+	void SetTextureRT(int slot, RenderTarget* target);
+	void SetSamplerState(int slot, uint32_t desc0, uint32_t desc1, uint32_t desc2, uint32_t desc3);
 
-	virtual void SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth);
+	void SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth);
 
-	virtual void SetVertexBuffer(VertexBuffer *buffer);
-	virtual void SetIndexBuffer(IndexBuffer *buffer);
+	void SetVertexBuffer(VertexBuffer *buffer);
+	void SetIndexBuffer(IndexBuffer *buffer);
 
-	virtual void SetVertexShader(VertexShader *shader);
-	virtual void SetPixelShader(PixelShader *shader);
-	virtual void SetShaderConstants(ShaderStage stage, void *data, uint32_t sizeInBytes);
+	void SetVertexShader(VertexShader *shader);
+	void SetPixelShader(PixelShader *shader);
+	void SetShaderConstants(ShaderStage stage, void *data, uint32_t sizeInBytes);
 
 	static void CreateSamplerState(	TextureFilter filter, 
 									TextureAddressMode addressU, 
@@ -91,14 +91,14 @@ public:
 										CS_OUT uint32_t &prim0,
 										CS_OUT uint32_t &flag1);
 
-	virtual void SetRasterizerState(uint32_t prim0, uint32_t desc1, float depthBias, float slopeScaleDepthBias);
+	void SetRasterizerState(uint32_t prim0, uint32_t desc1, float depthBias, float slopeScaleDepthBias);
 
 	static void CreateDepthStencilState(	bool depthBufferEnable,
 											bool depthBufferWriteEnable,
 											CompareFunction depthBufferFunction,
 											CS_OUT uint32_t &depth0);
 
-	virtual void SetDepthStencilState(uint32_t depth0);
+	void SetDepthStencilState(uint32_t depth0);
 
 
 	static void CreateBlendState(	Blend colorSourceBlend,
