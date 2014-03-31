@@ -101,7 +101,12 @@ public:
 	virtual void SetDepthStencilState(uint32_t depth0);
 
 
-	virtual void SetBlendState(uint32_t blend0);
+	static void CreateBlendState(	Blend colorSourceBlend,
+									Blend colorDestBlend,
+									BlendFunction colorBlendFunc,
+									CS_OUT uint32_t &blend);
+
+	void SetBlendState(uint32_t blend0, uint32_t blend1, uint32_t blend2, uint32_t blend3);
 };
 
 } // namespace Graphics

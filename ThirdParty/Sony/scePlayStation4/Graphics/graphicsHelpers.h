@@ -150,4 +150,72 @@ static inline Gnm::CompareFunc ToCompareFunction(CompareFunction func)
     }
 }
 
+static inline Gnm::BlendFunc ToBlendFunc(BlendFunction blend)
+{
+    switch (blend)
+    {
+        default:
+        case BlendFunction_Add:
+            return Gnm::kBlendFuncAdd;
+
+        case BlendFunction_Max:
+            return Gnm::kBlendFuncMax;
+
+        case BlendFunction_Min:
+            return Gnm::kBlendFuncMin;
+
+        case BlendFunction_ReverseSubtract:
+            return Gnm::kBlendFuncReverseSubtract;
+
+        case BlendFunction_Subtract:
+            return Gnm::kBlendFuncSubtract;
+    }
+}
+
+static inline Gnm::BlendMultiplier ToBlendMultiplier(Blend blend, bool alpha)
+{
+    switch (blend)
+    {
+        case Blend_BlendFactor:
+            return Gnm::kBlendMultiplierConstantColor;
+
+        case Blend_DestinationAlpha:
+            return Gnm::kBlendMultiplierDestAlpha;
+
+        case Blend_DestinationColor:
+            return alpha ? Gnm::kBlendMultiplierDestAlpha : Gnm::kBlendMultiplierDestColor;
+
+        case Blend_InverseBlendFactor:
+            return Gnm::kBlendMultiplierOneMinusConstantColor;
+
+        case Blend_InverseDestinationAlpha:
+            return Gnm::kBlendMultiplierOneMinusDestAlpha;
+
+        case Blend_InverseDestinationColor:
+            return alpha ? Gnm::kBlendMultiplierOneMinusDestAlpha : Gnm::kBlendMultiplierOneMinusDestColor;
+
+        case Blend_InverseSourceAlpha:
+            return Gnm::kBlendMultiplierInverseSrc1Alpha;
+
+        case Blend_InverseSourceColor:
+            return alpha ? Gnm::kBlendMultiplierInverseSrc1Alpha : Gnm::kBlendMultiplierInverseSrc1Color;
+
+		default:
+        case Blend_One:
+            return Gnm::kBlendMultiplierOne;
+
+        case Blend_SourceAlpha:
+            return Gnm::kBlendMultiplierSrcAlpha;
+
+        case Blend_SourceAlphaSaturation:
+            return Gnm::kBlendMultiplierSrcAlphaSaturate;
+
+        case Blend_SourceColor:
+            return alpha ? Gnm::kBlendMultiplierSrcAlpha : Gnm::kBlendMultiplierSrcColor;
+
+        case Blend_Zero:
+            return Gnm::kBlendMultiplierZero;
+    }
+}
+
 } // namespace Graphics
