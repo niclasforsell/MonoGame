@@ -1,6 +1,8 @@
 #pragma once
 #include <stdint.h>
 
+#define CS_VALUE_TYPE
+
 // Include all pre-declarations used from header files.
 
 typedef int32_t ControllerHandle;
@@ -13,5 +15,5 @@ namespace sce {
 }
 
 namespace Input {
-	struct GamePadState;
+	struct CS_VALUE_TYPE GamePadState;
 }

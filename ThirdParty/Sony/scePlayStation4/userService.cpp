@@ -18,15 +18,6 @@ void UserService::Initialize()
 	assert(ret == SCE_OK);
 
 	Input::GamePad::Initialize();
-
-	// We're supposed to get a login event for everyone from initialization
-	// onward, we don't always (could be the timing of calling this method from
-	// managed code. So we initialize the existing users from the start here.
-	SceUserServiceLoginUserIdList initialUsers;
-	ret = sceUserServiceGetLoginUserIdList(&initialUsers);
-	assert(ret == SCE_OK);
-	for (auto i = 0; i < SCE_USER_SERVICE_MAX_LOGIN_USERS; i++)
-		Input::GamePad::Enable(initialUsers.userId[i]);
 }
 
 void UserService::Terminate()
