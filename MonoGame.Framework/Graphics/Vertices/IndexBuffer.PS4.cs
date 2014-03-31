@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformConstruct(IndexElementSize indexElementSize, int indexCount)
         {
-            _buffer = new PSIndexBuffer((IndexElement)IndexElementSize, (uint)indexCount);
+            _buffer = new PSIndexBuffer((IndexElement)IndexElementSize, indexCount);
         }
 
         private void PlatformGraphicsDeviceResetting()
@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             unsafe
             {
-                _buffer.SetData((uint)offsetInBytes, (byte*)dataPtr, (uint)dataBytes);
+                _buffer.SetData(GraphicsDevice._system, offsetInBytes, (byte*)dataPtr, dataBytes, (options & SetDataOptions.Discard) != 0);
             }
 
             dataHandle.Free();

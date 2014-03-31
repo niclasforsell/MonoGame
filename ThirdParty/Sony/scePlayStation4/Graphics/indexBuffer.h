@@ -12,9 +12,12 @@ class __declspec(dllexport) IndexBuffer
 
 private:
 
-	void *_indexData;
+	uint8_t *_bufferData;
+	uint32_t _requiredSize;
+	uint32_t _actualSize;
+
 	uint32_t _indexCount;
-	int32_t _indexSize;
+	uint32_t _indexSize;
 
 	// No default or copy constructors.
 	IndexBuffer() { }
@@ -22,10 +25,10 @@ private:
 
 
 public:
-	IndexBuffer(IndexElement type, uint32_t indexCount);
+	IndexBuffer(IndexElement type, int32_t indexCount);
 	virtual ~IndexBuffer();
 
-	virtual void SetData(uint32_t offsetInBytes, unsigned char *data, uint32_t bytes);
+	virtual void SetData(GraphicsSystem *system, int32_t offsetInBytes, uint8_t *data, int32_t bytes, bool discard);
 
 };
 

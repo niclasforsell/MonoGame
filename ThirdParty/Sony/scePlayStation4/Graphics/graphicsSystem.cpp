@@ -404,7 +404,7 @@ void GraphicsSystem::SetIndexBuffer(IndexBuffer *buffer)
 
 	gfxc.setIndexSize((Gnm::IndexSize)buffer->_indexSize);
 	gfxc.setIndexCount(buffer->_indexCount);
-	gfxc.setIndexBuffer(buffer->_indexData);
+	gfxc.setIndexBuffer(buffer->_bufferData);
 }
 
 void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize)
