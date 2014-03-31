@@ -1,5 +1,7 @@
 #include "VertexBuffer.h"
 
+#include "GraphicsSystem.h"
+
 #include "../allocator.h"
 #include <gnm.h>
 #include <assert.h>
@@ -12,14 +14,14 @@ using namespace Graphics;
 
 VertexBuffer::VertexBuffer(int32_t *elements, int32_t elementCount, int32_t vertexStride, int32_t vertexCount)
 {
-	auto sizeInBytes = vertexStride * vertexCount;
-	_bufferData = Allocator::Get()->allocate(sizeInBytes, Gnm::kAlignmentOfBufferInBytes, SCE_KERNEL_WC_GARLIC);
+	_bufferSize = vertexStride * vertexCount;
+	_bufferData = (uint8_t*)Allocator::Get()->allocate(_bufferSize, Gnm::kAlignmentOfBufferInBytes, SCE_KERNEL_WC_GARLIC);
 
-	_buffers = (Gnm::Buffer*)Allocator::Get()->allocate(sizeof(Gnm::Buffer) * elementCount);
 	_bufferCount = elementCount;
-
+	_buffers = (Gnm::Buffer*)Allocator::Get()->allocate(sizeof(Gnm::Buffer) * _bufferCount);
+	
 	auto offset = 0;
-	for (auto i=0; i < elementCount; i++)
+	for (auto i=0; i < _bufferCount; i++)
 	{
 		auto format = GetFormat((VertexElement)elements[i]);
 		_buffers[i].initAsVertexBuffer((uint8_t*)_bufferData + offset, format, vertexStride, vertexCount);
@@ -29,7 +31,7 @@ VertexBuffer::VertexBuffer(int32_t *elements, int32_t elementCount, int32_t vert
 
 	// It is worth initializing it here for consistant
 	// behavior when accidentally unset.
-	memset(_bufferData, 0, sizeInBytes);
+	memset(_bufferData, 0, _bufferSize);
 }
 
 VertexBuffer::~VertexBuffer()
@@ -70,7 +72,26 @@ sce::Gnm::DataFormat VertexBuffer::GetFormat(VertexElement element)
 	};
 }
 
-void VertexBuffer::SetData(uint32_t offsetInBytes, unsigned char *data, uint32_t bytes)
+void VertexBuffer::SetData(GraphicsSystem *system, int32_t offsetInBytes, unsigned char *data, int32_t bytes, bool discard)
 {
-	memcpy((unsigned char*)_bufferData + offsetInBytes, data, bytes);
+	// Are we discarding this buffer for another?
+	if (discard)
+	{
+		//_bufferData = system->discardBuffer(_bufferData, _bufferSize);
+
+		// Reset the base address.
+		auto offset = 0;
+		for (auto i=0; i < _bufferCount; i++)
+		{
+			auto format = _buffers[i].getDataFormat();
+			_buffers[i].setBaseAddress(_bufferData + offset);
+			offset += format.getBytesPerElement();
+		}
+
+		// TODO: Should we clear the buffer to zeros?  Maybe we
+		// should clear it to 0xd34db33f in debug modes to ensure
+		// the error is very apparent?
+	}
+
+	memcpy(_bufferData + offsetInBytes, data, bytes);
 }
