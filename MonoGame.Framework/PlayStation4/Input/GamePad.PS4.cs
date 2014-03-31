@@ -13,9 +13,48 @@ namespace Microsoft.Xna.Framework.Input
 {
     public static partial class GamePad
     {
+        private static void ValidatePlayerIndex(PlayerIndex playerIndex)
+        {
+            // Make sure the player index is in range.
+            var index = (int)playerIndex;
+            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
+                throw new InvalidOperationException();
+        }
+
         public static GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
         {
-            throw new NotImplementedException();
+            ValidatePlayerIndex(playerIndex);
+
+            var state = PSGamePad.GetState((int)playerIndex);
+            return new GamePadCapabilities
+            {
+                IsConnected = state.IsConnected,
+                HasAButton = true,
+                HasBackButton = true,
+                HasBButton = true,
+                HasDPadDownButton = true,
+                HasDPadLeftButton = true,
+                HasDPadRightButton = true,
+                HasDPadUpButton = true,
+                HasLeftShoulderButton = true,
+                HasLeftStickButton = true,
+                HasRightShoulderButton = true,
+                HasRightStickButton = true,
+                HasStartButton = true,
+                HasXButton = true,
+                HasYButton = true,
+                HasBigButton = false,
+                HasLeftXThumbStick = true,
+                HasLeftYThumbStick = true,
+                HasRightXThumbStick = true,
+                HasRightYThumbStick = true,
+                HasLeftTrigger = true,
+                HasRightTrigger = true,
+                HasLeftVibrationMotor = true,
+                HasRightVibrationMotor = true,
+                HasVoiceSupport = true,
+                GamePadType = GamePadType.GamePad
+            };
         }
 
         public static GamePadState GetState(PlayerIndex playerIndex)
@@ -25,10 +64,7 @@ namespace Microsoft.Xna.Framework.Input
 
         public static GamePadState GetState(PlayerIndex playerIndex, GamePadDeadZone deadZoneMode)
         {
-            // Make sure the player index is in range.
-            var index = (int)playerIndex;
-            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
-                throw new InvalidOperationException();
+            ValidatePlayerIndex(playerIndex);
 
             var state = PSGamePad.GetState((int)playerIndex);
             return new GamePadState
@@ -48,22 +84,20 @@ namespace Microsoft.Xna.Framework.Input
 
         public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
         {
-            // Make sure the player index is in range.
-            var index = (int)playerIndex;
-            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
-                throw new InvalidOperationException();
-
+            ValidatePlayerIndex(playerIndex);
             return PSGamePad.SetVibration((int)playerIndex, leftMotor, rightMotor);
         }
 
         public static bool SetColor(PlayerIndex playerIndex, Color color)
         {
-            // Make sure the player index is in range.
-            var index = (int)playerIndex;
-            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
-                throw new InvalidOperationException();
-
+            ValidatePlayerIndex(playerIndex);
             return PSGamePad.SetColor((int)playerIndex, color.R, color.G, color.B);
+        }
+
+        public static bool ResetColor(PlayerIndex playerIndex)
+        {
+            ValidatePlayerIndex(playerIndex);
+            return PSGamePad.ResetColor((int)playerIndex);
         }
     }
 }

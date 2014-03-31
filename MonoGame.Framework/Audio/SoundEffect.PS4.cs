@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 var handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
                 var addr = (IntPtr)(handle.AddrOfPinnedObject().ToInt64() + offset);
-                _buffer = new AudioBuffer((void*)addr, (uint)count);
+                _buffer = new AudioBuffer((void*)addr, (uint)count, (int)channels, 16, false);
                 handle.Free();
             }
         }
