@@ -68,15 +68,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
+#if PLAYSTATION4
+        static readonly byte[] Bytecode = GenerateBasicEffect();
+#else
         static readonly byte[] Bytecode = LoadEffectResource(
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.dx11.mgfxo"
 #elif PSM 
             "MonoGame.Framework.PSMobile.PSSuite.Graphics.Resources.BasicEffect.cgx" //FIXME: This shader is totally incomplete
-#else
+#elif OPENGL
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.ogl.mgfxo"
 #endif
         );
+#endif
 
         #endregion
         
@@ -545,5 +549,207 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         #endregion
+
+#if PLAYSTATION4
+
+        static byte[] GenerateBasicEffect()
+        {
+            var stream = new System.IO.MemoryStream();
+            var writer = new System.IO.BinaryWriter(stream);
+
+            writer.Write("MGFX".ToCharArray());
+            writer.Write((byte)5); // version
+            writer.Write((byte)2); // profile
+
+            // Constant Buffers
+            writer.Write((byte)1);
+            {
+                // VSBasicNoFog
+                writer.Write((short)(5 * 4 * 4)); // size in bytes
+                writer.Write((byte)2); // parameter count
+                {
+                    writer.Write((byte)3); // parameter index
+                    writer.Write((ushort)0); // parameter offset
+                    writer.Write((byte)4); // parameter index
+                    writer.Write((ushort)(4*4)); // parameter offset
+                }
+
+                /*
+                // PSBasicNoFog
+                writer.Write((short)(4 * 4)); // size in bytes
+                writer.Write((byte)1); // parameter count
+                {
+                    writer.Write((byte)3); // parameter index
+                    writer.Write((ushort)0); // parameter offset
+                }
+                */
+            }
+
+            // Shaders
+            writer.Write((byte)3);
+            {
+                writer.Write(true); // is vertex shader
+                var VSBasicNoFog = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect_VSBasicNoFog.sb");
+                writer.Write((int)VSBasicNoFog.Length); // shader length
+                writer.Write(VSBasicNoFog);
+                writer.Write((byte)0); // sampler count
+                writer.Write((byte)1); // constant buffer count
+                {
+                    writer.Write((byte)0); // constant buffer index
+                }
+
+                writer.Write(false); // is vertex shader
+                var PSBasicNoFog = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect_PSBasicNoFog.sb");
+                writer.Write((int)PSBasicNoFog.Length); // shader length
+                writer.Write(PSBasicNoFog);
+                writer.Write((byte)0); // sampler count
+                writer.Write((byte)0); // constant buffer count
+
+                writer.Write(true); // is vertex shader
+                var VSBasicVcNoFog = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect_VSBasicVcNoFog.sb");
+                writer.Write((int)VSBasicVcNoFog.Length); // shader length
+                writer.Write(VSBasicVcNoFog);
+                writer.Write((byte)0); // sampler count
+                writer.Write((byte)1); // constant buffer count
+                {
+                    writer.Write((byte)0); // constant buffer index
+                }
+            }
+
+            // Parameters
+            writer.Write((byte)5);
+            {
+                writer.Write((byte)EffectParameterClass.Vector);
+                writer.Write((byte)EffectParameterType.Single);
+                writer.Write("SpecularColor");
+                writer.Write(""); // semantic
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // rowCount
+                writer.Write((byte)3); // columnCount
+                writer.Write((byte)0); // elements
+                writer.Write((byte)0); // struct members
+                writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); // data
+
+                writer.Write((byte)EffectParameterClass.Vector);
+                writer.Write((byte)EffectParameterType.Single);
+                writer.Write("SpecularPower");
+                writer.Write(""); // semantic
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // rowCount
+                writer.Write((byte)1); // columnCount
+                writer.Write((byte)0); // elements
+                writer.Write((byte)0); // struct members
+                writer.Write((float)0); // data
+
+                writer.Write((byte)EffectParameterClass.Vector);
+                writer.Write((byte)EffectParameterType.Single);
+                writer.Write("FogVector");
+                writer.Write(""); // semantic
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // rowCount
+                writer.Write((byte)4); // columnCount
+                writer.Write((byte)0); // elements
+                writer.Write((byte)0); // struct members
+                writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
+
+                writer.Write((byte)EffectParameterClass.Vector);
+                writer.Write((byte)EffectParameterType.Single);
+                writer.Write("DiffuseColor");
+                writer.Write(""); // semantic
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // rowCount
+                writer.Write((byte)4); // columnCount
+                writer.Write((byte)0); // elements
+                writer.Write((byte)0); // struct members
+                writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
+
+                writer.Write((byte)EffectParameterClass.Matrix);
+                writer.Write((byte)EffectParameterType.Single);
+                writer.Write("WorldViewProj");
+                writer.Write(""); // semantic
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)4); // rowCount
+                writer.Write((byte)4); // columnCount
+                writer.Write((byte)0); // elements
+                writer.Write((byte)0); // struct members
+                writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
+                writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
+                writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
+                writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
+            }
+
+            // Techniques
+            writer.Write((byte)6);
+            {
+                writer.Write("BasicEffect");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // passes
+                writer.Write("");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)255); // vertex shader index
+                writer.Write((byte)255); // pixel shader index
+                writer.Write(false); // blend state
+                writer.Write(false); // depth stencil state
+                writer.Write(false); // rasterizer state
+
+                writer.Write("BasicEffect_NoFog");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // passes
+                writer.Write("");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)0); // vertex shader index
+                writer.Write((byte)1); // pixel shader index
+                writer.Write(false); // blend state
+                writer.Write(false); // depth stencil state
+                writer.Write(false); // rasterizer state
+
+                writer.Write("BasicEffect_VertexColor");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // passes
+                writer.Write("");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)255); // vertex shader index
+                writer.Write((byte)255); // pixel shader index
+                writer.Write(false); // blend state
+                writer.Write(false); // depth stencil state
+                writer.Write(false); // rasterizer state
+
+                writer.Write("BasicEffect_VertexColor_NoFog");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // passes
+                writer.Write("");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)2); // vertex shader index
+                writer.Write((byte)1); // pixel shader index
+                writer.Write(false); // blend state
+                writer.Write(false); // depth stencil state
+                writer.Write(false); // rasterizer state
+
+                writer.Write("BasicEffect_Texture");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // passes
+                writer.Write("");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)255); // vertex shader index
+                writer.Write((byte)255); // pixel shader index
+                writer.Write(false); // blend state
+                writer.Write(false); // depth stencil state
+                writer.Write(false); // rasterizer state                
+
+                writer.Write("BasicEffect_Texture_NoFog");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // passes
+                writer.Write("");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)0); // vertex shader index
+                writer.Write((byte)1); // pixel shader index
+                writer.Write(false); // blend state
+                writer.Write(false); // depth stencil state
+                writer.Write(false); // rasterizer state   
+            }
+
+            return stream.ToArray();
+        }
+#endif
     }
 }

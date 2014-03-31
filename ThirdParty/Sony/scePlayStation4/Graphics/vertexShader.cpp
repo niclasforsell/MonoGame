@@ -30,8 +30,6 @@ VertexShader::VertexShader(const void *data)
 		Gnmx::computeVsFetchShaderSize(_shader),
 		Gnm::kAlignmentOfFetchShaderInBytes,
 		SCE_KERNEL_WC_GARLIC);
-	if( !_fsMem )
-		printf("Cannot allocate the fetch shader memory\n");
 
 	Gnmx::generateVsFetchShader(_fsMem, &_shaderModifier, _shader, NULL);
 }

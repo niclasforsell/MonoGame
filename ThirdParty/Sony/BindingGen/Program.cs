@@ -78,6 +78,8 @@ namespace BindingGen
             // in the output folder which we never use.  This gross hack disables them.
             driver.TranslationUnitPasses.Passes.Remove(
                 driver.TranslationUnitPasses.FindPass<GenerateInlinesCodePass>());
+
+            driver.AddTranslationUnitPass(new CheckMacroPass());
         }
 
         public void Preprocess(Driver driver, ASTContext lib)

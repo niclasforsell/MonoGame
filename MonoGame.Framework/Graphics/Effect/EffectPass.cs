@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var device = _effect.GraphicsDevice;
 
-#if OPENGL || DIRECTX
+#if OPENGL || DIRECTX || PLAYSTATION4
 
             if (_vertexShader != null)
             {

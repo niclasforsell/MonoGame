@@ -31,6 +31,34 @@
 #define SAMPLE_TEXTURE(Name, texCoord)  Name.Sample(Name##Sampler, texCoord)
 #define SAMPLE_CUBEMAP(Name, texCoord)  Name.Sample(Name##Sampler, texCoord)
 
+#elif __PSSL__
+
+// Macros for targetting shader model 4.0 (DX11)
+
+#define TECHNIQUE(name, vsname, psname ) \
+	technique name { pass { VertexShader = compile sce_vs_vs_orbis vsname (); PixelShader = compile sce_ps_orbis psname(); } }
+
+#define BEGIN_CONSTANTS
+#define MATRIX_CONSTANTS
+#define END_CONSTANTS
+
+#define _vs(r)
+#define _ps(r)
+#define _cb(r)
+
+#define DECLARE_TEXTURE(Name, index) \
+    Texture2D Name : register(t##index); \
+    SamplerState Name##Sampler : register(s##index)
+
+#define DECLARE_CUBEMAP(Name, index) \
+    TextureCube Name : register(t##index); \
+    SamplerState Name##Sampler : register(s##index)
+
+#define SAMPLE_TEXTURE(Name, texCoord)  Name.Sample(Name##Sampler, texCoord)
+#define SAMPLE_CUBEMAP(Name, texCoord)  Name.Sample(Name##Sampler, texCoord)
+
+#define SV_Position	S_POSITION
+#define SV_Target0	S_TARGET_OUTPUT0
 
 #else
 

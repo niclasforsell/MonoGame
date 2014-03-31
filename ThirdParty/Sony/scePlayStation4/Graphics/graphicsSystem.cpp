@@ -288,11 +288,13 @@ void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sc
 
 	SetViewport(0, 0, renderTarget->getWidth(), renderTarget->getHeight(), 0.0f, 1.0f);
 
+	// Do this now that the depth target changed and won't have to later.
+	if (depthTarget != NULL)
+		gfxc.setPolygonOffsetZFormat(Gnm::kZFormatInvalid);
+	else
+		gfxc.setPolygonOffsetZFormat(depthTarget->getZFormat());
+
 	// Setup some default state.
-	sce::Gnm::PrimitiveSetup prim;
-	prim.init();
-	prim.setCullFace(sce::Gnm::kPrimitiveSetupCullFaceNone);
-	gfxc.setPrimitiveSetup(prim);
 	sce::Gnm::ClipControl clip;
 	clip.init();
 	clip.setClipSpace(sce::Gnm::kClipControlClipSpaceDX);
@@ -341,34 +343,49 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 	else
 		gfxc.setRenderTargetMask(0x0000);
 
-	// Are we clearing depth?
-	auto clearDepth = (options & ClearOptions_DepthBuffer) != 0;
+	// What else are we clearing?
+	auto clearDepth = (options & ClearOptions_DepthBuffer) == ClearOptions_DepthBuffer;
+	auto clearStencil = (options & ClearOptions_Stencil) == ClearOptions_Stencil;
+
+	Gnm::DbRenderControl dbRenderControl;
+	dbRenderControl.init();
+	dbRenderControl.setDepthClearEnable(clearDepth);
+	dbRenderControl.setStencilClearEnable(clearStencil);
+	gfxc.setDbRenderControl(dbRenderControl);
+
 	sce::Gnm::DepthStencilControl depthControl;
 	depthControl.init();
-	depthControl.setDepthEnable(false);
-	depthControl.setDepthControl(clearDepth ? Gnm::kDepthControlZWriteEnable : Gnm::kDepthControlZWriteDisable, Gnm::kCompareFuncNever);
+	depthControl.setDepthEnable(clearDepth);
+	depthControl.setStencilEnable(clearStencil);
+	depthControl.setStencilFunction(Gnm::kCompareFuncAlways);
+	if (clearDepth)
+		depthControl.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncAlways);
+	else
+		depthControl.setDepthControl(Gnm::kDepthControlZWriteDisable, Gnm::kCompareFuncAlways);
 	gfxc.setDepthStencilControl(depthControl);
 
 	// Are we clearing stencil?
-	auto clearStencil = (options & ClearOptions_Stencil) != 0;
 	sce::Gnm::StencilControl stencilControl;
 	stencilControl.init();
-	stencilControl.m_writeMask = 0xFF;
-	stencilControl.m_opVal = (uint8_t)stencil;
+	if (clearStencil)
+	{
+		stencilControl.m_testVal = 0xFF;
+		stencilControl.m_mask = 0xFF;
+		stencilControl.m_writeMask = 0xFF;
+		stencilControl.m_opVal = 0xFF;
+	}
 	gfxc.setStencil(stencilControl);
+
+	gfxc.setStencilClearValue(stencil);
+	gfxc.setDepthClearValue(depth);
 
 	// Clobber some more states.
 	sce::Gnm::PrimitiveSetup prim;
 	prim.init();
 	prim.setCullFace(sce::Gnm::kPrimitiveSetupCullFaceNone);
 	gfxc.setPrimitiveSetup(prim);
-	sce::Gnm::ClipControl clip;
-	clip.init();
-	clip.setClipSpace(sce::Gnm::kClipControlClipSpaceDX);
-	gfxc.setClipControl(clip);
 	Gnm::BlendControl blendControl;
 	blendControl.init();
-	blendControl.setBlendEnable(false);
 	gfxc.setBlendControl(0, blendControl);
 
 	// We do the draw using a rect primitive and a vertex
@@ -401,7 +418,6 @@ void GraphicsSystem::DrawIndexedPrimitives(PrimitiveType primitiveType, int base
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
 	gfxc.setPrimitiveType(ToPrimitiveType(primitiveType));	
-
 	auto indexCount = ToPrimitiveElementCount(primitiveType, primitiveCount);
 	gfxc.drawIndexOffset(startIndex, indexCount, baseVertex, 0);	
 }
@@ -656,11 +672,106 @@ void GraphicsSystem::SetTextureRT(int slot, RenderTarget* target)
 		Gnm::kWaitTargetSlotCb0, Gnm::kCacheActionWriteBackAndInvalidateL1andL2, Gnm::kExtendedCacheActionFlushAndInvalidateCbCache,
 		Gnm::kStallCommandBufferParserDisable);
 
+	// TODO: Why were we doing this?
 	//_effectDirty = true;
+
 	gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, target->_texture);
 }
 
-void GraphicsSystem::SetBlendState(const char* name)
+void GraphicsSystem::CreateRasterizerState(	CullMode cullMode,
+											FillMode fillMode,
+											bool multiSampleAntiAlias,
+											bool scissorTestEnable,
+											uint32_t &prim0,
+											uint32_t &flag1)
+{
+	Gnm::PrimitiveSetup prim;
+	prim.init();
+	prim.setFrontFace(Gnm::kPrimitiveSetupFrontFaceCw);
+
+	switch (cullMode)
+	{
+		case CullMode_CullClockwiseFace:
+			prim.setCullFace(Gnm::kPrimitiveSetupCullFaceFront);
+			break;
+
+		default:
+		case CullMode_CullCounterClockwiseFace:
+			prim.setCullFace(Gnm::kPrimitiveSetupCullFaceBack);
+			break;
+
+		case CullMode_None:
+			prim.setCullFace(Gnm::kPrimitiveSetupCullFaceNone);
+			break;
+	};
+
+	switch (fillMode)
+	{
+		default:
+		case FillMode_Solid:
+			prim.setPolygonMode(Gnm::kPrimitiveSetupPolygonModeFill, Gnm::kPrimitiveSetupPolygonModeFill);
+			break;
+
+		case FillMode_WireFrame:
+			prim.setPolygonMode(Gnm::kPrimitiveSetupPolygonModeLine, Gnm::kPrimitiveSetupPolygonModeLine);
+			break;
+	};	
+
+	prim0 = prim.m_reg;
+	flag1 = (scissorTestEnable ? 1<<0 : 0) | (multiSampleAntiAlias ? 1<<1 : 0);
+}
+
+void GraphicsSystem::SetRasterizerState(uint32_t prim0, uint32_t flag1, float depthBias, float slopeScaleDepthBias)
+{
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+	Gnmx::GfxContext &gfxc = backBuffer->context;
+
+	gfxc.setScanModeControl((flag1 & (1<<1)) ? Gnm::kScanModeControlAaEnable : Gnm::kScanModeControlAaDisable,
+							(flag1 & (1<<0)) ? Gnm::kScanModeControlViewportScissorEnable : Gnm::kScanModeControlViewportScissorDisable);
+	gfxc.setPolygonOffsetFront(slopeScaleDepthBias, depthBias);
+
+	Gnm::PrimitiveSetup prim;
+	prim.m_reg = prim0;
+	gfxc.setPrimitiveSetup(prim);
+}
+
+void GraphicsSystem::CreateDepthStencilState(	bool depthBufferEnable,
+												bool depthBufferWriteEnable,
+												CompareFunction depthBufferFunction,
+												uint32_t &depth0)
+{
+	Gnm::DepthStencilControl depthControl;
+	depthControl.init();
+	depthControl.setDepthEnable(depthBufferEnable);
+	depthControl.setDepthControl(	depthBufferWriteEnable ? 
+									Gnm::kDepthControlZWriteEnable : Gnm::kDepthControlZWriteDisable, 
+									ToCompareFunction(depthBufferFunction));
+
+	depth0 = depthControl.m_reg;
+}
+
+void GraphicsSystem::SetDepthStencilState(uint32_t depth0)
+{
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+	Gnmx::GfxContext &gfxc = backBuffer->context;
+
+	// TODO: If we kept track of this we could decide
+	// to skip changing it saving a context roll.
+	Gnm::DbRenderControl dbRenderControl;
+	dbRenderControl.init();
+	gfxc.setDbRenderControl(dbRenderControl);
+
+	Gnm::DepthStencilControl depthControl;
+	depthControl.m_reg = depth0;
+	gfxc.setDepthStencilControl(depthControl);
+
+	// TODO: Add stencil support!
+	sce::Gnm::StencilControl stencilControl;
+	stencilControl.init();
+	gfxc.setStencil(stencilControl);
+}
+
+void GraphicsSystem::SetBlendState(uint32_t blend0)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
@@ -668,6 +779,7 @@ void GraphicsSystem::SetBlendState(const char* name)
 	Gnm::BlendControl blendControl;
 	blendControl.init();
 
+	/*
 	if (strcmp(name, "BlendState.Opaque") == 0)
 		blendControl.setBlendEnable(false);
 
@@ -690,6 +802,7 @@ void GraphicsSystem::SetBlendState(const char* name)
 		blendControl.setColorEquation(Gnm::kBlendMultiplierSrcAlpha, Gnm::kBlendFuncReverseSubtract, Gnm::kBlendMultiplierOne);
 		blendControl.setAlphaEquation(Gnm::kBlendMultiplierOne, Gnm::kBlendFuncReverseSubtract, Gnm::kBlendMultiplierOne);
 	}
+	*/
 
 	gfxc.setBlendControl(0, blendControl);
 }

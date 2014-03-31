@@ -60,8 +60,6 @@ public:
 
 	virtual void SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth);
 
-	virtual void SetBlendState(const char* name);
-
 	virtual void SetVertexBuffer(VertexBuffer *buffer);
 	virtual void SetIndexBuffer(IndexBuffer *buffer);
 
@@ -76,11 +74,29 @@ public:
 									int maxAnisotropy,
 									int maxMipLevel,
 									float mipMapLevelOfDetailBias,
-									uint32_t &desc0,
-									uint32_t &desc1,
-									uint32_t &desc2,
-									uint32_t &desc3);
+									CS_OUT uint32_t &desc0,
+									CS_OUT uint32_t &desc1,
+									CS_OUT uint32_t &desc2,
+									CS_OUT uint32_t &desc3);
 
+	static void CreateRasterizerState(	CullMode cullMode, 
+										FillMode fillMode,
+										bool multiSampleAntiAlias,
+										bool scissorTestEnable,
+										CS_OUT uint32_t &prim0,
+										CS_OUT uint32_t &flag1);
+
+	virtual void SetRasterizerState(uint32_t prim0, uint32_t desc1, float depthBias, float slopeScaleDepthBias);
+
+	static void CreateDepthStencilState(	bool depthBufferEnable,
+											bool depthBufferWriteEnable,
+											CompareFunction depthBufferFunction,
+											CS_OUT uint32_t &depth0);
+
+	virtual void SetDepthStencilState(uint32_t depth0);
+
+
+	virtual void SetBlendState(uint32_t blend0);
 };
 
 } // namespace Graphics

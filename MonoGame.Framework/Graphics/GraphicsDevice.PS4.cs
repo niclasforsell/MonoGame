@@ -51,6 +51,18 @@ namespace Microsoft.Xna.Framework.Graphics
             
             // Restore the viewport after present.
             _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+
+            // Reapply all the render states.
+            Textures.Dirty();
+            SamplerStates.Dirty();
+            _depthStencilStateDirty = true;
+            _blendStateDirty = true;
+            _indexBufferDirty = true;
+            _vertexBufferDirty = true;
+            _pixelShaderDirty = true;
+            _vertexShaderDirty = true;
+            _rasterizerStateDirty = true;
+            _scissorRectangleDirty = true;
         }
 
         private void PlatformSetViewport(ref Viewport viewport)
@@ -74,6 +86,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void PlatformApplyState(bool applyShaders)
         {
+            if (_blendStateDirty)
+            {
+                _blendState.PlatformApplyState(this);
+                _blendStateDirty = false;
+            }
+            if (_depthStencilStateDirty)
+            {
+                _depthStencilState.PlatformApplyState(this);
+                _depthStencilStateDirty = false;
+            }
+            if (_rasterizerStateDirty)
+            {
+                _rasterizerState.PlatformApplyState(this);
+                _rasterizerStateDirty = false;
+            }
+
+            // If we're not applying shaders then early out now.
+            if (!applyShaders)
+                return;
+
             if (_vertexBufferDirty)
             {
                 if (_vertexBuffer != null)
@@ -104,6 +136,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 _system.SetPixelShader(_pixelShader._pixelShader);
                 _pixelShaderDirty = false;
             }
+
+            _vertexConstantBuffers.SetConstantBuffers(this);
+            _pixelConstantBuffers.SetConstantBuffers(this);
 
             Textures.SetTextures(this);
             SamplerStates.PlatformSetSamplers(this);
