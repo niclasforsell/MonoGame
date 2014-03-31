@@ -12,7 +12,8 @@ class __declspec(dllexport) VertexBuffer
 private:
 
 	uint8_t *_bufferData;
-	uint32_t _bufferSize;
+	uint32_t _requiredSize;
+	uint32_t _actualSize;
 
 	uint32_t _bufferCount;
 	sce::Gnm::Buffer *_buffers;

@@ -1,6 +1,6 @@
 #include "VertexBuffer.h"
 
-#include "GraphicsSystem.h"
+#include "graphicsSystem.h"
 
 #include "../allocator.h"
 #include <gnm.h>
@@ -14,8 +14,8 @@ using namespace Graphics;
 
 VertexBuffer::VertexBuffer(int32_t *elements, int32_t elementCount, int32_t vertexStride, int32_t vertexCount)
 {
-	_bufferSize = vertexStride * vertexCount;
-	_bufferData = (uint8_t*)Allocator::Get()->allocate(_bufferSize, Gnm::kAlignmentOfBufferInBytes, SCE_KERNEL_WC_GARLIC);
+	_actualSize = _requiredSize = vertexStride * vertexCount;
+	_bufferData = (uint8_t*)Allocator::Get()->allocate(_actualSize, Gnm::kAlignmentOfBufferInBytes, SCE_KERNEL_WC_GARLIC);
 
 	_bufferCount = elementCount;
 	_buffers = (Gnm::Buffer*)Allocator::Get()->allocate(sizeof(Gnm::Buffer) * _bufferCount);
@@ -28,10 +28,6 @@ VertexBuffer::VertexBuffer(int32_t *elements, int32_t elementCount, int32_t vert
 		_buffers[i].setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
 		offset += format.getBytesPerElement();
 	}
-
-	// It is worth initializing it here for consistant
-	// behavior when accidentally unset.
-	memset(_bufferData, 0, _bufferSize);
 }
 
 VertexBuffer::~VertexBuffer()
@@ -77,7 +73,7 @@ void VertexBuffer::SetData(GraphicsSystem *system, int32_t offsetInBytes, unsign
 	// Are we discarding this buffer for another?
 	if (discard)
 	{
-		//_bufferData = system->discardBuffer(_bufferData, _bufferSize);
+		system->_discardBuffer(_bufferData, _actualSize, _requiredSize);
 
 		// Reset the base address.
 		auto offset = 0;
@@ -92,6 +88,8 @@ void VertexBuffer::SetData(GraphicsSystem *system, int32_t offsetInBytes, unsign
 		// should clear it to 0xd34db33f in debug modes to ensure
 		// the error is very apparent?
 	}
+
+	assert(offsetInBytes + bytes <= _requiredSize);
 
 	memcpy(_bufferData + offsetInBytes, data, bytes);
 }

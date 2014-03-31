@@ -27,15 +27,6 @@ using namespace sce;
 using namespace sce::Gnmx;
 using namespace Graphics;
 
-/*
-class SpriteMeshVertex
-{
-public:
-	Vector3Unaligned Position;
-	Vector4Unaligned Color;
-	Vector2Unaligned TexCoords;
-};
-*/
 
 GraphicsSystem::GraphicsSystem()
 {
@@ -90,7 +81,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 	}
 
 	auto kStencilFormat = depthFormat_ == DepthFormat_Depth24Stencil8 ? Gnm::kStencil8 : Gnm::kStencilInvalid;
-	_displayBuffers = new DisplayBuffer[kDisplayBufferCount];
+	_displayBuffers = (DisplayBuffer*)Allocator::Get()->allocate(sizeof(DisplayBuffer) * kDisplayBufferCount);
 
 	for(uint32_t i=0; i<kDisplayBufferCount; ++i)
 	{
@@ -249,6 +240,10 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		}
 
 		_displayBuffers[i].state[0] = kDisplayBufferIdle;
+
+		// Initialize the free and discard buffer counts.
+		_displayBuffers[i].freeBufferCount = 0;
+		_displayBuffers[i].discardBufferCount = 0;
 	}
 
 	// Initialization the VideoOut buffer descriptor
@@ -412,6 +407,65 @@ void GraphicsSystem::SetIndexBuffer(IndexBuffer *buffer)
 	gfxc.setIndexBuffer(buffer->_indexData);
 }
 
+void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize)
+{
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+
+	// If we were passed an existing buffer then store it
+	// until the start of the next frame.
+	if (buffer != NULL)
+	{
+		assert(backBuffer->discardBufferCount + 1 < MAX_DISCARD_BUFFERS);
+		auto discardInfo = backBuffer->discardBuffers + backBuffer->discardBufferCount;
+		discardInfo->buffer = buffer;
+		discardInfo->bufferSize = actualSize;
+		backBuffer->discardBufferCount++;
+	}
+
+	// Search for the best fit free buffer.
+	BufferInfo *bestBuffer = NULL;
+	auto current = backBuffer->freeBuffers;
+	auto end = backBuffer->freeBuffers + backBuffer->freeBufferCount;
+	for (; current != end; current++)
+	{
+		// If we have a match return it immediately.
+		if (current->bufferSize == requiredSize)
+		{
+			buffer = current->buffer;
+
+			// Fill the hole with the last entry.
+			if (--backBuffer->freeBufferCount > 0)	
+				*current = *(end-1);
+			return;
+		}
+
+		// Is it big enough at all?
+		if (requiredSize > current->bufferSize)
+			continue;
+
+		// Is it better than the last best fit?
+		if (bestBuffer == NULL || current->bufferSize < bestBuffer->bufferSize)
+			bestBuffer = current;
+	}
+
+	// If we didn't find a new buffer then we 
+	// have to allocate a new one.
+	if (bestBuffer == NULL)
+	{
+		buffer = (uint8_t*)Allocator::Get()->allocate(requiredSize, Gnm::kAlignmentOfBufferInBytes, SCE_KERNEL_WC_GARLIC);
+		actualSize = requiredSize;
+		return;
+	}
+
+	// Reture out best one.
+	buffer = bestBuffer->buffer;
+	actualSize = bestBuffer->bufferSize;
+
+	// Fill the hole with the last entry.
+	if (--backBuffer->freeBufferCount > 0)	
+		*bestBuffer = *(end-1);
+}
+
 void GraphicsSystem::DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
@@ -535,8 +589,14 @@ void GraphicsSystem::prepareBackBuffer()
 	_applyRenderTarget(	&backBuffer->renderTarget, 
 						backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL);
 	
-	// Clear the gpu mapped vertex memory.
-	//backBuffer->userOffset = 0;
+	// Move all the previously discarded buffers to 
+	// the end of the free buffer list.
+	assert(backBuffer->freeBufferCount + backBuffer->discardBufferCount < MAX_DISCARD_BUFFERS);
+	memcpy(	backBuffer->freeBuffers + backBuffer->freeBufferCount, 
+			backBuffer->discardBuffers, 
+			sizeof(BufferInfo) * backBuffer->discardBufferCount);
+	backBuffer->freeBufferCount += backBuffer->discardBufferCount;
+	backBuffer->discardBufferCount = 0;
 
 	// We always use the vertex and pixel shader stages.
 	gfxc.setActiveShaderStages(Gnm::kActiveShaderStagesVsPs);

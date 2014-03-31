@@ -10,6 +10,9 @@ class __declspec(dllexport) GraphicsSystem
 {
 private:
 
+	friend class VertexBuffer;
+	friend class IndexBuffer;
+
 	static const uint32_t kDisplayBufferCount				= 2;
 	static const bool kHtileEnabled							= true;
 	
@@ -38,6 +41,8 @@ private:
 	void prepareBackBuffer();
 
 	void _applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sce::Gnm::DepthRenderTarget *depthTarget);
+
+	void _discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize);
 
 public:
 

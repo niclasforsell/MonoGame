@@ -5,6 +5,14 @@
 
 namespace Graphics {
 
+typedef struct BufferInfo
+{
+	uint8_t *buffer;
+	uint32_t bufferSize;
+};
+
+const int MAX_DISCARD_BUFFERS = 1000;
+
 
 typedef struct DisplayBuffer
 {
@@ -18,16 +26,11 @@ typedef struct DisplayBuffer
 	sce::Gnm::DepthRenderTarget		depthTarget;
 	volatile uint32_t				*state;
 
-	/*
-	// Gpu mapped buffer space for vertex and index data.
-	sce::Gnm::Buffer userBuffer[3];
-	uint32_t userOffset;
-	void *userData;
+	BufferInfo freeBuffers[MAX_DISCARD_BUFFERS];
+	uint32_t freeBufferCount;
 
-	// 1MB should be a safe scratch buffer size for all a
-	// scenese vertex/index data.
-	static const uint32_t MaxBufferSize = 1024 * 1024;
-	*/
+	BufferInfo discardBuffers[MAX_DISCARD_BUFFERS];
+	uint32_t discardBufferCount;
 };
 
 } // namespace Graphics
