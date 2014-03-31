@@ -432,6 +432,7 @@ void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint
 		if (current->bufferSize == requiredSize)
 		{
 			buffer = current->buffer;
+			actualSize = requiredSize;
 
 			// Fill the hole with the last entry.
 			if (--backBuffer->freeBufferCount > 0)	
