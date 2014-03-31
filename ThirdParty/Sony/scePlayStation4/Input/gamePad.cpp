@@ -160,13 +160,13 @@ GamePadState* GamePad::GetState(int playerIndex)
 	return padStates[playerIndex];
 }
 
-void GamePad::SetColor(int playerIndex, uint8_t r, uint8_t g, uint8_t b)
+bool GamePad::SetColor(int playerIndex, uint8_t r, uint8_t g, uint8_t b)
 {
 	assert(playerIndex >= 0);
 	assert(playerIndex < PLAYER_MAX);
 
 	if (!padStates[playerIndex]->IsConnected)
-		return;
+		return false;
 
 	struct ScePadColor color = {
 		(uint8_t)r,
@@ -174,21 +174,23 @@ void GamePad::SetColor(int playerIndex, uint8_t r, uint8_t g, uint8_t b)
 		(uint8_t)b,
 	};
 
-	scePadSetLightBar(padHandles[playerIndex], &color);
+	auto ret = scePadSetLightBar(padHandles[playerIndex], &color);
+	return ret == SCE_OK;
 }
 
-void GamePad::SetVibration(int playerIndex, float smallMotor, float largeMotor)
+bool GamePad::SetVibration(int playerIndex, float smallMotor, float largeMotor)
 {
 	assert(playerIndex >= 0);
 	assert(playerIndex < PLAYER_MAX);
 
 	if (!padStates[playerIndex]->IsConnected)
-		return;
+		return false;
 
 	auto vibParams = ScePadVibrationParam();
 	vibParams.largeMotor = largeMotor * 255;
 	vibParams.smallMotor = smallMotor * 255;
 
-	scePadSetVibration(padHandles[playerIndex], &vibParams);
+	auto ret = scePadSetVibration(padHandles[playerIndex], &vibParams);
+	return ret == SCE_OK;
 }
 
