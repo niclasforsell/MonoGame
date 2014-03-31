@@ -30,6 +30,9 @@ AudioBuffer::AudioBuffer(void *data, size_t dataSize)
 
 AudioBuffer::AudioBuffer(void *data, size_t dataSize, int numChannels, int blockAlign, bool isMSADPCM)
 {
+	_waveformInfo = (SceNgs2WaveformInfo*)Allocator::Get()->allocate(sizeof(SceNgs2WaveformInfo));
+	_loopedWaveformInfo = (SceNgs2WaveformInfo*)Allocator::Get()->allocate(sizeof(SceNgs2WaveformInfo));
+
 	if (isMSADPCM)
 		MSADPCM_to_PCM(data, dataSize, numChannels, blockAlign, &dataSize, &_waveformData);
 	else
@@ -40,7 +43,7 @@ AudioBuffer::AudioBuffer(void *data, size_t dataSize, int numChannels, int block
 
 	int numSamples = (dataSize / numChannels) / 2;
 
-	memset(&_waveformInfo, 0, sizeof(SceNgs2WaveformInfo));
+	memset(_waveformInfo, 0, sizeof(SceNgs2WaveformInfo));
 	_waveformInfo->format.waveformType = SCE_NGS2_WAVEFORM_TYPE_PCM_I16L;
 	_waveformInfo->format.numChannels = numChannels;
 	_waveformInfo->format.sampleRate = 44100;
@@ -67,7 +70,7 @@ AudioBuffer::AudioBuffer(void *data, size_t dataSize, int numChannels, int block
 	_waveformInfo->aBlock[0].reserved = 0;
 	_waveformInfo->aBlock[0].userData = 0;
 
-	memcpy(&_loopedWaveformInfo, &_waveformInfo, sizeof(SceNgs2WaveformInfo));
+	memcpy(_loopedWaveformInfo, _waveformInfo, sizeof(SceNgs2WaveformInfo));
 	_loopedWaveformInfo->aBlock[0].numRepeats = SCE_NGS2_WAVEFORM_BLOCK_REPEAT_INFINITE;
 }
 
