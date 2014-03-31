@@ -180,8 +180,14 @@ bool GamePad::SetColor(int playerIndex, uint8_t r, uint8_t g, uint8_t b)
 	assert(playerIndex >= 0);
 	assert(playerIndex < PLAYER_MAX);
 
-	if (!padStates[playerIndex]->IsConnected)
-		return false;
+	// Clamp to minimum value to avoid SCE_PAD_ERROR_INVALID_COLOR_SETTINGS
+	const uint8_t min = 13;
+	if (r < min && g < min && b < min)
+	{
+		r = min;
+		g = min;
+		b = min;
+	}
 
 	struct ScePadColor color = {
 		(uint8_t)r,
@@ -190,6 +196,15 @@ bool GamePad::SetColor(int playerIndex, uint8_t r, uint8_t g, uint8_t b)
 	};
 
 	auto ret = scePadSetLightBar(padHandles[playerIndex], &color);
+	return ret == SCE_OK;
+}
+
+bool GamePad::ResetColor(int playerIndex)
+{
+	assert(playerIndex >= 0);
+	assert(playerIndex < PLAYER_MAX);
+
+	auto ret = scePadResetLightBar(padHandles[playerIndex]);
 	return ret == SCE_OK;
 }
 
