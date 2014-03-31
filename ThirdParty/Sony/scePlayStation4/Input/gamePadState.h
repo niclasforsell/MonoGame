@@ -4,7 +4,7 @@
 
 namespace Input {
 
-struct GamePadState
+struct CS_VALUE_TYPE GamePadState
 {
 	bool IsConnected;
 	int PacketNumber;
