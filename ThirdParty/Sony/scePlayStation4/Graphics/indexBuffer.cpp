@@ -23,7 +23,7 @@ IndexBuffer::IndexBuffer(IndexElement type, int32_t indexCount)
 	// TODO: Should we clear the buffer to zeros?  Maybe we
 	// should clear it to 0xd34db33f in debug modes to ensure
 	// the error is very apparent?
-	//memset(buffer->_bufferData, 0xd34db33f, buffer->_actualSize);
+	//memset(_bufferData, 0xd34db33f, _actualSize);
 }
 
 IndexBuffer::~IndexBuffer()
