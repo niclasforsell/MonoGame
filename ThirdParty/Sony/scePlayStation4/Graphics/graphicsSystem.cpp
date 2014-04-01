@@ -246,7 +246,11 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		_displayBuffers[i].discardBufferCount = 0;
 		
 		_displayBuffers[i].currentVB = NULL;
+		_displayBuffers[i].currentVBDirty = false;
+		_displayBuffers[i].currentVBOffset = 0;
+
 		_displayBuffers[i].currentIB = NULL;
+		_displayBuffers[i].currentIBDirty = false;
 	}
 
 	// Initialization the VideoOut buffer descriptor
@@ -397,8 +401,7 @@ void GraphicsSystem::SetVertexBuffer(VertexBuffer *buffer)
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
 	backBuffer->currentVB = buffer;
-
-	gfxc.setVertexBuffers(sce::Gnm::ShaderStage::kShaderStageVs, 0, buffer->_bufferCount, buffer->_buffers);
+	backBuffer->currentVBDirty = true;
 }
 
 void GraphicsSystem::SetIndexBuffer(IndexBuffer *buffer)
@@ -407,10 +410,7 @@ void GraphicsSystem::SetIndexBuffer(IndexBuffer *buffer)
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
 	backBuffer->currentIB = buffer;
-
-	gfxc.setIndexSize((Gnm::IndexSize)buffer->_indexSize);
-	gfxc.setIndexCount(buffer->_indexCount);
-	gfxc.setIndexBuffer(buffer->_bufferData);
+	backBuffer->currentIBDirty = true;
 }
 
 void GraphicsSystem::_discardBuffer(VertexBuffer *buffer)
@@ -433,8 +433,7 @@ void GraphicsSystem::_discardBuffer(VertexBuffer *buffer)
 
 	// If this is the current VB then update the command buffer.
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
-	if (backBuffer->currentVB == buffer)
-		SetVertexBuffer(buffer);
+	backBuffer->currentVBDirty |= backBuffer->currentVB == buffer;
 }
 
 void GraphicsSystem::_discardBuffer(IndexBuffer *buffer)
@@ -450,8 +449,7 @@ void GraphicsSystem::_discardBuffer(IndexBuffer *buffer)
 	// to point at the new index data... the size and count should
 	// both still be valid.
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
-	if (backBuffer->currentIB == buffer)
-		backBuffer->context.setIndexBuffer(buffer->_bufferData);
+	backBuffer->currentIBDirty |= backBuffer->currentIB == buffer;
 }
 
 void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize)
@@ -514,14 +512,53 @@ void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint
 		*bestBuffer = *(end-1);
 }
 
+void GraphicsSystem::_applyBuffers(DisplayBuffer *backBuffer, int baseVertex)
+{
+	auto &gfxc = backBuffer->context;
+
+	if (backBuffer->currentVBDirty || backBuffer->currentVBOffset != baseVertex)
+	{
+		auto currentVB = backBuffer->currentVB;
+		auto bufferCount = currentVB->_bufferCount;
+		auto buffers = currentVB->_buffers;
+		auto bufferData = currentVB->_bufferData + (baseVertex * buffers[0].getStride());
+
+		auto offset = 0;
+		for (auto i=0; i < bufferCount; i++)
+		{
+			auto format = buffers[i].getDataFormat();
+			buffers[i].setBaseAddress(bufferData + offset);
+			offset += format.getBytesPerElement();
+		}
+
+		gfxc.setVertexBuffers(sce::Gnm::ShaderStage::kShaderStageVs, 0, bufferCount, buffers);
+
+		backBuffer->currentVBOffset = baseVertex;
+		backBuffer->currentVBDirty = false;
+	}
+
+	if (backBuffer->currentIBDirty)
+	{
+		auto currentIB = backBuffer->currentIB;
+
+		gfxc.setIndexSize((Gnm::IndexSize)currentIB->_indexSize);
+		gfxc.setIndexCount(currentIB->_indexCount);
+		gfxc.setIndexBuffer(currentIB->_bufferData);
+
+		backBuffer->currentIBDirty = false;
+	}
+}
+
 void GraphicsSystem::DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
-	Gnmx::GfxContext &gfxc = backBuffer->context;
+	auto &gfxc = backBuffer->context;
+
+	_applyBuffers(backBuffer, baseVertex);
 
 	gfxc.setPrimitiveType(ToPrimitiveType(primitiveType));	
 	auto indexCount = ToPrimitiveElementCount(primitiveType, primitiveCount);
-	gfxc.drawIndexOffset(startIndex, indexCount, baseVertex, 0);	
+	gfxc.drawIndexOffset(startIndex, indexCount);	
 }
 
 void GraphicsSystem::DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
@@ -529,8 +566,10 @@ void GraphicsSystem::DrawPrimitives(PrimitiveType primitiveType, int vertexStart
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
+	_applyBuffers(backBuffer, vertexStart);
+
 	gfxc.setPrimitiveType(ToPrimitiveType(primitiveType));	
-	gfxc.drawIndexAuto(vertexCount, vertexStart, 0);	
+	gfxc.drawIndexAuto(vertexCount);	
 }
 
 void GraphicsSystem::Present()
@@ -648,7 +687,10 @@ void GraphicsSystem::prepareBackBuffer()
 
 	// Clear the current VB/IB.
 	backBuffer->currentVB = NULL;
+	backBuffer->currentVBOffset = 0;
+	backBuffer->currentVBDirty = false;
 	backBuffer->currentIB = NULL;
+	backBuffer->currentIBDirty = false;
 
 	// We always use the vertex and pixel shader stages.
 	gfxc.setActiveShaderStages(Gnm::kActiveShaderStagesVsPs);

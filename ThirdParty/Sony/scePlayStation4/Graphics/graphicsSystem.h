@@ -41,6 +41,8 @@ private:
 
 	void _discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize);
 
+	void _applyBuffers(DisplayBuffer *backBuffer, int baseVertex);
+
 public:
 
 	GraphicsSystem();
