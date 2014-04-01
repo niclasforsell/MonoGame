@@ -195,10 +195,10 @@ static inline Gnm::BlendMultiplier ToBlendMultiplier(Blend blend, bool alpha)
             return alpha ? Gnm::kBlendMultiplierOneMinusDestAlpha : Gnm::kBlendMultiplierOneMinusDestColor;
 
         case Blend_InverseSourceAlpha:
-            return Gnm::kBlendMultiplierInverseSrc1Alpha;
+            return Gnm::kBlendMultiplierOneMinusSrcAlpha;
 
         case Blend_InverseSourceColor:
-            return alpha ? Gnm::kBlendMultiplierInverseSrc1Alpha : Gnm::kBlendMultiplierInverseSrc1Color;
+            return alpha ? Gnm::kBlendMultiplierOneMinusSrcAlpha : Gnm::kBlendMultiplierOneMinusSrcColor;
 
 		default:
         case Blend_One:
