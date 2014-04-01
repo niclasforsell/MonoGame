@@ -97,6 +97,7 @@
     <ClCompile Include="Graphics\vertexShader.cpp" />
     <ClCompile Include="Input\gamePad.cpp" />
     <ClCompile Include="Input\gamePadState.cpp" />
+    <ClCompile Include="Media\musicPlayer.cpp" />
     <ClCompile Include="prx.cpp" />
     <ClCompile Include="userService.cpp" />
   </ItemGroup>
@@ -123,6 +124,8 @@
     <ClInclude Include="Input\gamePad.h" />
     <ClInclude Include="Input\gamePadState.h" />
     <ClInclude Include="Input\predecls.h" />
+    <ClInclude Include="Media\musicPlayer.h" />
+    <ClInclude Include="Media\predecls.h" />
     <ClInclude Include="userService.h" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\SceGnm.targets" Condition="Exists('$(SolutionDir)\SceGnm.Development.props')" />

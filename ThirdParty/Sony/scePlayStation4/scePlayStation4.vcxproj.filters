@@ -41,6 +41,9 @@
     <ClCompile Include="Input\gamePadState.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="Media\musicPlayer.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -51,6 +54,9 @@
     </Filter>
     <Filter Include="Input">
       <UniqueIdentifier>{cbc8235f-fea0-4c9e-b7c0-f92f9a7446c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Media">
+      <UniqueIdentifier>{ba7f91bf-2f60-41cd-8394-2f4e48a9f561}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -116,6 +122,12 @@
     </ClInclude>
     <ClInclude Include="Input\gamePadState.h">
       <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\musicPlayer.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\predecls.h">
+      <Filter>Media</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
