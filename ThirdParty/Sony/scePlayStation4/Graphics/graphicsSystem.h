@@ -104,9 +104,12 @@ public:
 	static void CreateBlendState(	Blend colorSourceBlend,
 									Blend colorDestBlend,
 									BlendFunction colorBlendFunc,
+									Blend alphaSourceBlend,
+									Blend alphaDestBlend,
+									BlendFunction alphaBlendFunc,
 									CS_OUT uint32_t &blend);
 
-	void SetBlendState(uint32_t blend0, uint32_t blend1, uint32_t blend2, uint32_t blend3);
+	void SetBlendState(uint32_t blend0, uint32_t blend1, uint32_t blend2, uint32_t blend3, uint32_t colorWrites);
 };
 
 } // namespace Graphics

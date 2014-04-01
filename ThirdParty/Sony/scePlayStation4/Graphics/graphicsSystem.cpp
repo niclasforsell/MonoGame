@@ -279,7 +279,6 @@ void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sc
 	
 	gfxc.setRenderTarget(0, renderTarget);
 	gfxc.setDepthRenderTarget(depthTarget);
-	gfxc.setRenderTargetMask(0x0000000F);
 
 	SetViewport(0, 0, renderTarget->getWidth(), renderTarget->getHeight(), 0.0f, 1.0f);
 
@@ -835,6 +834,9 @@ void GraphicsSystem::SetDepthStencilState(uint32_t depth0)
 void GraphicsSystem::CreateBlendState(	Blend colorSourceBlend,
 										Blend colorDestBlend,
 										BlendFunction colorBlendFunc,
+										Blend alphaSourceBlend,
+										Blend alphaDestBlend,
+										BlendFunction alphaBlendFunc,
 										CS_OUT uint32_t &blend)
 {
 	Gnm::BlendControl blendControl;
@@ -842,8 +844,8 @@ void GraphicsSystem::CreateBlendState(	Blend colorSourceBlend,
 
 	auto blendEnabled = !(	colorSourceBlend == Blend_One && 
 							colorDestBlend == Blend_Zero &&
-							colorSourceBlend == Blend_One && 
-							colorDestBlend == Blend_Zero);
+							alphaSourceBlend == Blend_One && 
+							alphaDestBlend == Blend_Zero);
 
 	blendControl.setBlendEnable(blendEnabled);
 
@@ -851,26 +853,25 @@ void GraphicsSystem::CreateBlendState(	Blend colorSourceBlend,
 									ToBlendFunc(colorBlendFunc), 
 									ToBlendMultiplier(colorDestBlend, false));
 
-	blendControl.setAlphaEquation(	ToBlendMultiplier(colorSourceBlend, true), 
-									ToBlendFunc(colorBlendFunc), 
-									ToBlendMultiplier(colorDestBlend, true));
+	blendControl.setAlphaEquation(	ToBlendMultiplier(alphaSourceBlend, true), 
+									ToBlendFunc(alphaBlendFunc), 
+									ToBlendMultiplier(alphaDestBlend, true));
 
 	// If the color and alpha blend values are different 
 	// then we're using a seperate alpha blend.
-	blendControl.setSeparateAlphaEnable(	colorSourceBlend != colorSourceBlend || 
-											colorDestBlend != colorDestBlend || 
-											colorBlendFunc != colorBlendFunc);
+	blendControl.setSeparateAlphaEnable(	colorSourceBlend != alphaSourceBlend || 
+											colorDestBlend != alphaDestBlend || 
+											colorBlendFunc != alphaBlendFunc);
 
 	blend = blendControl.m_reg;
 }
 
-void GraphicsSystem::SetBlendState(uint32_t blend0, uint32_t blend1, uint32_t blend2, uint32_t blend3)
+void GraphicsSystem::SetBlendState(uint32_t blend0, uint32_t blend1, uint32_t blend2, uint32_t blend3, uint32_t colorWrites)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
 	Gnm::BlendControl blendControl;
-	blendControl.init();
 	blendControl.m_reg = blend0;
 	gfxc.setBlendControl(0, blendControl);
 	blendControl.m_reg = blend1;
@@ -879,6 +880,8 @@ void GraphicsSystem::SetBlendState(uint32_t blend0, uint32_t blend1, uint32_t bl
 	gfxc.setBlendControl(2, blendControl);
 	blendControl.m_reg = blend3;
 	gfxc.setBlendControl(3, blendControl);
+
+	gfxc.setRenderTargetMask(colorWrites);
 }
 
 void GraphicsSystem::SetVertexShader(VertexShader *shader)
