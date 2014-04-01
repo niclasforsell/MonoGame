@@ -59,6 +59,8 @@ namespace Microsoft.Xna.Framework.Media
 		private AVAudioPlayer _sound;
 #elif PSM
         private PSSuiteSong _sound;
+#elif PLAYSTATION4
+        private PS4Song _sound;
 #elif WINDOWS_MEDIA_SESSION
         private Topology _topology;
 #elif !WINDOWS_MEDIA_ENGINE
@@ -86,6 +88,8 @@ namespace Microsoft.Xna.Framework.Media
             _sound.FinishedPlaying += OnFinishedPlaying;
 #elif PSM
             _sound = new PSSuiteSong(_name);
+#elif PLAYSTATION4
+            _sound = new PS4Song(_name);
 #elif WINDOWS_MEDIA_SESSION 
             GetTopology();      
 #elif !WINDOWS_MEDIA_ENGINE && !WINDOWS_PHONE

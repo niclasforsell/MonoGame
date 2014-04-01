@@ -1,8 +1,12 @@
 #pragma once
-#include <stdint.h>
 
 // Include all pre-declarations used from header files.
 
+namespace Audio {
+	class SoundSystem;
+	class AudioOut;
+}
+
 namespace Media {
-    class MusicPlayer;
+	class MusicPlayer;
 }

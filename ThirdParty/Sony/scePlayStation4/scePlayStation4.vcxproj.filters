@@ -44,6 +44,9 @@
     <ClCompile Include="Media\musicPlayer.cpp">
       <Filter>Media</Filter>
     </ClCompile>
+    <ClCompile Include="Media\adts_header_parser.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -127,6 +130,9 @@
       <Filter>Media</Filter>
     </ClInclude>
     <ClInclude Include="Media\predecls.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\adts_header_parser.h">
       <Filter>Media</Filter>
     </ClInclude>
   </ItemGroup>
