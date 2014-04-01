@@ -40,15 +40,15 @@ void Texture::SetData(uint32_t level, unsigned char *data, uint32_t bytes)
 	auto pitch = _texture->getPitch();
 	auto levelZeroSize = pitch * height * pixelBytes;
 
-	while (level > 1)
+	while (level > 0)
 	{
 		baseAddr += levelZeroSize;
 		levelZeroSize /= 4;
 		--level;
 
-		width = MAX(1, width << 1);
-		height = MAX(1, height << 1);
-		pitch = MAX(1, pitch << 1);
+		width = MAX(1, width >> 1);
+		height = MAX(1, height >> 1);
+		pitch = MAX(1, pitch >> 1);
 	}
 
 	if (pitch == width)
