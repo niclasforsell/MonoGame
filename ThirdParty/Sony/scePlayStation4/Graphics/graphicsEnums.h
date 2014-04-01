@@ -152,4 +152,37 @@ enum CompareFunction
     CompareFunction_NotEqual
 };
 
+enum BlendFunction
+{
+	// NOTE: This should match up with the MonoGame 
+	// BlendFunction enum for easy interop!
+
+	BlendFunction_Add,
+	BlendFunction_Subtract,
+	BlendFunction_ReverseSubtract,
+	BlendFunction_Max,
+	BlendFunction_Min,
+};
+
+enum Blend
+{
+	// NOTE: This should match up with the MonoGame 
+	// Blend enum for easy interop!
+
+	Blend_One,
+	Blend_Zero,
+	Blend_SourceColor,
+	Blend_InverseSourceColor,
+	Blend_SourceAlpha,
+	Blend_InverseSourceAlpha,
+	Blend_DestinationColor,
+	Blend_InverseDestinationColor,
+	Blend_DestinationAlpha,
+	Blend_InverseDestinationAlpha,
+	Blend_BlendFactor,
+	Blend_InverseBlendFactor,
+	Blend_SourceAlphaSaturation,
+};
+
+
 } // namespace Graphics
