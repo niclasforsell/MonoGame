@@ -845,7 +845,7 @@ void GraphicsSystem::CreateBlendState(	Blend colorSourceBlend,
 							colorSourceBlend == Blend_One && 
 							colorDestBlend == Blend_Zero);
 
-	blendControl.setBlendEnable(true);
+	blendControl.setBlendEnable(blendEnabled);
 
 	blendControl.setColorEquation(	ToBlendMultiplier(colorSourceBlend, false), 
 									ToBlendFunc(colorBlendFunc), 
@@ -871,13 +871,13 @@ void GraphicsSystem::SetBlendState(uint32_t blend0, uint32_t blend1, uint32_t bl
 
 	Gnm::BlendControl blendControl;
 	blendControl.init();
-	//blendControl.m_reg = blend0;
+	blendControl.m_reg = blend0;
 	gfxc.setBlendControl(0, blendControl);
-	//blendControl.m_reg = blend1;
+	blendControl.m_reg = blend1;
 	gfxc.setBlendControl(1, blendControl);
-	//blendControl.m_reg = blend2;
+	blendControl.m_reg = blend2;
 	gfxc.setBlendControl(2, blendControl);
-	//blendControl.m_reg = blend3;
+	blendControl.m_reg = blend3;
 	gfxc.setBlendControl(3, blendControl);
 }
 
