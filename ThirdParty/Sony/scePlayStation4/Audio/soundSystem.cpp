@@ -155,7 +155,7 @@ void SoundSystem::SubmitPlaybackEvent(SamplerVoice* voiceHandle, AudioBuffer *bu
 	SceNgs2Handle handle;
 	sceNgs2RackGetVoiceHandle(_samplerRackHandle, voiceHandle->_voiceHandleID, &handle);
 
-	int errorCode;
+	int errorCode = 0;
 
 	// If we're about to play a paused or stopped sound,
 	// ensure that the waveform data and info is current.
