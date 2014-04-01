@@ -26,6 +26,9 @@ typedef struct DisplayBuffer
 	sce::Gnm::DepthRenderTarget		depthTarget;
 	volatile uint32_t				*state;
 
+	VertexBuffer *currentVB;
+	IndexBuffer *currentIB;
+
 	BufferInfo freeBuffers[MAX_DISCARD_BUFFERS];
 	uint32_t freeBufferCount;
 

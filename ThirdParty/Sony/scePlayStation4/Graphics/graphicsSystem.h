@@ -10,9 +10,6 @@ class __declspec(dllexport) GraphicsSystem
 {
 private:
 
-	friend class VertexBuffer;
-	friend class IndexBuffer;
-
 	static const uint32_t kDisplayBufferCount				= 2;
 	static const bool kHtileEnabled							= true;
 	
@@ -68,6 +65,9 @@ public:
 	void SetVertexBuffer(VertexBuffer *buffer);
 	void SetIndexBuffer(IndexBuffer *buffer);
 
+	void CS_IGNORE _discardBuffer(VertexBuffer *buffer);
+	void CS_IGNORE _discardBuffer(IndexBuffer *buffer);
+
 	void SetVertexShader(VertexShader *shader);
 	void SetPixelShader(PixelShader *shader);
 	void SetShaderConstants(ShaderStage stage, void *data, uint32_t sizeInBytes);
@@ -110,6 +110,7 @@ public:
 									CS_OUT uint32_t &blend);
 
 	void SetBlendState(uint32_t blend0, uint32_t blend1, uint32_t blend2, uint32_t blend3, uint32_t colorWrites);
+
 };
 
 } // namespace Graphics

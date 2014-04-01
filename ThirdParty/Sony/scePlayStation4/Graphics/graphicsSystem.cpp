@@ -244,6 +244,9 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		// Initialize the free and discard buffer counts.
 		_displayBuffers[i].freeBufferCount = 0;
 		_displayBuffers[i].discardBufferCount = 0;
+		
+		_displayBuffers[i].currentVB = NULL;
+		_displayBuffers[i].currentIB = NULL;
 	}
 
 	// Initialization the VideoOut buffer descriptor
@@ -393,6 +396,8 @@ void GraphicsSystem::SetVertexBuffer(VertexBuffer *buffer)
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
+	backBuffer->currentVB = buffer;
+
 	gfxc.setVertexBuffers(sce::Gnm::ShaderStage::kShaderStageVs, 0, buffer->_bufferCount, buffer->_buffers);
 }
 
@@ -401,9 +406,52 @@ void GraphicsSystem::SetIndexBuffer(IndexBuffer *buffer)
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
+	backBuffer->currentIB = buffer;
+
 	gfxc.setIndexSize((Gnm::IndexSize)buffer->_indexSize);
 	gfxc.setIndexCount(buffer->_indexCount);
 	gfxc.setIndexBuffer(buffer->_bufferData);
+}
+
+void GraphicsSystem::_discardBuffer(VertexBuffer *buffer)
+{
+	_discardBuffer(buffer->_bufferData, buffer->_actualSize, buffer->_requiredSize);
+
+	// Reset the base address.
+	auto offset = 0;
+	for (auto i=0; i < buffer->_bufferCount; i++)
+	{
+		auto format = buffer->_buffers[i].getDataFormat();
+		buffer->_buffers[i].setBaseAddress(buffer->_bufferData + offset);
+		offset += format.getBytesPerElement();
+	}
+
+	// TODO: Should we clear the buffer to zeros?  Maybe we
+	// should clear it to 0xd34db33f in debug modes to ensure
+	// the error is very apparent?
+	//memset(buffer->_bufferData, 0xd34db33f, buffer->_actualSize);
+
+	// If this is the current VB then update the command buffer.
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+	if (backBuffer->currentVB == buffer)
+		SetVertexBuffer(buffer);
+}
+
+void GraphicsSystem::_discardBuffer(IndexBuffer *buffer)
+{
+	_discardBuffer(buffer->_bufferData, buffer->_actualSize, buffer->_requiredSize);
+
+	// TODO: Should we clear the buffer to zeros?  Maybe we
+	// should clear it to 0xd34db33f in debug modes to ensure
+	// the error is very apparent?
+	//memset(buffer->_bufferData, 0xd34db33f, buffer->_actualSize);
+
+	// If this is the current IB then update the command buffer
+	// to point at the new index data... the size and count should
+	// both still be valid.
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+	if (backBuffer->currentIB == buffer)
+		backBuffer->context.setIndexBuffer(buffer->_bufferData);
 }
 
 void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize)
@@ -597,6 +645,10 @@ void GraphicsSystem::prepareBackBuffer()
 			sizeof(BufferInfo) * backBuffer->discardBufferCount);
 	backBuffer->freeBufferCount += backBuffer->discardBufferCount;
 	backBuffer->discardBufferCount = 0;
+
+	// Clear the current VB/IB.
+	backBuffer->currentVB = NULL;
+	backBuffer->currentIB = NULL;
 
 	// We always use the vertex and pixel shader stages.
 	gfxc.setActiveShaderStages(Gnm::kActiveShaderStagesVsPs);

@@ -28,6 +28,11 @@ VertexBuffer::VertexBuffer(int32_t *elements, int32_t elementCount, int32_t vert
 		_buffers[i].setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
 		offset += format.getBytesPerElement();
 	}
+
+	// TODO: Should we clear the buffer to zeros?  Maybe we
+	// should clear it to 0xd34db33f in debug modes to ensure
+	// the error is very apparent?
+	//memset(buffer->_bufferData, 0xd34db33f, buffer->_actualSize);
 }
 
 VertexBuffer::~VertexBuffer()
@@ -72,22 +77,7 @@ void VertexBuffer::SetData(GraphicsSystem *system, int32_t offsetInBytes, unsign
 {
 	// Are we discarding this buffer for another?
 	if (discard)
-	{
-		system->_discardBuffer(_bufferData, _actualSize, _requiredSize);
-
-		// Reset the base address.
-		auto offset = 0;
-		for (auto i=0; i < _bufferCount; i++)
-		{
-			auto format = _buffers[i].getDataFormat();
-			_buffers[i].setBaseAddress(_bufferData + offset);
-			offset += format.getBytesPerElement();
-		}
-
-		// TODO: Should we clear the buffer to zeros?  Maybe we
-		// should clear it to 0xd34db33f in debug modes to ensure
-		// the error is very apparent?
-	}
+		system->_discardBuffer(this);
 
 	assert(offsetInBytes + bytes <= _requiredSize);
 
