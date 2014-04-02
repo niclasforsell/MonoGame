@@ -46,7 +46,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
         {
-            throw new NotImplementedException();
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var startBytes = startIndex * elementSizeInByte;
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+
+            if (rect.HasValue)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                unsafe
+                {
+                    _texture.GetData((uint)level, (byte*)dataPtr, (uint)(elementSizeInByte * elementCount));
+                }
+            }
+
+            dataHandle.Free();
         }
 
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
