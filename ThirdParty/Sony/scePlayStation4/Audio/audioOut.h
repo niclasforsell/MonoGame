@@ -6,11 +6,13 @@ PlayStation(R)4 Programmer Tool Runtime Library Release 01.500.111
 
 #pragma once
 
+#include "predecls.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <kernel.h>
 #include <audioout.h>
 #include <user_service.h>
+#include <ngs2.h>
 #include "../allocator.h"
 
 namespace Audio {
@@ -90,7 +92,8 @@ public:
 		m_isAborted		= false;
 		m_numPorts      = 0;
 
-		if ((result = sceAudioOutInit()) < 0)
+		result = sceAudioOutInit();
+		if (result < 0 && result != SCE_AUDIO_OUT_ERROR_ALREADY_INIT)
 			return result;
 
 		for(int32_t i = 0; i < AUDIO_OUT_PORT_MAX; i++){

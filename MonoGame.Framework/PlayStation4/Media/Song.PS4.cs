@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Media
         internal PS4Song(string fileName)
         {
             _player = new MusicPlayer();
-            if (!_player.Load(fileName))
+            if (!_player.LoadAAC(fileName))
                 throw new Exception();
         }
 

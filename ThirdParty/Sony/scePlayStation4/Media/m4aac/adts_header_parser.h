@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+namespace Media {
+
 typedef struct AdtsHeader {
 	uint32_t syncWord;
 	uint32_t id;
@@ -36,5 +38,7 @@ private:
 	AdtsHeader m_header;
 	uint32_t m_headerSize;
 };
+
+} // namespace Media
 
 #endif /* _ADTS_HEADER_PARSER_H */

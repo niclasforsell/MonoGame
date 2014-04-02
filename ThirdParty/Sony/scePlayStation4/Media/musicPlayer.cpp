@@ -1,8 +1,10 @@
 #include "musicPlayer.h"
 #include "../allocator.h"
-#include "adts_header_parser.h"
-#include "../Audio/soundSystem.h"
-#include "../Audio/audioOut.h"
+#include "stream.h"
+#include "audio_decoder.h"
+#include "at9/audio_decoder_at9.h"
+#include "m4aac/audio_decoder_m4aac.h"
+#include "mp3/audio_decoder_mp3.h"
 
 #include <assert.h>
 #include <libsysmodule.h>
@@ -10,110 +12,120 @@
 #include <audioout.h>
 #include <sceerror.h>
 
-using namespace Audio;
 using namespace Media;
 
-bool MusicPlayer::_isInitialized = false;
+namespace {
+	const uint32_t stackSize = 512 * 1024;
+	const uint32_t outputStreamSize = 128 * 1024;
+	const uint32_t outputStreamGrain = 256;
 
-void loadLibraries()
-{
-	auto ret = 0;
-	if (sceSysmoduleIsLoaded(SCE_SYSMODULE_AUDIODEC) != 0)
+	enum EventFlags : uint64_t
 	{
-		ret = sceSysmoduleLoadModule(SCE_SYSMODULE_AUDIODEC);
-		assert(ret == SCE_OK);
+		Loaded      = 1 << 0,
+		Stopping    = 1 << 1,
+	};
+}
+
+// Private state hidden from public interface
+struct Media::MusicPlayerState
+{
+	SceKernelEventFlag eventFlag;
+	ScePthreadBarrier barrier;
+	ScePthread threadDecode;
+	ScePthread threadOutput;
+
+	FileInputStream* inputStream;
+	OutputStream* outputStream;
+	AudioDecoder* decoder;
+
+	bool isRunning;
+};
+
+void* decodeMain(void* arg)
+{
+	auto state = (Media::MusicPlayerState*)arg;
+	sceKernelWaitEventFlag(state->eventFlag, EventFlags::Loaded, SCE_KERNEL_EVF_WAITMODE_AND, 0, 0);
+
+	while (state->isRunning)
+	{
+		if (state->inputStream->isEmpty())
+			break;
+
+		auto ret = state->decoder->decode(state->inputStream, state->outputStream);
+		if (ret < 0)
+		{
+			printf("ERROR: MusicPlayer decode failed: 0x%08X\n", ret);
+			return arg;
+		}
 	}
 
-	ret = sceAudiodecInitLibrary(SCE_AUDIODEC_TYPE_M4AAC);
-	assert(ret == SCE_OK);
+	state->outputStream->end();
+
+	sceKernelClearEventFlag(state->eventFlag, 0);
+	scePthreadBarrierWait(&state->barrier);
+
+	printf("MusicPlayer decode thread exiting.\n");
+	return arg;
+}
+
+void* outputMain(void* arg)
+{
+	auto state = (Media::MusicPlayerState*)arg;
+	sceKernelWaitEventFlag(state->eventFlag, EventFlags::Loaded, SCE_KERNEL_EVF_WAITMODE_AND, 0, 0);
+
+	while(state->isRunning)
+	{
+		if (state->inputStream->isEmpty() && state->outputStream->isEmpty())
+			break;
+
+		auto ret = state->outputStream->output();
+		if (ret < 0)
+		{
+			printf("ERROR: MusicPlayer output failed: 0x%08X\n", ret);
+			return arg;
+		}
+	}
+
+	sceKernelClearEventFlag(state->eventFlag, 0);
+	scePthreadBarrierWait(&state->barrier);
+	printf("MusicPlayer output thread exiting.\n");
+	return arg;
 }
 
 MusicPlayer::MusicPlayer()
-	: _decoder(-1),
-	_output(-1)
 {
-
+	_state = (Media::MusicPlayerState*)Allocator::Get()->allocate(sizeof(MusicPlayerState));
 }
 
 MusicPlayer::~MusicPlayer()
 {
 	Unload();
+	Allocator::Get()->release(_state);
 }
 
-bool MusicPlayer::Load(const char* fileName)
+bool MusicPlayer::LoadAAC(const char* fileName)
 {
-	if (!_isInitialized)
-	{
-		loadLibraries();
-		_isInitialized = true;
-	}
-
 	assert(fileName != NULL);
 	Unload();
 
-	auto file = fopen(fileName, "rb");
-	if (file == NULL)
-		return false;
+	const uint32_t fileSize = File(fileName, "rb").size();
+	_state->inputStream = new FileInputStream(fileSize);
+	assert(_state->inputStream);
 
-	fseek(file, 0, SEEK_END);
-	_srcBufferSize = ftell(file);
-	_outBufferSize = _srcBufferSize * 4;
-	fseek(file, 0, SEEK_SET);
-	_srcBuffer = (uint8_t*)Allocator::Get()->allocate(_srcBufferSize);
-	_outBuffer = (uint8_t*)Allocator::Get()->allocate(_outBufferSize);
-	auto len = fread(_srcBuffer, 1, _srcBufferSize, file);
-	assert(len == _srcBufferSize);
-	fclose(file);
+	auto ret = _state->inputStream->open(fileName, "rb");
+	assert(ret >= 0);
 
-	AdtsHeaderParser parser;
-	const AdtsHeader& header = parser.header();
-	auto ret = parser.parse(_srcBuffer, _srcBufferSize);
-	assert(ret == SCE_OK);
-	_numChannels = header.numChannels;
+	ret = _state->inputStream->input();
+	_state->inputStream->end();
 
-	SceAudiodecParamM4aac aacParam;
-	aacParam.uiSize = sizeof(SceAudiodecParamM4aac);
-	aacParam.iBwPcm = SCE_AUDIODEC_WORD_SZ_16BIT;
-	aacParam.uiConfigNumber = SCE_AUDIODEC_M4AAC_CONFIG_NUMBER_RAW;
-	aacParam.uiSamplingFreqIndex = SCE_AUDIODEC_M4AAC_SAMPLING_FREQ_48000;
-	aacParam.uiMaxChannels = header.numChannels;
-	aacParam.uiEnableHeaac = SCE_AUDIODEC_M4AAC_HEAAC_DISABLE;
+	_state->decoder = new AudioDecoderM4aac(_state->inputStream);
+	assert(_state->decoder);
 
-	SceAudiodecM4aacInfo aacInfo;
-	aacInfo.uiSize = sizeof(SceAudiodecM4aacInfo);
-	aacInfo.uiSamplingFreq = SCE_AUDIODEC_M4AAC_SAMPLING_FREQ_48000;
-	aacInfo.uiNumberOfChannels = header.numChannels;
-	aacInfo.uiHeaac = SCE_AUDIODEC_M4AAC_HEAAC_DISABLE;
-	aacInfo.iResult = 0;
+	_state->outputStream = new AudioOutputStream(outputStreamSize, sizeof(int16_t) * AUDIO_STEREO * outputStreamGrain);
+	assert(_state->outputStream);
 
-	SceAudiodecAuInfo auInfo;
-	auInfo.uiSize = sizeof(SceAudiodecAuInfo);
-	auInfo.pAuAddr = _srcBuffer;
-	auInfo.uiAuSize = _srcBufferSize;
-
-	SceAudiodecPcmItem pcmItem;
-	pcmItem.uiSize = sizeof(SceAudiodecPcmItem);
-	pcmItem.pPcmAddr = _outBuffer;
-	pcmItem.uiPcmSize = _outBufferSize;
-
-	SceAudiodecCtrl audioDecCtrl;
-	audioDecCtrl.pParam = (void*)(&aacParam);
-	audioDecCtrl.pBsiInfo = (void*)(&aacInfo);
-	audioDecCtrl.pAuInfo = &auInfo;
-	audioDecCtrl.pPcmItem = &pcmItem;
-
-	ret = sceAudiodecCreateDecoder(&audioDecCtrl, SCE_AUDIODEC_TYPE_M4AAC);
-	if (ret < 0)
-		return false;
-
-	_decoder = ret;
-
-	// TODO: Setup streaming instead of a blocking decode load
-	ret = sceAudiodecDecode(_decoder, &audioDecCtrl);
-	assert(ret == 0);
-
-	// Actual size of decoded data
-	_outBufferUsed = auInfo.uiAuSize;
+	ret = _state->outputStream->open(outputStreamGrain, _state->decoder->sampleRate(), AudioOutputSystem::param(_state->decoder->numChannels()));
+	assert(ret >= 0);
 
 	return true;
 }
@@ -122,30 +134,77 @@ void MusicPlayer::Unload()
 {
 	Stop();
 
-	if (_decoder != -1)
+	if (_state->outputStream)
 	{
-		auto ret = sceAudiodecDeleteDecoder(_decoder);
-		assert(ret == SCE_OK);
-		_decoder = -1;
+		Allocator::Get()->release(_state->outputStream);
+		_state->outputStream = NULL;
 	}
 
-	if (_outBuffer != NULL)
+	if (_state->decoder)
 	{
-		Allocator::Get()->release(_outBuffer);
-		_outBuffer = NULL;
+		Allocator::Get()->release(_state->decoder);
+		_state->decoder = NULL;
 	}
 
-	if (_srcBuffer != NULL)
+	if (_state->inputStream)
 	{
-		Allocator::Get()->release(_srcBuffer);
-		_srcBuffer = NULL;
+		Allocator::Get()->release(_state->inputStream);
+		_state->inputStream = NULL;
 	}
 }
 
 void MusicPlayer::Play()
 {
-	Stop();
-	_output = _audioOut->open(SCE_AUDIO_OUT_PORT_TYPE_BGM, 0);
+	if (_state->isRunning)
+		Stop();
+
+	auto ret = 0;
+	ScePthreadAttr attr = 0;
+	SceKernelSchedParam schedParam;
+
+	ret = sceKernelCreateEventFlag(&_state->eventFlag, "AudioBgm", SCE_KERNEL_EVF_ATTR_MULTI, 0, 0);
+	if (ret < 0)
+	{
+		printf("error: sceKernelCreateEventFlag() failed: 0x%08X\n", ret);
+		goto term;
+	}
+
+	ret = scePthreadBarrierInit(&_state->barrier, 0, 2, "AudioBgm");
+	if (ret < 0)
+	{
+		printf("error: sceThreadBarrierInit() failed: 0x%08X\n", ret);
+		goto term;
+	}
+
+	scePthreadAttrInit(&attr);
+	scePthreadAttrSetstacksize(&attr, stackSize);
+	scePthreadAttrSetinheritsched(&attr, SCE_PTHREAD_EXPLICIT_SCHED);
+	schedParam.sched_priority = SCE_KERNEL_PRIO_FIFO_HIGHEST;
+	scePthreadAttrSetschedparam(&attr, &schedParam);
+
+	ret = scePthreadCreate(&_state->threadDecode, &attr, decodeMain, _state, "AudioDecBgm");
+	if (ret < 0)
+	{
+		printf("error: scePthreadCreate() failed: 0x%08X\n", ret);
+		goto term;
+	}
+
+	ret = scePthreadCreate(&_state->threadOutput, &attr, outputMain, _state, "AudioOutBgM");
+	if (ret < 0)
+	{
+		printf("error: scePthreadCreate() failed: 0x%08X\n", ret);
+		goto term;
+	}
+
+	_state->isRunning = true;
+	sceKernelSetEventFlag(_state->eventFlag, EventFlags::Loaded);
+
+term:
+	if (attr)
+	{
+		scePthreadAttrDestroy(&attr);
+		attr = 0;
+	}
 }
 
 void MusicPlayer::Resume()
@@ -158,93 +217,42 @@ void MusicPlayer::Pause()
 
 void MusicPlayer::Stop()
 {
-	if (_output != -1)
-	{
-		sceAudioOutClose(_output);
-		_output = -1;
+	if (!_state->isRunning)
+		return;
+
+	sceKernelClearEventFlag(_state->eventFlag, EventFlags::Loaded);
+
+	_state->isRunning = false;
+
+	// join and detach a thread for audio decode
+	if (_state->threadDecode) {
+		scePthreadJoin(_state->threadDecode, 0);
+		_state->threadDecode = 0;
 	}
+
+	// join and detach a thread for audio output
+	if (_state->threadOutput) {
+		scePthreadJoin(_state->threadOutput, 0);
+		_state->threadOutput = 0;
+	}
+
+	if (_state->barrier) {
+		scePthreadBarrierDestroy(&_state->barrier);
+		_state->barrier = 0;
+	}
+
+	if (_state->eventFlag) {
+		sceKernelDeleteEventFlag(_state->eventFlag);
+		_state->eventFlag = 0;
+	}
+
 }
 
 float MusicPlayer::GetVolume()
 {
+	return 1;
 }
 
 void MusicPlayer::SetVolume(float value)
 {
 }
-
-/*
-namespace {
-	SceAudiodecCtrl audioDecCtrl;
-	SceAudiodecParamM4aac paramAac;
-	SceAudiodecM4aacInfo aacInfo;
-	SceAudiodecAuInfo auInfo;
-	SceAudiodecPcmItem pcmItem;
-
-	int32_t playerHandle;
-	uint32_t playerSampleRate;
-	uint32_t playerNumChannels;
-}
-
-void MusicPlayer::Initialize()
-{
-	auto ret = sceAudiodecInitLibrary(SCE_AUDIODEC_TYPE_M4AAC);
-	assert(ret == SCE_OK);
-}
-
-void MusicPlayer::Terminate()
-{
-	if (playerHandle != -1)
-		Stop();
-
-	auto ret = sceAudiodecTermLibrary(SCE_AUDIODEC_TYPE_M4AAC);
-	assert(ret == SCE_OK);
-}
-
-void MusicPlayer::Play(void* buffer, size_t size, int sampleRate, int numChannels)
-{
-	if (playerHandle != -1)
-		Stop();
-
-	paramAac.uiSize = sizeof(SceAudiodecParamM4aac);
-	paramAac.iBwPcm = SCE_AUDIODEC_WORD_SZ_16BIT;
-	paramAac.uiConfigNumber = SCE_AUDIODEC_M4AAC_CONFIG_NUMBER_RAW;
-	paramAac.uiSamplingFreqIndex = SCE_AUDIODEC_M4AAC_SAMPLING_FREQ_48000;
-	paramAac.uiMaxChannels = 2;
-	paramAac.uiEnableHeaac = SCE_AUDIODEC_M4AAC_HEAAC_DISABLE;
-	audioDecCtrl.pParam = (void*)&(paramAac);
-
-	aacInfo.uiSize = sizeof(SceAudiodecM4aacInfo);
-	aacInfo.uiNumberOfChannels = 2;
-	aacInfo.uiSamplingFreq = SCE_AUDIODEC_M4AAC_SAMPLING_FREQ_48000;
-	audioDecCtrl.pBsiInfo = (void*)&(aacInfo);
-
-	auInfo.uiSize = sizeof(SceAudiodecAuInfo);
-	auInfo.pAuAddr = buffer;
-	auInfo.uiAuSize = size;
-	audioDecCtrl.pAuInfo = &(auInfo);
-
-	pcmItem.uiSize = sizeof(SceAudiodecPcmItem);
-	pcmItem.pPcmAddr = buffer;
-	pcmItem.uiPcmSize = size;
-	audioDecCtrl.pPcmItem = &(pcmItem);
-
-	auto ret = sceAudiodecCreateDecoder(&audioDecCtrl, SCE_AUDIODEC_TYPE_M4AAC);
-	assert(ret == SCE_OK);
-
-	playerHandle = ret;
-
-	playerSampleRate = sampleRate;
-	playerNumChannels = numChannels;
-
-	// Decode
-	ret = sceAudiodecDecode(playerHandle, &audioDecCtrl);
-	assert(ret == 0);
-}
-
-void MusicPlayer::Stop()
-{
-	sceAudiodecDeleteDecoder(playerHandle);
-	playerHandle = -1;
-}
-*/

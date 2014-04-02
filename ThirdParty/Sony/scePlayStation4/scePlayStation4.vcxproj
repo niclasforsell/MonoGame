@@ -54,7 +54,7 @@
     </ClCompile>
     <Link>
       <OutputFile>bin\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>-lSceAudiodec_stub_weak;-lSceVideoOut_stub_weak;-lSceGnmDriver_stub_weak;-lSceGnmx;-lSceGnm;-lSceNgs2_stub_weak;-lSceAudioOut_stub_weak;-lSceGpuAddress;-lScePngDec_stub_weak;-lSceSysmodule_stub_weak;-lScePad_stub_weak;-lSceUserService_stub_weak;-lSceSaveData_stub_weak;-lSceSystemService_stub_weak;-lSceNpTrophy_stub_weak;-lSceNpCommon_stub_weak;-lSceNpManager_stub_weak;-lSceVideoRecording_stub_weak;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>-lSceVideoOut_stub_weak;-lSceGnmDriver_stub_weak;-lSceGnmx;-lSceGnm;-lSceNgs2_stub_weak;-lSceAudioOut_stub_weak;-lSceAudiodec_stub_weak;-lSceGpuAddress;-lScePngDec_stub_weak;-lSceSysmodule_stub_weak;-lScePad_stub_weak;-lSceUserService_stub_weak;-lSceSaveData_stub_weak;-lSceSystemService_stub_weak;-lSceNpTrophy_stub_weak;-lSceNpCommon_stub_weak;-lSceNpManager_stub_weak;-lSceVideoRecording_stub_weak;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>..\BindingGen\bin\$(Configuration)\BindingGen.exe</Command>
@@ -97,8 +97,18 @@
     <ClCompile Include="Graphics\vertexShader.cpp" />
     <ClCompile Include="Input\gamePad.cpp" />
     <ClCompile Include="Input\gamePadState.cpp" />
-    <ClCompile Include="Media\adts_header_parser.cpp" />
+    <ClCompile Include="Media\at9\audio_decoder_at9.cpp" />
+    <ClCompile Include="Media\at9\riff_wave_header_at9_parser.cpp" />
+    <ClCompile Include="Media\audio_decoder.cpp" />
+    <ClCompile Include="Media\audio_output.cpp" />
+    <ClCompile Include="Media\file.cpp" />
+    <ClCompile Include="Media\m4aac\adts_header_parser.cpp" />
+    <ClCompile Include="Media\m4aac\audio_decoder_m4aac.cpp" />
+    <ClCompile Include="Media\mp3\audio_decoder_mp3.cpp" />
+    <ClCompile Include="Media\mp3\mpeg_audio_header_parser.cpp" />
     <ClCompile Include="Media\musicPlayer.cpp" />
+    <ClCompile Include="Media\ring_buffer.cpp" />
+    <ClCompile Include="Media\stream.cpp" />
     <ClCompile Include="prx.cpp" />
     <ClCompile Include="userService.cpp" />
   </ItemGroup>
@@ -125,9 +135,19 @@
     <ClInclude Include="Input\gamePad.h" />
     <ClInclude Include="Input\gamePadState.h" />
     <ClInclude Include="Input\predecls.h" />
-    <ClInclude Include="Media\adts_header_parser.h" />
+    <ClInclude Include="Media\at9\audio_decoder_at9.h" />
+    <ClInclude Include="Media\at9\riff_wave_header_at9_parser.h" />
+    <ClInclude Include="Media\audio_decoder.h" />
+    <ClInclude Include="Media\audio_output.h" />
+    <ClInclude Include="Media\file.h" />
+    <ClInclude Include="Media\m4aac\adts_header_parser.h" />
+    <ClInclude Include="Media\m4aac\audio_decoder_m4aac.h" />
+    <ClInclude Include="Media\mp3\audio_decoder_mp3.h" />
+    <ClInclude Include="Media\mp3\mpeg_audio_header_parser.h" />
     <ClInclude Include="Media\musicPlayer.h" />
     <ClInclude Include="Media\predecls.h" />
+    <ClInclude Include="Media\ring_buffer.h" />
+    <ClInclude Include="Media\stream.h" />
     <ClInclude Include="userService.h" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\SceGnm.targets" Condition="Exists('$(SolutionDir)\SceGnm.Development.props')" />

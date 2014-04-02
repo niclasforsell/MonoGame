@@ -9,6 +9,8 @@
 #include <assert.h>
 #include "adts_header_parser.h"
 
+using namespace Media;
+
 #define ADTS_HEADER_SIZE (4)
 
 int AdtsHeaderParser::parse(const uint8_t *pBuffer, uint32_t bufferSize)

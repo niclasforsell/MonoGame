@@ -2,11 +2,7 @@
 
 // Include all pre-declarations used from header files.
 
-namespace Audio {
-	class SoundSystem;
-	class AudioOut;
-}
-
 namespace Media {
+	struct MusicPlayerState;
 	class MusicPlayer;
 }
