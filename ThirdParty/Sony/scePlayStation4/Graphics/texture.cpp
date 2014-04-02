@@ -31,7 +31,7 @@ Texture::~Texture()
 	delete _texture;
 }
 
-void Texture::SetData(uint32_t level, unsigned char *data, uint32_t bytes)
+void Texture::SetData(uint32_t level, uint8_t *data, uint32_t bytes)
 {
 	auto width = _texture->getWidth();
 	auto height = _texture->getHeight();
@@ -64,6 +64,23 @@ void Texture::SetData(uint32_t level, unsigned char *data, uint32_t bytes)
 	}
 }
 
+void Texture::GetData(uint32_t level, uint8_t *data, uint32_t bytes)
+{
+	auto height = _texture->getHeight();
+	auto pixelBytes = _texture->getDataFormat().getBytesPerElement();
+	auto baseAddr = (unsigned char*)_texture->getBaseAddress();
+	auto pitch = _texture->getPitch();
+	auto levelZeroSize = pitch * height * pixelBytes;
+
+	while (level > 0)
+	{
+		baseAddr += levelZeroSize;
+		levelZeroSize /= 4;
+		--level;
+	}
+
+	memcpy(data, baseAddr, bytes);
+}
 
 /*
 Texture* GraphicsSystem::CreateTextureFromPng(unsigned char *data, uint32_t bytes)
