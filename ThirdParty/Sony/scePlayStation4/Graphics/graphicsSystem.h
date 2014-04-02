@@ -14,7 +14,7 @@ private:
 	static const bool kHtileEnabled							= true;
 	
 	const uint32_t kCueRingEntries							= 16;
-	const uint32_t kDcbSizeInBytes							= 4 * 1024 * 1024;
+	const uint32_t kDcbSizeInBytes							= 8 * 1024 * 1024;
 	const uint32_t kCcbSizeInBytes							= 4 * 1024 * 1024;
 
 	enum DisplayBufferState
