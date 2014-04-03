@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,18 +10,22 @@ using Sce.PlayStation4.Media;
 
 namespace Microsoft.Xna.Framework.Media
 {
-    internal class PS4Song : IDisposable
+    public sealed partial class Song : IEquatable<Song>, IDisposable
     {
-        private readonly MusicPlayer _player;
+        private MusicPlayer _player;
 
-        internal PS4Song(string fileName)
+        internal void PlatformInitialize(string fileName)
         {
             _player = new MusicPlayer();
             if (!_player.LoadAT9(fileName))
                 throw new Exception();
         }
 
-        public void Dispose()
+        internal void SetEventHandler(Action<object, EventArgs> OnSongFinishedPlaying)
+        {
+        }
+
+        public void PlatformDispose(bool disposing)
         {
             _player.Stop();
             _player.Dispose();
@@ -47,6 +55,15 @@ namespace Microsoft.Xna.Framework.Media
         {
             get { return _player.Volume; }
             set { _player.Volume = value; }
+        }
+
+        internal TimeSpan Position
+        {
+            get
+            {
+                // TODO: Implement
+                return new TimeSpan(0);
+            }
         }
     }
 }
