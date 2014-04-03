@@ -161,7 +161,7 @@
     <xsl:if test="/Input/Generation/Platform = 'Windows8'">
       <DefaultLanguage>en-US</DefaultLanguage>
     </xsl:if>
-    <xsl:if test="user:IsTrue(/Input/Properties/NoStdLib)">
+    <xsl:if test="/Input/Generation/Platform = 'PlayStation4'">
 	    <NoStdLib>True</NoStdLib>
     </xsl:if>
   </xsl:template>
