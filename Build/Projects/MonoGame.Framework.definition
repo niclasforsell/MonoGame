@@ -746,7 +746,7 @@
       <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Media\MediaPlayer.Default.cs">
-      <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya,PSMobile</Platforms>
+      <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya,PSMobile,PlayStation4</Platforms>
     </Compile>
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaSource.cs">
