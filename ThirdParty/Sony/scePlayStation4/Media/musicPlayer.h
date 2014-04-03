@@ -12,8 +12,6 @@ class __declspec(dllexport) MusicPlayer
 private:
 	MusicPlayerState* _state;
 
-	void Unload();
-
 public:
 	MusicPlayer();
 	~MusicPlayer();

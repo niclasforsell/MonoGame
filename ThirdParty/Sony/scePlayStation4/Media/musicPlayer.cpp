@@ -18,12 +18,10 @@ namespace {
 	const uint32_t stackSize = 512 * 1024;
 	const uint32_t outputStreamSize = 128 * 1024;
 	const uint32_t outputStreamGrain = 256;
-	const SceKernelUseconds pauseSleepTime = 500000;
 
 	enum EventFlags : uint64_t
 	{
-		Loaded      = 1 << 0,
-		Stopping    = 1 << 1,
+		Loaded = 1 << 0,
 	};
 }
 
@@ -66,6 +64,7 @@ void* decodeMain(void* arg)
 
 	state->outputStream->end();
 
+	sceKernelClearEventFlag(state->eventFlag, EventFlags::Loaded);
 	scePthreadBarrierWait(&state->barrier);
 	printf("MusicPlayer decode thread exiting.\n");
 	return arg;
@@ -104,14 +103,60 @@ MusicPlayer::MusicPlayer()
 
 MusicPlayer::~MusicPlayer()
 {
-	Unload();
+	Stop();
+
+	// join and detach a thread for audio decode
+	if (_state->threadDecode) {
+		scePthreadJoin(_state->threadDecode, 0);
+		_state->threadDecode = 0;
+	}
+
+	// join and detach a thread for audio output
+	if (_state->threadOutput) {
+		scePthreadJoin(_state->threadOutput, 0);
+		_state->threadOutput = 0;
+	}
+
+	if (_state->barrier) {
+		scePthreadBarrierDestroy(&_state->barrier);
+		_state->barrier = 0;
+	}
+
+	if (_state->eventFlag) {
+		sceKernelDeleteEventFlag(_state->eventFlag);
+		_state->eventFlag = 0;
+	}
+
+	if (_state->outputStream)
+	{
+		//Allocator::Get()->release(_state->outputStream);
+		delete _state->outputStream;
+		_state->outputStream = NULL;
+	}
+
+	if (_state->decoder)
+	{
+		//Allocator::Get()->release(_state->decoder);
+		delete _state->decoder;
+		_state->decoder = NULL;
+	}
+
+	if (_state->inputStream)
+	{
+		//Allocator::Get()->release(_state->inputStream);
+		delete _state->inputStream;
+		_state->inputStream = NULL;
+	}
+
 	Allocator::Get()->release(_state);
 }
 
 bool MusicPlayer::LoadAAC(const char* fileName)
 {
+	if (_state->inputStream != NULL)
+		return false;
+
 	assert(fileName != NULL);
-	Unload();
 
 	const uint32_t fileSize = File(fileName, "rb").size();
 	_state->inputStream = new FileInputStream(fileSize);
@@ -133,29 +178,6 @@ bool MusicPlayer::LoadAAC(const char* fileName)
 	assert(ret >= 0);
 
 	return true;
-}
-
-void MusicPlayer::Unload()
-{
-	Stop();
-
-	if (_state->outputStream)
-	{
-		Allocator::Get()->release(_state->outputStream);
-		_state->outputStream = NULL;
-	}
-
-	if (_state->decoder)
-	{
-		Allocator::Get()->release(_state->decoder);
-		_state->decoder = NULL;
-	}
-
-	if (_state->inputStream)
-	{
-		Allocator::Get()->release(_state->inputStream);
-		_state->inputStream = NULL;
-	}
 }
 
 void MusicPlayer::Play()
@@ -227,30 +249,7 @@ void MusicPlayer::Stop()
 	if (!_state->isRunning)
 		return;
 
-	sceKernelClearEventFlag(_state->eventFlag, EventFlags::Loaded);
 	_state->isRunning = false;
-
-	// join and detach a thread for audio decode
-	if (_state->threadDecode) {
-		scePthreadJoin(_state->threadDecode, 0);
-		_state->threadDecode = 0;
-	}
-
-	// join and detach a thread for audio output
-	if (_state->threadOutput) {
-		scePthreadJoin(_state->threadOutput, 0);
-		_state->threadOutput = 0;
-	}
-
-	if (_state->barrier) {
-		scePthreadBarrierDestroy(&_state->barrier);
-		_state->barrier = 0;
-	}
-
-	if (_state->eventFlag) {
-		sceKernelDeleteEventFlag(_state->eventFlag);
-		_state->eventFlag = 0;
-	}
 }
 
 float MusicPlayer::GetVolume()
