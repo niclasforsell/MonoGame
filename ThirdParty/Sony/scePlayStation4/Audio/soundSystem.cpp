@@ -259,9 +259,3 @@ void SoundSystem::CloseControllerPort(int playerIdx)
 SoundSystem::~SoundSystem(void)
 {
 }
-
-AudioOut* SoundSystem::GetAudioOut()
-{
-	assert(m_audioOut != NULL);
-	return m_audioOut;
-}

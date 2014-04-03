@@ -6,13 +6,11 @@ PlayStation(R)4 Programmer Tool Runtime Library Release 01.500.111
 
 #pragma once
 
-#include "predecls.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <kernel.h>
 #include <audioout.h>
 #include <user_service.h>
-#include <ngs2.h>
 #include "../allocator.h"
 
 namespace Audio {

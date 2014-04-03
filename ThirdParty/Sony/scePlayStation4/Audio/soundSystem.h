@@ -47,8 +47,6 @@ public:
 	void CloseControllerPort(int playerIdx);
 
 	~SoundSystem(void);
-
-	AudioOut* GetAudioOut();
 };
 
 } // namespace Audio
