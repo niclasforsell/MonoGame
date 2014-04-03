@@ -33,19 +33,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CppSharp">
-      <HintPath>deps\CppSharp.dll</HintPath>
+      <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.dll</HintPath>
     </Reference>
     <Reference Include="CppSharp.AST">
-      <HintPath>deps\CppSharp.AST.dll</HintPath>
+      <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.AST.dll</HintPath>
     </Reference>
     <Reference Include="CppSharp.Generator">
-      <HintPath>deps\CppSharp.Generator.dll</HintPath>
+      <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.Generator.dll</HintPath>
     </Reference>
     <Reference Include="CppSharp.Parser">
-      <HintPath>deps\CppSharp.Parser.dll</HintPath>
+      <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.Parser.dll</HintPath>
     </Reference>
     <Reference Include="CppSharp.Runtime">
-      <HintPath>deps\CppSharp.Runtime.dll</HintPath>
+      <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
