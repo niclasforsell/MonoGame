@@ -1,6 +1,6 @@
 ﻿/* SCE CONFIDENTIAL
  * PlayStation(R)4 Programmer Tool Runtime Library Release 01.600.051
- * Copyright (C) 2012 Sony Computer Entertainment Inc.
+ * Copyright (C) 2013 Sony Computer Entertainment Inc.
  * All Rights Reserved.
  */
 
@@ -16,7 +16,7 @@ namespace Media {
 class AudioDecoderAt9 : public AudioDecoder
 {
 public:
-	AudioDecoderAt9(InputStream *input);
+	AudioDecoderAt9(InputStream *input, AudioDecoderTrickPlayPoint playPoint, int *pRet);
 	~AudioDecoderAt9(void) {}
 };
 

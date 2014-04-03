@@ -33,12 +33,13 @@ struct Media::MusicPlayerState
 	ScePthread threadDecode;
 	ScePthread threadOutput;
 
-	FileInputStream* inputStream;
+	InputStream* inputStream;
 	AudioOutputStream* outputStream;
 	AudioDecoder* decoder;
 
 	bool isPaused;
 	bool isRunning;
+	bool isRestarting;
 };
 
 void* decodeMain(void* arg)
@@ -51,10 +52,16 @@ void* decodeMain(void* arg)
 		if (state->inputStream->isEmpty())
 			break;
 
+		if (state->isRestarting)
+		{
+			state->decoder->restart(state->inputStream);
+			state->isRestarting = false;
+		}
+
 		if (state->isPaused)
 			continue;
 
-		auto ret = state->decoder->decode(state->inputStream, state->outputStream);
+		auto ret = state->decoder->decodeSeek(state->inputStream, state->outputStream, NULL);
 		if (ret < 0)
 		{
 			printf("ERROR: MusicPlayer decode failed: 0x%08X\n", ret);
@@ -77,8 +84,8 @@ void* outputMain(void* arg)
 
 	while(state->isRunning)
 	{
-		if (state->isPaused)
-			continue;
+		//if (state->isPaused)
+		//	continue;
 
 		if (state->inputStream->isEmpty() && state->outputStream->isEmpty())
 			break;
@@ -151,24 +158,25 @@ MusicPlayer::~MusicPlayer()
 	Allocator::Get()->release(_state);
 }
 
-bool MusicPlayer::LoadAAC(const char* fileName)
+bool MusicPlayer::LoadAT9(const char* fileName)
 {
 	if (_state->inputStream != NULL)
 		return false;
 
 	assert(fileName != NULL);
 
-	const uint32_t fileSize = File(fileName, "rb").size();
-	_state->inputStream = new FileInputStream(fileSize);
+	_state->inputStream = new InputStream();
 	assert(_state->inputStream);
 
 	auto ret = _state->inputStream->open(fileName, "rb");
 	assert(ret >= 0);
 
-	ret = _state->inputStream->input();
-	_state->inputStream->end();
+	_state->inputStream->setIsEmpty(false);
 
-	_state->decoder = new AudioDecoderM4aac(_state->inputStream);
+	//_state->decoder = new AudioDecoderM4aac(_state->inputStream);
+	AudioDecoderTrickPlayPoint point;
+	memset(&point, 0, sizeof(AudioDecoderTrickPlayPoint));
+	_state->decoder = new AudioDecoderAt9(_state->inputStream, point, &ret);
 	assert(_state->decoder);
 
 	_state->outputStream = new AudioOutputStream(outputStreamSize, sizeof(int16_t) * AUDIO_STEREO * outputStreamGrain);
@@ -182,8 +190,11 @@ bool MusicPlayer::LoadAAC(const char* fileName)
 
 void MusicPlayer::Play()
 {
-	if (_state->isRunning)
-		Stop();
+	if (_state->isPaused)
+	{
+		_state->isPaused = false;
+		return;
+	}
 
 	auto ret = 0;
 	ScePthreadAttr attr = 0;
@@ -249,7 +260,8 @@ void MusicPlayer::Stop()
 	if (!_state->isRunning)
 		return;
 
-	_state->isRunning = false;
+	_state->isRestarting = true;
+	_state->isPaused = true;
 }
 
 float MusicPlayer::GetVolume()

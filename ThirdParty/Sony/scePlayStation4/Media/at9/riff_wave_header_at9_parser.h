@@ -1,6 +1,6 @@
 ﻿/* SCE CONFIDENTIAL
  * PlayStation(R)4 Programmer Tool Runtime Library Release 01.600.051
- * Copyright (C) 2012 Sony Computer Entertainment Inc.
+ * Copyright (C) 2013 Sony Computer Entertainment Inc.
  * All Rights Reserved.
  */
 
@@ -8,6 +8,7 @@
 #define _RIFF_WAVE_HEADER_AT9_PARSER_H
 
 #include <stdint.h>
+#include "../stream.h"
 
 namespace Media {
 
@@ -63,7 +64,7 @@ typedef struct SmplChunk {
 	uint32_t smpteOffset;
 	uint32_t sampleLoops;
 	uint32_t samplerData;
-	SampleLoop sampleLoop;
+	SampleLoop sampleLoop[STREAM_LOOPINFO_MAX];
 } SmplChunk;
 
 typedef struct RiffWaveHeaderAt9 {
@@ -84,7 +85,7 @@ public:
 	~RiffWaveHeaderAt9Parser(void) {}
 	const RiffWaveHeaderAt9 &header() { return m_header; }
 	uint32_t headerSize(void) { return m_headerSize; }
-	int parse(const uint8_t *pBuffer, uint32_t bufferSize);
+	int parse(InputStream *input);
 private:
 	RiffWaveHeaderAt9 m_header;
 	uint32_t m_headerSize;

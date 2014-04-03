@@ -1,6 +1,6 @@
 ﻿/* SCE CONFIDENTIAL
  * PlayStation(R)4 Programmer Tool Runtime Library Release 01.600.051
- * Copyright (C) 2012 Sony Computer Entertainment Inc.
+ * Copyright (C) 2013 Sony Computer Entertainment Inc.
  * All Rights Reserved.
  */
 
@@ -18,27 +18,22 @@ static const uint8_t s_subFormat[16] = {
 	0xD2, 0x42, 0xE1, 0x47, 0xBA, 0x36, 0x8D, 0x4D, 0x88, 0xFC, 0x61, 0x65, 0x4F, 0x8C, 0x83, 0x6C
 };
 
-int RiffWaveHeaderAt9Parser::parse(const uint8_t *pBuffer, uint32_t bufferSize)
+int RiffWaveHeaderAt9Parser::parse(InputStream *input)
 {
 	uint32_t readSize = 0;
 	uint32_t chunkDataSize;
-
 	uint32_t headerSize = 0;
-
-	assert(pBuffer);
+	int ret = 0;
 
 	// clear context
 	memset(&m_header, 0, sizeof(m_header));
-
-	// find RIFF-WAVE chunk
-	for ( ; ; ) {
-		if (bufferSize < readSize + sizeof(RiffWaveHeader)) {
-			printf("error: buffer size is too small\n");
+	// get Riff Type chunk
+	do {
+		ret = input->input((char *)&(m_header.riffWaveHeader), sizeof(RiffWaveHeader), 0, SEEK_CUR);
+		if (ret < 0) {
 			return -1;
 		}
-		memcpy(&m_header.riffWaveHeader, pBuffer + readSize, sizeof(RiffWaveHeader));
 		readSize += sizeof(RiffWaveHeader);
-
 		if (m_header.riffWaveHeader.chunkId != 0x46464952) { // "RIFF"
 			printf("error: beginning of header is not \"RIFF\"\n");
 			return -1;
@@ -48,28 +43,22 @@ int RiffWaveHeaderAt9Parser::parse(const uint8_t *pBuffer, uint32_t bufferSize)
 			// if chunkDataSize is odd, add padding data length
 			chunkDataSize += 1;
 		}
-
 		if (m_header.riffWaveHeader.typeId == 0x45564157) { // "WAVE"
 			break;
 		}
+		ret = input->input(NULL, 0, chunkDataSize, SEEK_CUR);
+		readSize += chunkDataSize;
+	} while (ret == 0);
 
-		if (bufferSize < readSize + chunkDataSize - sizeof(m_header.riffWaveHeader.typeId)) {
-			printf("error: buffer size is too small\n");
-			return -1;
-		}
-		readSize += chunkDataSize - sizeof(m_header.riffWaveHeader.typeId);
-	}
-
-	while (headerSize == 0) {
+	// get other chunk
+	while ((input->size() - readSize) > 0) {
 		ChunkHeader chunkHeader;
 
-		if (bufferSize < readSize + sizeof(ChunkHeader)) {
-			printf("error: buffer size is too small\n");
+		ret = input->input((char *)&chunkHeader, sizeof(ChunkHeader), 0, SEEK_CUR);
+		if (ret < 0) {
 			return -1;
 		}
-		memcpy(&chunkHeader, pBuffer + readSize, sizeof(ChunkHeader));
 		readSize += sizeof(ChunkHeader);
-
 		chunkDataSize = chunkHeader.chunkDataSize;
 		if (chunkDataSize % 2 == 1) {
 			// if chunkDataSize is odd, add padding data length
@@ -78,21 +67,21 @@ int RiffWaveHeaderAt9Parser::parse(const uint8_t *pBuffer, uint32_t bufferSize)
 		switch (chunkHeader.chunkId) {
 		case 0x20746D66: // "fmt "
 			memcpy(&m_header.fmtChunkHeader, &chunkHeader, sizeof(ChunkHeader));
-
-			if (bufferSize < readSize + sizeof(FmtChunk)) {
-				printf("error: buffer size is too small\n");
+			ret = input->input((char *)&(m_header.fmtChunk), sizeof(FmtChunk), 0, SEEK_CUR);
+			if (ret < 0) {
 				return -1;
 			}
-			memcpy(&m_header.fmtChunk, pBuffer + readSize, sizeof(FmtChunk));
 			readSize += sizeof(FmtChunk);
-
 			if (m_header.fmtChunk.formatTag != WAVE_FORMAT_EXTENSIBLE) {
 				printf("unknown ID: %X\n", m_header.fmtChunk.formatTag);
 				return -1;
 			}
 			if (memcmp(s_subFormat, m_header.fmtChunk.subFormat, sizeof(s_subFormat))) {
-				const uint32_t *p = (uint32_t *)m_header.fmtChunk.subFormat;
-				printf("unknown codec ID: %08X%08X%08X%08X\n", p[0], p[1], p[3], p[4]);
+				printf("unknown codec ID:");
+				for (int i = 0; i < sizeof(m_header.fmtChunk.subFormat); i++) {
+					printf(" %02x", m_header.fmtChunk.subFormat[i]);
+				}
+				printf("\n");
 				return -1;
 			}
 			// rest is unknown data, so just skip them
@@ -100,32 +89,38 @@ int RiffWaveHeaderAt9Parser::parse(const uint8_t *pBuffer, uint32_t bufferSize)
 			break;
 		case 0x74636166: // "fact"
 			memcpy(&m_header.factChunkHeader, &chunkHeader, sizeof(ChunkHeader));
-
-			if (bufferSize < readSize + sizeof(FactChunk)) {
-				printf("error: buffer size is too small\n");
+			ret = input->input((char *)&(m_header.factChunk), sizeof(FactChunk), 0, SEEK_CUR);
+			if (ret < 0) {
 				return -1;
 			}
-			memcpy(&m_header.factChunk, pBuffer + readSize, sizeof(FactChunk));
 			readSize += sizeof(FactChunk);
-
 			// rest is unknown data, so just skip them
 			chunkDataSize = (chunkDataSize < sizeof(FactChunk)) ? 0 : chunkDataSize - sizeof(FactChunk);
 			break;
 		case 0x61746164: // "data"
 			memcpy(&m_header.dataChunkHeader, &chunkHeader, sizeof(ChunkHeader));
-
+			// get size to data
 			headerSize = readSize;
+			// rest is unknown data, so just skip them
+			chunkDataSize = m_header.dataChunkHeader.chunkDataSize;
 			break;
 		case 0x6C706D73: // "smpl"
 			memcpy(&m_header.smplChunkHeader, &chunkHeader, sizeof(ChunkHeader));
-
-			if (bufferSize < readSize + sizeof(SmplChunk)) {
-				printf("error: buffer size is too small\n");
+			ret = input->input((char *)&(m_header.smplChunk), (sizeof(SmplChunk) - sizeof(SampleLoop) * STREAM_LOOPINFO_MAX), 0, SEEK_CUR);
+			if (ret < 0) {
 				return -1;
 			}
-			memcpy(&m_header.smplChunk, pBuffer + readSize, sizeof(SmplChunk));
-			readSize += sizeof(SmplChunk);
-
+			readSize += ret;
+			// loop information is to STREAM_LOOPINFO_MAX
+			if (m_header.smplChunk.sampleLoops <= STREAM_LOOPINFO_MAX) {
+				ret = input->input((char *)m_header.smplChunk.sampleLoop, (sizeof(SampleLoop) * m_header.smplChunk.sampleLoops), 0, SEEK_CUR);
+			} else {
+				ret = input->input((char *)m_header.smplChunk.sampleLoop, (sizeof(SampleLoop) * STREAM_LOOPINFO_MAX), 0, SEEK_CUR);
+			}
+			if (ret < 0) {
+				return -1;
+			}
+			readSize += ret;
 			// rest is unknown data, so just skip them
 			chunkDataSize = (chunkDataSize < sizeof(SmplChunk)) ? 0 : chunkDataSize - sizeof(SmplChunk);
 			break;
@@ -133,13 +128,12 @@ int RiffWaveHeaderAt9Parser::parse(const uint8_t *pBuffer, uint32_t bufferSize)
 			printf("unknown\n");
 			break;
 		}
-		if (bufferSize < readSize + chunkDataSize) {
-			printf("error: buffer size is too small\n");
+		ret = input->input(NULL, 0, chunkDataSize, SEEK_CUR);
+		if (ret < 0) {
 			return -1;
 		}
 		readSize += chunkDataSize;
 	}
-
 #ifdef DISPLAY_HEADER
 	printf("= ATRAC9 Audio header ===============\n");
 	printf("RiffWaveHeader.chunkId                    : 0x%X (0x45564157 (\"RIFF\") fixed)\n", m_header.riffWaveHeader.chunkId);
@@ -175,8 +169,12 @@ int RiffWaveHeaderAt9Parser::parse(const uint8_t *pBuffer, uint32_t bufferSize)
 	printf("=====================================\n");
 #endif /* DISPLAY_HEADER */
 
+	// rewind to data start point
+	ret = input->input(NULL, 0, headerSize, SEEK_SET);
+	if (ret < 0) {
+		return -1;
+	}
 	// header size
 	m_headerSize = headerSize;
-
 	return 0;
 }

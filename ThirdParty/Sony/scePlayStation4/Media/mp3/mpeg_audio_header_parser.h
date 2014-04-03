@@ -8,6 +8,7 @@
 #define _MPEG_AUDIO_HEADER_PARSER_H
 
 #include <stdint.h>
+#include "../stream.h"
 
 namespace Media {
 
@@ -42,7 +43,7 @@ public:
 	~MpegAudioHeaderParser(void) {}
 	const MpegAudioHeader &header() { return m_header; }
 	uint32_t headerSize(void) { return m_headerSize; }
-	int parse(const uint8_t *pBuffer, uint32_t bufferSize);
+	int parse(InputStream *input);
 private:
 	MpegAudioHeader m_header;
 	uint32_t m_headerSize;

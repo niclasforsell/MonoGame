@@ -19,8 +19,6 @@ File::File(const char *path, const char *mode) : m_fp(0), m_path(0), m_size(0)
 
 int File::open(const char *path, const char *mode)
 {
-	int ret = 0;
-
 	assert(path);
 	assert(mode);
 	assert(!m_fp);
@@ -30,16 +28,14 @@ int File::open(const char *path, const char *mode)
 	m_fp = fopen(path, mode);
 	if (!m_fp) {
 		printf("error: fopen() failed: %s\n", path);
-		goto term;
+		return -1;
 	}
 
 	// get the file size
 	fseek(m_fp, 0, SEEK_END);
 	m_size = (uint32_t)ftell(m_fp);
 	fseek(m_fp, 0, SEEK_SET);
-
-term:
-	return ret;
+	return 0;
 }
 
 File::~File(void)
@@ -49,14 +45,13 @@ File::~File(void)
 
 int File::close(void)
 {
-	int ret = 0;
-
 	if (m_fp) {
 		// close a file
 		fclose(m_fp);
+		m_fp = 0;
 	}
 
-	return ret;
+	return 0;
 }
 
 int File::read(void *p, uint32_t size, off_t offset, int32_t whence)

@@ -13,7 +13,7 @@ using namespace Media;
 
 #define MPEG_AUDIO_HEADER_SIZE (4)
 
-int MpegAudioHeaderParser::parse(const uint8_t *pBuffer, uint32_t bufferSize)
+int MpegAudioHeaderParser::parse(InputStream *input)
 {
 #ifdef DISPLAY_HEADER
 	const char *version[4] = {
@@ -42,11 +42,14 @@ int MpegAudioHeaderParser::parse(const uint8_t *pBuffer, uint32_t bufferSize)
 		2, 2, 2, 1
 	};
 
-	assert(pBuffer);
+	assert(input);
 
-	if (bufferSize < MPEG_AUDIO_HEADER_SIZE) {
+	if (input->size() < MPEG_AUDIO_HEADER_SIZE) {
 		return -1;
 	}
+
+    char pBuffer[MPEG_AUDIO_HEADER_SIZE];
+    input->input(pBuffer, MPEG_AUDIO_HEADER_SIZE, 0, 0);
 
 	// clear MPEG header
 	memset(&m_header, 0, sizeof(m_header));

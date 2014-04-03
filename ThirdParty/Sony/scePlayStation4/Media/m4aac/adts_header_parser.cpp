@@ -13,8 +13,9 @@ using namespace Media;
 
 #define ADTS_HEADER_SIZE (4)
 
-int AdtsHeaderParser::parse(const uint8_t *pBuffer, uint32_t bufferSize)
+int AdtsHeaderParser::parse(InputStream *input)
 {
+    int ret = 0;
 	const uint32_t samplingFrequency[] = {
 		96000,
 		88200,
@@ -34,11 +35,14 @@ int AdtsHeaderParser::parse(const uint8_t *pBuffer, uint32_t bufferSize)
 		0,
 	};
 
-	assert(pBuffer);
+	assert(input);
 
-	if (bufferSize < ADTS_HEADER_SIZE) {
+	if (input->size() < ADTS_HEADER_SIZE) {
 		return -1;
 	}
+
+	char pBuffer[ADTS_HEADER_SIZE];
+	input->input(pBuffer, ADTS_HEADER_SIZE, 0, 0);
 
 	// clear ADTS header
 	memset(&m_header, 0, sizeof(m_header));
@@ -75,6 +79,11 @@ int AdtsHeaderParser::parse(const uint8_t *pBuffer, uint32_t bufferSize)
 	printf("home                     : 0x%X\n", m_header.home);
 	printf("===================================\n");
 #endif /* DISPLAY_HEADER */
+
+	ret = input->input(NULL, 0, ADTS_HEADER_SIZE, SEEK_SET);
+	if (ret < 0) {
+		return -1;
+	}
 
 	// header size
 	m_headerSize = ADTS_HEADER_SIZE;

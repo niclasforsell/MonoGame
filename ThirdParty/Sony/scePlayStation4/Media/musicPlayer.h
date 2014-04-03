@@ -16,7 +16,7 @@ public:
 	MusicPlayer();
 	~MusicPlayer();
 
-	bool LoadAAC(const char* fileName);
+	bool LoadAT9(const char* fileName);
 
 	void Play();
 	void Resume();

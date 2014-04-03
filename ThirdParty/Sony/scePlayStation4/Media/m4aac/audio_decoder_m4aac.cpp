@@ -25,14 +25,11 @@ AudioDecoderM4aac::AudioDecoderM4aac(InputStream *input) : AudioDecoder(SCE_AUDI
 	assert(input);
 
 	// parse the header
-	ret = parser.parse(input->lock(), input->readingSize());
+	ret = parser.parse(input);
 	if (ret < 0) {
 		printf("error: AdtsHeaderParser::parse() failed: 0x%08X\n", ret);
 		goto term;
 	}
-
-	// set the head of file to the read point
-	input->unlock(0);
 
 	// set initial values
 	m_ctrl.pParam = reinterpret_cast<void *>(&m_param.m4aac);
@@ -55,7 +52,7 @@ AudioDecoderM4aac::AudioDecoderM4aac(InputStream *input) : AudioDecoder(SCE_AUDI
 		printf("error: sceAudiodecCreateDecoder() failed: 0x%08X\n", ret);
 		goto term;
 	}
-	m_handle = ret;
+	m_instance = ret;
 
 	// sample rate
 	m_sampleRate = header.samplingFrequency;
