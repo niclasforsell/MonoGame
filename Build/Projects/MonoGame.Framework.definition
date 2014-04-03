@@ -22,7 +22,6 @@
 
   <Properties>
 	
-	<NoStdLib>True</NoStdLib>
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
 	<RemoveXnaAssembliesOnWP8>false</RemoveXnaAssembliesOnWP8>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
