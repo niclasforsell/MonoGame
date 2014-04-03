@@ -90,7 +90,8 @@ public:
 		m_isAborted		= false;
 		m_numPorts      = 0;
 
-		if ((result = sceAudioOutInit()) < 0)
+		result = sceAudioOutInit();
+		if (result < 0 && result != SCE_AUDIO_OUT_ERROR_ALREADY_INIT)
 			return result;
 
 		for(int32_t i = 0; i < AUDIO_OUT_PORT_MAX; i++){

@@ -41,6 +41,42 @@
     <ClCompile Include="Input\gamePadState.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="Media\m4aac\adts_header_parser.cpp">
+      <Filter>Media\m4aac</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\at9\audio_decoder_at9.cpp">
+      <Filter>Media\at9</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\at9\riff_wave_header_at9_parser.cpp">
+      <Filter>Media\at9</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\m4aac\audio_decoder_m4aac.cpp">
+      <Filter>Media\m4aac</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\mp3\audio_decoder_mp3.cpp">
+      <Filter>Media\mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\mp3\mpeg_audio_header_parser.cpp">
+      <Filter>Media\mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\audio_decoder.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\file.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\ring_buffer.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\stream.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\musicPlayer.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\audio_output.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -51,6 +87,18 @@
     </Filter>
     <Filter Include="Input">
       <UniqueIdentifier>{cbc8235f-fea0-4c9e-b7c0-f92f9a7446c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Media">
+      <UniqueIdentifier>{ba7f91bf-2f60-41cd-8394-2f4e48a9f561}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Media\at9">
+      <UniqueIdentifier>{e423ae72-e91b-473f-abe1-94cacac32fe5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Media\m4aac">
+      <UniqueIdentifier>{ac3c1c25-f8c5-4e9a-8b9d-2bfc47e7d032}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Media\mp3">
+      <UniqueIdentifier>{6893d4ef-a490-45d1-bc3a-db39b7b460c9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -116,6 +164,45 @@
     </ClInclude>
     <ClInclude Include="Input\gamePadState.h">
       <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\predecls.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\m4aac\adts_header_parser.h">
+      <Filter>Media\m4aac</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\at9\audio_decoder_at9.h">
+      <Filter>Media\at9</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\at9\riff_wave_header_at9_parser.h">
+      <Filter>Media\at9</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\m4aac\audio_decoder_m4aac.h">
+      <Filter>Media\m4aac</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\mp3\mpeg_audio_header_parser.h">
+      <Filter>Media\mp3</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\mp3\audio_decoder_mp3.h">
+      <Filter>Media\mp3</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\stream.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\audio_decoder.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\file.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\ring_buffer.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\musicPlayer.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\audio_output.h">
+      <Filter>Media</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
