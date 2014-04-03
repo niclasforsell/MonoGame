@@ -771,6 +771,9 @@
     <Compile Include="Media\Song.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Media\Song.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Media\Song.IOS.cs">
         <Platforms>iOS</Platforms>
     </Compile>
@@ -1211,9 +1214,6 @@
         <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="PlayStation4\Input\GamePad.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
-    </Compile>
-    <Compile Include="PlayStation4\Media\Song.PS4.cs">
         <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="PlayStation4\Media\Video.cs">
