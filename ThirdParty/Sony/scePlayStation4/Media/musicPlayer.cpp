@@ -18,6 +18,7 @@ namespace {
 	const uint32_t stackSize = 512 * 1024;
 	const uint32_t outputStreamSize = 128 * 1024;
 	const uint32_t outputStreamGrain = 256;
+	const SceKernelUseconds pauseSleepTime = 500000;
 
 	enum EventFlags : uint64_t
 	{
@@ -35,9 +36,10 @@ struct Media::MusicPlayerState
 	ScePthread threadOutput;
 
 	FileInputStream* inputStream;
-	OutputStream* outputStream;
+	AudioOutputStream* outputStream;
 	AudioDecoder* decoder;
 
+	bool isPaused;
 	bool isRunning;
 };
 
@@ -51,6 +53,9 @@ void* decodeMain(void* arg)
 		if (state->inputStream->isEmpty())
 			break;
 
+		if (state->isPaused)
+			continue;
+
 		auto ret = state->decoder->decode(state->inputStream, state->outputStream);
 		if (ret < 0)
 		{
@@ -61,9 +66,7 @@ void* decodeMain(void* arg)
 
 	state->outputStream->end();
 
-	sceKernelClearEventFlag(state->eventFlag, 0);
 	scePthreadBarrierWait(&state->barrier);
-
 	printf("MusicPlayer decode thread exiting.\n");
 	return arg;
 }
@@ -75,6 +78,9 @@ void* outputMain(void* arg)
 
 	while(state->isRunning)
 	{
+		if (state->isPaused)
+			continue;
+
 		if (state->inputStream->isEmpty() && state->outputStream->isEmpty())
 			break;
 
@@ -86,7 +92,6 @@ void* outputMain(void* arg)
 		}
 	}
 
-	sceKernelClearEventFlag(state->eventFlag, 0);
 	scePthreadBarrierWait(&state->barrier);
 	printf("MusicPlayer output thread exiting.\n");
 	return arg;
@@ -209,10 +214,12 @@ term:
 
 void MusicPlayer::Resume()
 {
+	_state->isPaused = false;
 }
 
 void MusicPlayer::Pause()
 {
+	_state->isPaused = true;
 }
 
 void MusicPlayer::Stop()
@@ -221,7 +228,6 @@ void MusicPlayer::Stop()
 		return;
 
 	sceKernelClearEventFlag(_state->eventFlag, EventFlags::Loaded);
-
 	_state->isRunning = false;
 
 	// join and detach a thread for audio decode
@@ -245,14 +251,20 @@ void MusicPlayer::Stop()
 		sceKernelDeleteEventFlag(_state->eventFlag);
 		_state->eventFlag = 0;
 	}
-
 }
 
 float MusicPlayer::GetVolume()
 {
-	return 1;
+	if (_state->outputStream == NULL)
+		return 1.0f;
+
+	return _state->outputStream->getOutput()->getVolume();
 }
 
 void MusicPlayer::SetVolume(float value)
 {
+	if (_state->outputStream == NULL)
+		return;
+
+	_state->outputStream->getOutput()->setVolume(value);
 }

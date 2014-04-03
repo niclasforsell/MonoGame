@@ -94,6 +94,7 @@ public:
 	}
 	int output(uint32_t size = 0);
 	uint32_t size(void) { return m_audioOutput.size(); }
+	AudioOutput* getOutput() { return &m_audioOutput; }
 private:
 	AudioOutput m_audioOutput;
 	bool m_hasOutput;

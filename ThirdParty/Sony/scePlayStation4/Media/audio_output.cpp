@@ -81,6 +81,9 @@ AudioOutput::AudioOutput(void)
 	m_sampleRate = 0;
 	m_param = 0;
 	m_numChannels = 0;
+
+	m_volume[0] = SCE_AUDIO_VOLUME_0dB / 4;
+	m_volume[1] = SCE_AUDIO_VOLUME_0dB / 4;
 }
 
 AudioOutput::~AudioOutput(void)
@@ -91,11 +94,6 @@ AudioOutput::~AudioOutput(void)
 int AudioOutput::open(int32_t grain, int32_t sampleRate, int32_t param)
 {
 	int ret = 0;
-
-	int32_t volume[AUDIO_STEREO] = {
-		SCE_AUDIO_VOLUME_0dB / 4,
-		SCE_AUDIO_VOLUME_0dB / 4,
-	};
 
 	// open audio port
 	ret = sceAudioOutOpen(SCE_USER_SERVICE_USER_ID_SYSTEM, SCE_AUDIO_OUT_PORT_TYPE_BGM, 0, grain, sampleRate, param);
@@ -111,7 +109,7 @@ int AudioOutput::open(int32_t grain, int32_t sampleRate, int32_t param)
 	ret = 0;
 
 	// set volume
-	ret = sceAudioOutSetVolume(m_handle, (SCE_AUDIO_VOLUME_FLAG_L_CH | SCE_AUDIO_VOLUME_FLAG_R_CH), volume);
+	ret = sceAudioOutSetVolume(m_handle, (SCE_AUDIO_VOLUME_FLAG_L_CH | SCE_AUDIO_VOLUME_FLAG_R_CH), m_volume);
 	if (ret < 0) {
 		printf("error: sceAudioOutSetVolume() failed: 0x%08X\n", ret);
 		goto term;
@@ -161,3 +159,23 @@ term:
 	return ret;
 }
 
+float AudioOutput::getVolume()
+{
+	return (float)(m_volume[0] / SCE_AUDIO_VOLUME_0DB);
+}
+
+void AudioOutput::setVolume(float value)
+{
+	if (value > 1.0f)
+		value = 1.0f;
+
+	if (value < 0.0f)
+		value = 0.0f;
+
+	m_volume[0] = m_volume[1] = (int32_t)(value * SCE_AUDIO_VOLUME_0DB);
+
+	auto ret = sceAudioOutSetVolume(m_handle, (SCE_AUDIO_VOLUME_FLAG_L_CH | SCE_AUDIO_VOLUME_FLAG_R_CH), m_volume);
+	if (ret < 0) {
+		printf("error: sceAudioOutSetVolume() failed: 0x%08X\n", ret);
+	}
+}

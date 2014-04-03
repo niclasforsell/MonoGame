@@ -33,6 +33,8 @@ public:
 	int close(void);
 	int output(const void *p);
 	uint32_t size(void) { return sizeof(int16_t) * m_numChannels * m_grain; }
+	float getVolume();
+	void setVolume(float value);
 private:
 	static AudioOutputSystem s_system;
 	int32_t m_handle;
@@ -40,6 +42,7 @@ private:
 	int32_t m_sampleRate;
 	int32_t m_param;
 	uint32_t m_numChannels;
+	int32_t m_volume[AUDIO_STEREO];
 };
 
 } // namespace Media
