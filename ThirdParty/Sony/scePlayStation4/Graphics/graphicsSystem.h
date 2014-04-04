@@ -30,7 +30,7 @@ private:
 	uint32_t _backBufferIndex;
 	_SceKernelEqueue *_eopEventQueue;
 	uint32_t _frameIndex;
-	RenderTarget *_currentRenderTarget;
+	sce::Gnm::RenderTarget *_currentRenderTarget;
 
 	PixelShader *_clearPS;
 	VertexShader *_clearVS;

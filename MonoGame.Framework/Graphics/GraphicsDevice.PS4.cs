@@ -38,6 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clear clobbers a bunch of state, so just make it 
             // all dirty and it will get re-applied on the next draw.
+            PlatformSetViewport(ref _viewport);
             _depthStencilStateDirty = true;
             _blendStateDirty = true;
             _pixelShaderDirty = true;

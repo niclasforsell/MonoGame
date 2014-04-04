@@ -284,6 +284,7 @@ void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sc
 {
 	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
 	
+	_currentRenderTarget = renderTarget;
 	gfxc.setRenderTarget(0, renderTarget);
 	gfxc.setDepthRenderTarget(depthTarget);
 
@@ -322,8 +323,6 @@ void GraphicsSystem::SetRenderTarget(RenderTarget *renderTarget_)
 		depthTarget = backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL;
 	}
 
-	_currentRenderTarget = renderTarget_;
-
 	_applyRenderTarget(renderTarget, depthTarget);
 }
 
@@ -343,6 +342,10 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 		gfxc.setRenderTargetMask(0x0000000F);
 	else
 		gfxc.setRenderTargetMask(0x00000000);
+
+	// We should clear the entire target.
+	gfxc.setupScreenViewport(0, 0,	_currentRenderTarget->getWidth(), 
+									_currentRenderTarget->getHeight(), 1.0f, 0.0f);
 
 	// What else are we clearing?
 	auto clearDepth = (options & ClearOptions_DepthBuffer) == ClearOptions_DepthBuffer;
@@ -694,8 +697,6 @@ void GraphicsSystem::prepareBackBuffer()
 
 	// We always use the vertex and pixel shader stages.
 	gfxc.setActiveShaderStages(Gnm::kActiveShaderStagesVsPs);
-
-	_currentRenderTarget = NULL;
 }
 
 void GraphicsSystem::SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth)
