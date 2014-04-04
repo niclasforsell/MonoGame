@@ -103,6 +103,19 @@ void copyState(const ScePadData& data, GamePadState* state)
 	state->Buttons |= (buttons & SCE_PAD_BUTTON_CIRCLE) != 0 ? 8192 : 0;
 	state->Buttons |= (buttons & SCE_PAD_BUTTON_SQUARE) != 0 ? 16384 : 0;
 	state->Buttons |= (buttons & SCE_PAD_BUTTON_TRIANGLE) != 0 ? 32768 : 0;
+
+	state->OrientationX = data.orientation.x;
+	state->OrientationY = data.orientation.y;
+	state->OrientationZ = data.orientation.z;
+	state->OrientationW = data.orientation.w;
+
+	state->AccelerationX = data.acceleration.x;
+	state->AccelerationY = data.acceleration.y;
+	state->AccelerationZ = data.acceleration.z;
+
+	state->AngularVelocityX = data.angularVelocity.x;
+	state->AngularVelocityY = data.angularVelocity.y;
+	state->AngularVelocityZ = data.angularVelocity.z;
 }
 
 void GamePad::Update(float elapsedSeconds)
@@ -175,7 +188,23 @@ GamePadState* GamePad::GetState(int playerIndex)
 	return padStates[playerIndex];
 }
 
-bool GamePad::SetColor(int playerIndex, uint8_t r, uint8_t g, uint8_t b)
+bool GamePad::SetVibration(int playerIndex, float smallMotor, float largeMotor)
+{
+	assert(playerIndex >= 0);
+	assert(playerIndex < PLAYER_MAX);
+
+	if (!padStates[playerIndex]->IsConnected)
+		return false;
+
+	auto vibParams = ScePadVibrationParam();
+	vibParams.largeMotor = largeMotor * 255;
+	vibParams.smallMotor = smallMotor * 255;
+
+	auto ret = scePadSetVibration(padHandles[playerIndex], &vibParams);
+	return ret == SCE_OK;
+}
+
+bool GamePad::SetLightBar(int playerIndex, uint8_t r, uint8_t g, uint8_t b)
 {
 	assert(playerIndex >= 0);
 	assert(playerIndex < PLAYER_MAX);
@@ -199,7 +228,7 @@ bool GamePad::SetColor(int playerIndex, uint8_t r, uint8_t g, uint8_t b)
 	return ret == SCE_OK;
 }
 
-bool GamePad::ResetColor(int playerIndex)
+bool GamePad::ResetLightBar(int playerIndex)
 {
 	assert(playerIndex >= 0);
 	assert(playerIndex < PLAYER_MAX);
@@ -208,19 +237,38 @@ bool GamePad::ResetColor(int playerIndex)
 	return ret == SCE_OK;
 }
 
-bool GamePad::SetVibration(int playerIndex, float smallMotor, float largeMotor)
+bool GamePad::SetMotionEnabled(int playerIndex, bool value)
 {
 	assert(playerIndex >= 0);
 	assert(playerIndex < PLAYER_MAX);
 
-	if (!padStates[playerIndex]->IsConnected)
-		return false;
-
-	auto vibParams = ScePadVibrationParam();
-	vibParams.largeMotor = largeMotor * 255;
-	vibParams.smallMotor = smallMotor * 255;
-
-	auto ret = scePadSetVibration(padHandles[playerIndex], &vibParams);
+	auto ret = scePadSetMotionSensorState(padHandles[playerIndex], value);
 	return ret == SCE_OK;
 }
 
+bool GamePad::SetVelocityDeadbandEnabled(int playerIndex, bool value)
+{
+	assert(playerIndex >= 0);
+	assert(playerIndex < PLAYER_MAX);
+
+	auto ret = scePadSetAngularVelocityDeadbandState(padHandles[playerIndex], value);
+	return ret == SCE_OK;
+}
+
+bool GamePad::SetTiltCorrectionEnabled(int playerIndex, bool value)
+{
+	assert(playerIndex >= 0);
+	assert(playerIndex < PLAYER_MAX);
+
+	auto ret = scePadSetTiltCorrectionState(padHandles[playerIndex], value);
+	return ret == SCE_OK;
+}
+
+bool GamePad::ResetOrientation(int playerIndex)
+{
+	assert(playerIndex >= 0);
+	assert(playerIndex < PLAYER_MAX);
+
+	auto ret = scePadResetOrientation(padHandles[playerIndex]);
+	return ret == SCE_OK;
+}

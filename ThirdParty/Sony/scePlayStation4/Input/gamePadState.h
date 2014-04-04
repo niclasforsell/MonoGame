@@ -19,6 +19,19 @@ struct CS_VALUE_TYPE GamePadState
 	float RightTrigger;
 
 	uint32_t Buttons;
+
+	float OrientationX;
+	float OrientationY;
+	float OrientationZ;
+	float OrientationW;
+
+	float AccelerationX;
+	float AccelerationY;
+	float AccelerationZ;
+
+	float AngularVelocityX;
+	float AngularVelocityY;
+	float AngularVelocityZ;
 };
 
 } // namespace Input

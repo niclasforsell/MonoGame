@@ -13,24 +13,14 @@ namespace Microsoft.Xna.Framework.Input
 {
     public static partial class GamePad
     {
-        private static void ValidatePlayerIndex(PlayerIndex playerIndex)
-        {
-            // Make sure the player index is in range.
-            var index = (int)playerIndex;
-            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
-                throw new InvalidOperationException();
-        }
-
         public static GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
         {
-            ValidatePlayerIndex(playerIndex);
-
             var state = PSGamePad.GetState((int)playerIndex);
             return new GamePadCapabilities
             {
                 IsConnected = state.IsConnected,
                 HasAButton = true,
-                HasBackButton = true,
+                HasBackButton = false, // No equivalent for PS4 as far as I can tell
                 HasBButton = true,
                 HasDPadDownButton = true,
                 HasDPadLeftButton = true,
@@ -40,7 +30,7 @@ namespace Microsoft.Xna.Framework.Input
                 HasLeftStickButton = true,
                 HasRightShoulderButton = true,
                 HasRightStickButton = true,
-                HasStartButton = true,
+                HasStartButton = true, // TODO: Verify this maps semantics with Options button
                 HasXButton = true,
                 HasYButton = true,
                 HasBigButton = false,
@@ -64,8 +54,6 @@ namespace Microsoft.Xna.Framework.Input
 
         public static GamePadState GetState(PlayerIndex playerIndex, GamePadDeadZone deadZoneMode)
         {
-            ValidatePlayerIndex(playerIndex);
-
             var state = PSGamePad.GetState((int)playerIndex);
             return new GamePadState
             {
@@ -79,25 +67,61 @@ namespace Microsoft.Xna.Framework.Input
                     Right = new Vector2(state.RightStickX, state.RightStickY),
                 },
                 Triggers = new GamePadTriggers(state.LeftTrigger, state.RightTrigger),
+                Orientation = new Quaternion
+                {
+                    X = state.OrientationX,
+                    Y = state.OrientationY,
+                    Z = state.OrientationZ,
+                    W = state.OrientationW
+                },
+                Acceleration = new Vector3
+                {
+                    X = state.AccelerationX,
+                    Y = state.AccelerationY,
+                    Z = state.AccelerationZ
+                },
+                AngularVelocity = new Vector3
+                {
+                    X = state.AngularVelocityX,
+                    Y = state.AngularVelocityY,
+                    Z = state.AngularVelocityZ
+                },
             };
         }
 
         public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
         {
-            ValidatePlayerIndex(playerIndex);
             return PSGamePad.SetVibration((int)playerIndex, leftMotor, rightMotor);
         }
 
-        public static bool SetColor(PlayerIndex playerIndex, Color color)
+        public static bool SetLightBar(PlayerIndex playerIndex, Color color)
         {
-            ValidatePlayerIndex(playerIndex);
-            return PSGamePad.SetColor((int)playerIndex, color.R, color.G, color.B);
+            return PSGamePad.SetLightBar((int)playerIndex, color.R, color.G, color.B);
         }
 
-        public static bool ResetColor(PlayerIndex playerIndex)
+        public static bool ResetLightBar(PlayerIndex playerIndex)
         {
-            ValidatePlayerIndex(playerIndex);
-            return PSGamePad.ResetColor((int)playerIndex);
+            return PSGamePad.ResetLightBar((int)playerIndex);
+        }
+
+        public static bool SetMotionEnabled(PlayerIndex playerIndex, bool value)
+        {
+            return PSGamePad.SetMotionEnabled((int)playerIndex, value);
+        }
+
+        public static bool SetVelocityDeadbandEnabled(PlayerIndex playerIndex, bool value)
+        {
+            return PSGamePad.SetVelocityDeadbandEnabled((int)playerIndex, value);
+        }
+
+        public static bool SetTiltCorrectionEnabled(PlayerIndex playerIndex, bool value)
+        {
+            return PSGamePad.SetTiltCorrectionEnabled((int)playerIndex, value);
+        }
+
+        public static bool ResetOrientation(PlayerIndex playerIndex)
+        {
+            return PSGamePad.ResetOrientation((int)playerIndex);
         }
     }
 }

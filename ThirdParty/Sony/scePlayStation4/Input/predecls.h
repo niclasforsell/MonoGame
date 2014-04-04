@@ -8,12 +8,6 @@
 typedef int32_t ControllerHandle;
 typedef int32_t SceUserServiceUserId;
 
-struct ScePadColor;
-struct ScePadData;
-
-namespace sce {
-}
-
 namespace Input {
 	struct CS_VALUE_TYPE GamePadState;
 }
