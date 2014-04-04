@@ -86,6 +86,17 @@ namespace Microsoft.Xna.Framework.Input
                     Y = state.AngularVelocityY,
                     Z = state.AngularVelocityZ
                 },
+                TouchCount = state.TouchCount,
+                TouchPoint1 = new GamePadTouch
+                {
+                    Position = new Vector2(state.Touch1X, state.Touch1Y),
+                    Id = state.Touch1Id
+                },
+                TouchPoint2 = new GamePadTouch
+                {
+                    Position = new Vector2(state.Touch2X, state.Touch2Y),
+                    Id = state.Touch2Id
+                }
             };
         }
 
