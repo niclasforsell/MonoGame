@@ -706,6 +706,9 @@
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\GamePadDPad.cs" />
     <Compile Include="Input\GamePadState.cs" />
+    <Compile Include="Input\GamePadState.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Input\GamePadThumbSticks.cs" />
     <Compile Include="Input\GamePadTriggers.cs" />
     <Compile Include="Input\GamePadType.cs" />

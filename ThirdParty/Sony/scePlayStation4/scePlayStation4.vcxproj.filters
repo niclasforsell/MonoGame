@@ -38,9 +38,6 @@
     <ClCompile Include="Input\gamePad.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="Input\gamePadState.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
     <ClCompile Include="Media\m4aac\adts_header_parser.cpp">
       <Filter>Media\m4aac</Filter>
     </ClCompile>
