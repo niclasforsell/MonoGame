@@ -586,7 +586,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Shaders
-            writer.Write((byte)3);
+            writer.Write((byte)5);
             {
                 writer.Write(true); // is vertex shader
                 var VSBasicNoFog = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect_VSBasicNoFog.sb");
@@ -614,10 +614,34 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     writer.Write((byte)0); // constant buffer index
                 }
+
+                writer.Write(true); // is vertex shader
+                var VSBasicTxNoFog = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect_VSBasicTxNoFog.sb");
+                writer.Write((int)VSBasicTxNoFog.Length); // shader length
+                writer.Write(VSBasicTxNoFog);
+                writer.Write((byte)0); // sampler count
+                writer.Write((byte)1); // constant buffer count
+                {
+                    writer.Write((byte)0); // constant buffer index
+                }
+
+                writer.Write(false); // is vertex shader
+                var PSBasicTxNoFog = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect_PSBasicTxNoFog.sb");
+                writer.Write((int)PSBasicTxNoFog.Length); // shader length
+                writer.Write(PSBasicTxNoFog);
+                writer.Write((byte)1); // sampler count
+                {
+                    writer.Write((byte)SamplerType.Sampler2D);
+                    writer.Write((byte)0); // texture slot
+                    writer.Write((byte)0); // sampler slot
+                    writer.Write(false); // sampler state
+                    writer.Write((byte)5); // parameter index
+                }
+                writer.Write((byte)0); // constant buffer count
             }
 
             // Parameters
-            writer.Write((byte)5);
+            writer.Write((byte)6);
             {
                 writer.Write((byte)EffectParameterClass.Vector);
                 writer.Write((byte)EffectParameterType.Single);
@@ -676,6 +700,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
                 writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
                 writer.Write((float)0); writer.Write((float)0); writer.Write((float)0); writer.Write((float)0);
+
+                writer.Write((byte)EffectParameterClass.Object);
+                writer.Write((byte)EffectParameterType.Texture2D);
+                writer.Write("Texture");
+                writer.Write(""); // semantic
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)0); // rowCount
+                writer.Write((byte)0); // columnCount
+                writer.Write((byte)0); // elements
+                writer.Write((byte)0); // struct members
             }
 
             // Techniques
@@ -741,8 +775,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 writer.Write((byte)1); // passes
                 writer.Write("");
                 writer.Write((byte)0); // annotations
-                writer.Write((byte)0); // vertex shader index
-                writer.Write((byte)1); // pixel shader index
+                writer.Write((byte)3); // vertex shader index
+                writer.Write((byte)4); // pixel shader index
                 writer.Write(false); // blend state
                 writer.Write(false); // depth stencil state
                 writer.Write(false); // rasterizer state   
