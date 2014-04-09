@@ -253,6 +253,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                 case ConversionFormat.Vorbis:
                     throw new NotImplementedException("Vorbis is not yet implemented as an encoding format.");
+
+            case ConversionFormat.Atrac9:
+#if WINDOWS
+                    ExternalTool.Run("at9tool.exe", string.Format("-e \"{0}\" \"{1}\"", this.fileName, targetFileName));
+#else
+                throw new NotImplementedException("Conversion to this format is only supported on Windows.");
+#endif
+                    break;
             }
         }
 
