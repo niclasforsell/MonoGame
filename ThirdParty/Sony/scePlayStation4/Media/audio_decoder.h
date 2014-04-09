@@ -58,10 +58,11 @@ class AudioDecoder
 public:
 	AudioDecoder(uint32_t codecType);
 	virtual ~AudioDecoder(void);
-    void restart(InputStream *input);
+	void restart(InputStream *input);
 	int decodeNormal(InputStream *input, OutputStream *output, OutputStream *outputFile);
 	int decodeSeek(InputStream *input, OutputStream *output, OutputStream *outputFile);
 	int decodeLoop(InputStream *input, OutputStream *output, OutputStream *outputFile);
+	float getProgress(void);
 	uint32_t codecType(void) { return m_codecType; }
 	uint32_t sampleRate(void) { return m_sampleRate; }
 	uint32_t numChannels(void) { return m_numChannels; }

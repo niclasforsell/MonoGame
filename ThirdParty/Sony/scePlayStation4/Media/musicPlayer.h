@@ -25,6 +25,8 @@ public:
 
 	float GetVolume();
 	void SetVolume(float value);
+
+	float GetPosition();
 };
 
 } // namespace Media

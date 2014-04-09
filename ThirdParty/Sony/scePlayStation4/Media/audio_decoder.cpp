@@ -379,3 +379,8 @@ int AudioDecoder::decodeLoop(InputStream *input, OutputStream *output, OutputStr
 term:
 	return ret;
 }
+
+float AudioDecoder::getProgress()
+{
+	return (float)m_numFrames / (float)m_numTotalDecode;
+}
