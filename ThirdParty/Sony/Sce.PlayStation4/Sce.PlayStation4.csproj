@@ -47,11 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioBuffer.cs" />
-    <Compile Include="CppSharp\Runtime\Helpers.cs" />
-    <Compile Include="CppSharp\Runtime\Interfaces.cs" />
-    <Compile Include="CppSharp\Runtime\StdString.cs" />
-    <Compile Include="CppSharp\Runtime\StdVector.cs" />
-    <Compile Include="CppSharp\Runtime\SymbolResolver.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePad.cs" />
     <Compile Include="GamePadState.cs" />
