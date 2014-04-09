@@ -52,6 +52,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 case TargetPlatform.Linux:
                     targetFormat = ConversionFormat.Vorbis;
                     break;
+
+                case TargetPlatform.PlayStation4:
+                    targetFormat = ConversionFormat.Atrac9;
+                    break;
             }
 
             // Get the song output path with the target format extension.

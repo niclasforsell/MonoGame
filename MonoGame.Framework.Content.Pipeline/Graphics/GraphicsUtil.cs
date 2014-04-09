@@ -179,6 +179,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     CompressPvrtc(content, generateMipmaps, premultipliedAlpha);
                     break;
 
+                case TargetPlatform.PlayStation4:
+                    CompressGnf(content, generateMipmaps);
+                    break;
+
                 default:
                     throw new NotImplementedException(string.Format("Texture Compression it not implemented for {0}", context.TargetPlatform));
             }
@@ -290,7 +294,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             dataHandle.Free();
         }
-        
+
+        private static void CompressGnf(TextureContent content, bool generateMipmaps)
+        {
+            // TODO: Put PS4 specific stuff here
+            CompressDxt(content, generateMipmaps);
+        }
+
         internal static bool ContainsFractionalAlpha(byte[] data)
         {
             for (var x = 3; x < data.Length; x += 4)
