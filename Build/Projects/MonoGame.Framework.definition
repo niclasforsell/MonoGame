@@ -796,17 +796,23 @@
     <Compile Include="Media\Video.MacOS.cs">
         <Platforms>MacOS</Platforms>
     </Compile>
+    <Compile Include="Media\Video.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Media\Video.Android.cs">
         <Platforms>Android,Ouya</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.cs">
-      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone</ExcludePlatforms>
+      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,PlayStation4</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.IOS.cs">
         <Platforms>iOS</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.MacOS.cs">
         <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.PS4.cs">
+        <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.Android.cs">
         <Platforms>Android,Ouya</Platforms>
@@ -1214,9 +1220,6 @@
         <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="PlayStation4\Input\GamePad.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
-    </Compile>
-    <Compile Include="PlayStation4\Media\Video.cs">
         <Platforms>PlayStation4</Platforms>
     </Compile>
 
