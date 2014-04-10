@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.Xna.Framework.Graphics
+namespace TwoMGFX
 {
-	internal class DXHelper
+	internal class MarshalHelper
 	{
         public static T Unmarshal<T>(IntPtr ptr)
         {

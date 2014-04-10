@@ -1,6 +1,8 @@
-namespace Microsoft.Xna.Framework.Graphics
+using Microsoft.Xna.Framework.Graphics;
+
+namespace TwoMGFX
 {
-	internal partial class DXShaderData
+	internal partial class ShaderData
 	{
 		public bool IsVertexShader;
 

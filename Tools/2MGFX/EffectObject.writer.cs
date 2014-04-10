@@ -1,9 +1,9 @@
 using System.IO;
-using TwoMGFX;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace Microsoft.Xna.Framework.Graphics
+namespace TwoMGFX
 {
-	internal partial class DXEffectObject
+	internal partial class EffectObject
 	{
 
         private const string Header = "MGFX";
@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Write an simple identifier for DX11 vs GLSL
             // so we can easily detect the correct shader type.
-            var profile = (byte)( options.DX11Profile ? 1 : 0 );
+            var profile = (byte)options.Profile;
             writer.Write(profile);
 
             // Write all the constant buffers.

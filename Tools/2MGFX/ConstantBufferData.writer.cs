@@ -1,13 +1,12 @@
 using System.IO;
-using TwoMGFX;
 
-namespace Microsoft.Xna.Framework.Graphics
+namespace TwoMGFX
 {
-    internal partial class DXConstantBufferData
+    internal partial class ConstantBufferData
     {
         public void Write(BinaryWriter writer, Options options)
         {
-            if (!options.DX11Profile)
+            if (options.Profile == ShaderProfile.OpenGL)
                 writer.Write(Name);
 
             writer.Write((ushort)Size);
