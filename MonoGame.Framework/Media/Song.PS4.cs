@@ -59,11 +59,7 @@ namespace Microsoft.Xna.Framework.Media
 
         internal TimeSpan Position
         {
-            get
-            {
-                // TODO: Implement
-                return new TimeSpan(0);
-            }
+            get { return TimeSpan.FromMilliseconds(Duration.TotalMilliseconds * _player.Position); }
         }
     }
 }

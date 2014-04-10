@@ -160,6 +160,11 @@ MusicPlayer::~MusicPlayer()
 
 bool MusicPlayer::LoadAT9(const char* fileName)
 {
+	assert(_state != NULL);
+	assert(_state->inputStream == NULL);
+	assert(_state->decoder == NULL);
+	assert(_state->outputStream == NULL);
+
 	if (_state->inputStream != NULL)
 		return false;
 
@@ -278,4 +283,12 @@ void MusicPlayer::SetVolume(float value)
 		return;
 
 	_state->outputStream->getOutput()->setVolume(value);
+}
+
+float MusicPlayer::GetPosition()
+{
+	if (_state->outputStream == NULL)
+		return 0.0f;
+
+	return _state->decoder->getProgress();
 }
