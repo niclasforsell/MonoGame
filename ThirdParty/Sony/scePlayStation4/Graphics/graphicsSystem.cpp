@@ -291,7 +291,7 @@ void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sc
 	SetViewport(0, 0, renderTarget->getWidth(), renderTarget->getHeight(), 0.0f, 1.0f);
 
 	// Do this now that the depth target changed and won't have to later.
-	if (depthTarget != NULL)
+	if (depthTarget == NULL)
 		gfxc.setPolygonOffsetZFormat(Gnm::kZFormatInvalid);
 	else
 		gfxc.setPolygonOffsetZFormat(depthTarget->getZFormat());
