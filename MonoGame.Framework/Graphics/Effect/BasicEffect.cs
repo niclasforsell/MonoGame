@@ -586,7 +586,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Shaders
-            writer.Write((byte)5);
+            writer.Write((byte)6);
             {
                 writer.Write(true); // is vertex shader
                 var VSBasicNoFog = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect_VSBasicNoFog.sb");
@@ -638,6 +638,16 @@ namespace Microsoft.Xna.Framework.Graphics
                     writer.Write((byte)5); // parameter index
                 }
                 writer.Write((byte)0); // constant buffer count
+
+                writer.Write(true); // is vertex shader
+                var VSBasicTxVcNoFog = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect_VSBasicTxVcNoFog.sb");
+                writer.Write((int)VSBasicTxVcNoFog.Length); // shader length
+                writer.Write(VSBasicTxVcNoFog);
+                writer.Write((byte)0); // sampler count
+                writer.Write((byte)1); // constant buffer count
+                {
+                    writer.Write((byte)0); // constant buffer index
+                }
             }
 
             // Parameters
@@ -713,7 +723,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Techniques
-            writer.Write((byte)6);
+            writer.Write((byte)8);
             {
                 writer.Write("BasicEffect");
                 writer.Write((byte)0); // annotations
@@ -776,6 +786,28 @@ namespace Microsoft.Xna.Framework.Graphics
                 writer.Write("");
                 writer.Write((byte)0); // annotations
                 writer.Write((byte)3); // vertex shader index
+                writer.Write((byte)4); // pixel shader index
+                writer.Write(false); // blend state
+                writer.Write(false); // depth stencil state
+                writer.Write(false); // rasterizer state   
+
+                writer.Write("BasicEffect_Texture_VertexColor");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // passes
+                writer.Write("");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)255); // vertex shader index
+                writer.Write((byte)255); // pixel shader index
+                writer.Write(false); // blend state
+                writer.Write(false); // depth stencil state
+                writer.Write(false); // rasterizer state  
+
+                writer.Write("BasicEffect_Texture_VertexColor_NoFog");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)1); // passes
+                writer.Write("");
+                writer.Write((byte)0); // annotations
+                writer.Write((byte)5); // vertex shader index
                 writer.Write((byte)4); // pixel shader index
                 writer.Write(false); // blend state
                 writer.Write(false); // depth stencil state
