@@ -1402,6 +1402,9 @@
     <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_PSBasicTxNoFog.sb">
       <Platforms>PlayStation4</Platforms>
     </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect_VSBasicTxVcNoFog.sb">
+      <Platforms>PlayStation4</Platforms>
+    </EmbeddedResource>
 	<!--
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ps4.mgfxo">
       <Platforms>PlayStation4</Platforms>
