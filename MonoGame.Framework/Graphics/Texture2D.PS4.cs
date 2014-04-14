@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _texture = new Sce.PlayStation4.Graphics.Texture((TextureFormat)format, width, height, (mipmap ? _levelCount : 1));
         }
 
-        internal override void PlatformDispose(bool disposing)
+        protected override void PlatformDispose(bool disposing)
         {
             _texture.Dispose();
         }
