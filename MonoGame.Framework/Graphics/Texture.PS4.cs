@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        private void PlatformDispose(bool disposing)
+        protected virtual void PlatformDispose(bool disposing)
         {
             throw new NotImplementedException();
         }

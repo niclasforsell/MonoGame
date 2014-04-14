@@ -21,6 +21,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _texture = new Sce.PlayStation4.Graphics.Texture((TextureFormat)format, width, height, (mipmap ? _levelCount : 1));
         }
 
+        protected override void PlatformDispose(bool disposing)
+        {
+            _texture.Dispose();
+        }
+
         private void PlatformSetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
         {
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
