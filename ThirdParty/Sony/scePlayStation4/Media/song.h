@@ -7,16 +7,16 @@
 
 namespace Media {
 
-class __declspec(dllexport) MusicPlayer
+class __declspec(dllexport) Song
 {
 private:
-	MusicPlayerState* _state;
+	SongState* _state;
 
 public:
-	MusicPlayer();
-	~MusicPlayer();
+	Song();
+	~Song();
 
-	bool LoadAT9(const char* fileName);
+	bool Load(const char* fileName);
 
 	void Play();
 	void Resume();

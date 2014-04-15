@@ -59,7 +59,7 @@ namespace BindingGen
             options.Headers.Add(@"Graphics\IndexBuffer.h");
             options.Headers.Add(@"Input\GamePadState.h");
             options.Headers.Add(@"Input\GamePad.h");
-            options.Headers.Add(@"Media\MusicPlayer.h");
+            options.Headers.Add(@"Media\Song.h");
             options.Headers.Add(@"UserService.h");
 
             // Make sure any system headers needed is available.

@@ -1,4 +1,4 @@
-#include "musicPlayer.h"
+#include "song.h"
 #include "../allocator.h"
 #include "stream.h"
 #include "audio_decoder.h"
@@ -21,13 +21,19 @@ namespace {
 
 	enum EventFlags : uint64_t
 	{
-		Loaded = 1 << 0,
+		Loaded  = 1 << 0,
+		Decoder = 1 << 1,
+		Output  = 1 << 2,
+
+		AllDone = Decoder | Output
 	};
 }
 
 // Private state hidden from public interface
-struct Media::MusicPlayerState
+struct Media::SongState
 {
+	char* fileName;
+
 	SceKernelEventFlag eventFlag;
 	ScePthreadBarrier barrier;
 	ScePthread threadDecode;
@@ -39,48 +45,104 @@ struct Media::MusicPlayerState
 
 	bool isPaused;
 	bool isRunning;
-	bool isRestarting;
 };
 
 void* decodeMain(void* arg)
 {
-	auto state = (Media::MusicPlayerState*)arg;
+	auto ret = 0;
+	auto state = (Media::SongState*)arg;
+	assert(state != NULL);
+	assert(state->inputStream == NULL);
+	assert(state->decoder == NULL);
+	assert(state->outputStream == NULL);
+
 	sceKernelWaitEventFlag(state->eventFlag, EventFlags::Loaded, SCE_KERNEL_EVF_WAITMODE_AND, 0, 0);
+
+	if (state->inputStream != NULL)
+		return false;
+
+	assert(state->fileName != NULL);
+
+	state->inputStream = new InputStream();
+	assert(state->inputStream);
+
+	ret = state->inputStream->open(state->fileName, "rb");
+	assert(ret >= 0);
+
+	state->inputStream->setIsEmpty(false);
+
+	//_state->decoder = new AudioDecoderM4aac(_state->inputStream);
+	AudioDecoderTrickPlayPoint point;
+	memset(&point, 0, sizeof(AudioDecoderTrickPlayPoint));
+	state->decoder = new AudioDecoderAt9(state->inputStream, point, &ret);
+	assert(state->decoder);
+
+	// Signal we're loaded and wait for the sync point.
+	sceKernelSetEventFlag(state->eventFlag, EventFlags::Decoder);
+	scePthreadBarrierWait(&state->barrier);
 
 	while (state->isRunning)
 	{
 		if (state->inputStream->isEmpty())
 			break;
 
-		if (state->isRestarting)
-		{
-			state->decoder->restart(state->inputStream);
-			state->isRestarting = false;
-		}
-
 		if (state->isPaused)
 			continue;
 
 		auto ret = state->decoder->decodeSeek(state->inputStream, state->outputStream, NULL);
+
 		if (ret < 0)
 		{
 			printf("ERROR: MusicPlayer decode failed: 0x%08X\n", ret);
-			return arg;
+			goto term;
 		}
 	}
 
 	state->outputStream->end();
 
-	sceKernelClearEventFlag(state->eventFlag, EventFlags::Loaded);
+term:
+	if (ret < 0)
+	{
+		sceKernelSetEventFlag(state->eventFlag, EventFlags::Decoder);
+		scePthreadBarrierWait(&state->barrier);
+	}
+
+	sceKernelClearEventFlag(state->eventFlag, EventFlags::Decoder);
 	scePthreadBarrierWait(&state->barrier);
-	printf("MusicPlayer decode thread exiting.\n");
+
+	if (state->decoder != NULL)
+	{
+		delete state->decoder;
+		state->decoder = NULL;
+	}
+
+	if (state->inputStream != NULL)
+	{
+		delete state->inputStream;
+		state->inputStream = NULL;
+	}
+
 	return arg;
 }
 
 void* outputMain(void* arg)
 {
-	auto state = (Media::MusicPlayerState*)arg;
-	sceKernelWaitEventFlag(state->eventFlag, EventFlags::Loaded, SCE_KERNEL_EVF_WAITMODE_AND, 0, 0);
+	auto ret = 0;
+	auto state = (Media::SongState*)arg;
+	assert(state != NULL);
+	assert(state->outputStream == NULL);
+
+	sceKernelWaitEventFlag(state->eventFlag, EventFlags::Decoder, SCE_KERNEL_EVF_WAITMODE_AND, 0, 0);
+	assert(state->decoder != NULL);
+
+	state->outputStream = new AudioOutputStream(outputStreamSize, sizeof(int16_t) * AUDIO_STEREO * outputStreamGrain);
+	assert(state->outputStream);
+
+	ret = state->outputStream->open(outputStreamGrain, state->decoder->sampleRate(), AudioOutputSystem::param(state->decoder->numChannels()));
+	assert(ret >= 0);
+
+	sceKernelSetEventFlag(state->eventFlag, EventFlags::Output);
+	scePthreadBarrierWait(&state->barrier);
 
 	while(state->isRunning)
 	{
@@ -94,112 +156,82 @@ void* outputMain(void* arg)
 		if (ret < 0)
 		{
 			printf("ERROR: MusicPlayer output failed: 0x%08X\n", ret);
-			return arg;
+			goto term;
 		}
 	}
 
+term:
+	if (ret < 0)
+	{
+		sceKernelSetEventFlag(state->eventFlag, EventFlags::Output);
+		scePthreadBarrierWait(&state->barrier);
+	}
+
 	scePthreadBarrierWait(&state->barrier);
-	printf("MusicPlayer output thread exiting.\n");
+
+	if (state->outputStream)
+	{
+		delete state->outputStream;
+		state->outputStream = NULL;
+	}
+
 	return arg;
 }
 
-MusicPlayer::MusicPlayer()
+Song::Song()
+	: _state(0)
 {
-	_state = (Media::MusicPlayerState*)Allocator::Get()->allocate(sizeof(MusicPlayerState));
 }
 
-MusicPlayer::~MusicPlayer()
+Song::~Song()
 {
 	Stop();
 
 	// join and detach a thread for audio decode
 	if (_state->threadDecode) {
 		scePthreadJoin(_state->threadDecode, 0);
-		_state->threadDecode = 0;
+		_state->threadDecode = NULL;
 	}
 
 	// join and detach a thread for audio output
 	if (_state->threadOutput) {
 		scePthreadJoin(_state->threadOutput, 0);
-		_state->threadOutput = 0;
+		_state->threadOutput = NULL;
 	}
 
 	if (_state->barrier) {
 		scePthreadBarrierDestroy(&_state->barrier);
-		_state->barrier = 0;
+		_state->barrier = NULL;
 	}
 
 	if (_state->eventFlag) {
 		sceKernelDeleteEventFlag(_state->eventFlag);
-		_state->eventFlag = 0;
+		_state->eventFlag = NULL;
 	}
 
-	if (_state->outputStream)
-	{
-		//Allocator::Get()->release(_state->outputStream);
-		delete _state->outputStream;
-		_state->outputStream = NULL;
-	}
-
-	if (_state->decoder)
-	{
-		//Allocator::Get()->release(_state->decoder);
-		delete _state->decoder;
-		_state->decoder = NULL;
-	}
-
-	if (_state->inputStream)
-	{
-		//Allocator::Get()->release(_state->inputStream);
-		delete _state->inputStream;
-		_state->inputStream = NULL;
-	}
-
+	Allocator::Get()->release(_state->fileName);
 	Allocator::Get()->release(_state);
 }
 
-bool MusicPlayer::LoadAT9(const char* fileName)
+bool Song::Load(const char* fileName)
 {
-	assert(_state != NULL);
-	assert(_state->inputStream == NULL);
-	assert(_state->decoder == NULL);
-	assert(_state->outputStream == NULL);
-
-	if (_state->inputStream != NULL)
+	auto len = strlen(fileName) + 1;
+	if (len > FILENAME_MAX || len == 0)
 		return false;
 
-	assert(fileName != NULL);
-
-	_state->inputStream = new InputStream();
-	assert(_state->inputStream);
-
-	auto ret = _state->inputStream->open(fileName, "rb");
-	assert(ret >= 0);
-
-	_state->inputStream->setIsEmpty(false);
-
-	//_state->decoder = new AudioDecoderM4aac(_state->inputStream);
-	AudioDecoderTrickPlayPoint point;
-	memset(&point, 0, sizeof(AudioDecoderTrickPlayPoint));
-	_state->decoder = new AudioDecoderAt9(_state->inputStream, point, &ret);
-	assert(_state->decoder);
-
-	_state->outputStream = new AudioOutputStream(outputStreamSize, sizeof(int16_t) * AUDIO_STEREO * outputStreamGrain);
-	assert(_state->outputStream);
-
-	ret = _state->outputStream->open(outputStreamGrain, _state->decoder->sampleRate(), AudioOutputSystem::param(_state->decoder->numChannels()));
-	assert(ret >= 0);
+	_state = (Media::SongState*)Allocator::Get()->allocate(sizeof(SongState));
+	_state->fileName = (char*)Allocator::Get()->allocate(len);
+	strcpy(_state->fileName, fileName);
 
 	return true;
 }
 
-void MusicPlayer::Play()
+void Song::Play()
 {
-	if (_state->isPaused)
-	{
-		_state->isPaused = false;
+	if (_state == NULL)
 		return;
-	}
+
+	Stop();
 
 	auto ret = 0;
 	ScePthreadAttr attr = 0;
@@ -250,44 +282,57 @@ term:
 	}
 }
 
-void MusicPlayer::Resume()
+void Song::Resume()
 {
+	if (_state == NULL)
+		return;
+
 	_state->isPaused = false;
 }
 
-void MusicPlayer::Pause()
+void Song::Pause()
 {
-	_state->isPaused = true;
-}
-
-void MusicPlayer::Stop()
-{
-	if (!_state->isRunning)
+	if (_state == NULL)
 		return;
 
-	_state->isRestarting = true;
 	_state->isPaused = true;
 }
 
-float MusicPlayer::GetVolume()
+void Song::Stop()
 {
+	if (_state == NULL)
+		return;
+
+	_state->isRunning = false;
+}
+
+float Song::GetVolume()
+{
+	if (_state == NULL)
+		return 1.0f;
+
 	if (_state->outputStream == NULL)
 		return 1.0f;
 
 	return _state->outputStream->getOutput()->getVolume();
 }
 
-void MusicPlayer::SetVolume(float value)
+void Song::SetVolume(float value)
 {
+	if (_state == NULL)
+		return;
+
+	assert(value >= 0.0f || value <= 1.0f);
+
 	if (_state->outputStream == NULL)
 		return;
 
 	_state->outputStream->getOutput()->setVolume(value);
 }
 
-float MusicPlayer::GetPosition()
+float Song::GetPosition()
 {
-	if (_state->outputStream == NULL)
+	if (_state == NULL || _state->outputStream == NULL)
 		return 0.0f;
 
 	return _state->decoder->getProgress();
