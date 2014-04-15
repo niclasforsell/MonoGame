@@ -27,6 +27,9 @@ public:
 	void SetVolume(float value);
 
 	float GetPosition();
+
+	bool GetIsRepeating();
+	void SetIsRepeating(bool value);
 };
 
 } // namespace Media

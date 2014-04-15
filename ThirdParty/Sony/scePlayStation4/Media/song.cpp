@@ -45,6 +45,7 @@ struct Media::SongState
 
 	bool isPaused;
 	bool isRunning;
+	bool isLooping;
 };
 
 void* decodeMain(void* arg)
@@ -84,12 +85,23 @@ void* decodeMain(void* arg)
 	while (state->isRunning)
 	{
 		if (state->inputStream->isEmpty())
-			break;
+		{
+			if (state->isLooping)
+			{
+				state->inputStream->input(NULL, 0, 0, SEEK_SET);
+				state->inputStream->setIsEmpty(false);
+				state->decoder->restart(state->inputStream);
+			}
+			else
+			{
+				break;
+			}
+		}
 
 		if (state->isPaused)
 			continue;
 
-		auto ret = state->decoder->decodeSeek(state->inputStream, state->outputStream, NULL);
+		auto ret = state->decoder->decodeNormal(state->inputStream, state->outputStream, NULL);
 
 		if (ret < 0)
 		{
@@ -332,8 +344,24 @@ void Song::SetVolume(float value)
 
 float Song::GetPosition()
 {
-	if (_state == NULL || _state->outputStream == NULL)
+	if (_state == NULL || _state->decoder == NULL || _state->outputStream == NULL)
 		return 0.0f;
 
 	return _state->decoder->getProgress();
+}
+
+bool Song::GetIsRepeating()
+{
+	if (_state == NULL)
+		return false;
+
+	return _state->isLooping;
+}
+
+void Song::SetIsRepeating(bool value)
+{
+	if (_state == NULL)
+		return;
+
+	_state->isLooping = value;
 }
