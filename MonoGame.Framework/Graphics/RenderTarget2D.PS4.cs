@@ -25,13 +25,18 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        private void PlatformDispose(bool disposing)
+        // Use new to replace the PlatformDispose method in Texture2D.
+        // This could definitely use some cleanup.
+        private new void PlatformDispose(bool disposing)
         {
             if (disposing)
             {
                 _target.Dispose();
                 _target = null;
             }
+
+            // No need to call base PlatformDispose, we didn't allocate
+            // a texture there at construction.
         }
     }
 }
