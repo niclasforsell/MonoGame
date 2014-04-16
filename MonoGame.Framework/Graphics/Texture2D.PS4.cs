@@ -23,7 +23,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         protected override void PlatformDispose(bool disposing)
         {
-            _texture.Dispose();
+            // In this particular case, we can be called when _texture is null,
+            // because RenderTarget2D doesn't construct a texture with this class'
+            // PlatformConstruct method.
+            if (_texture != null)
+            {
+                _texture.Dispose();
+                _texture = null;
+            }
         }
 
         private void PlatformSetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
