@@ -232,6 +232,7 @@ bool Song::Load(const char* fileName)
 		return false;
 
 	_state = (Media::SongState*)Allocator::Get()->allocate(sizeof(SongState));
+	memset(_state, 0, sizeof(SongState));
 	_state->fileName = (char*)Allocator::Get()->allocate(len);
 	strcpy(_state->fileName, fileName);
 
