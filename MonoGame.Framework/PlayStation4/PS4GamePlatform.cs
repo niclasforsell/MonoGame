@@ -11,7 +11,6 @@ using Game = Microsoft.Xna.Framework.Game;
 using Microsoft.Xna.Framework.Audio;
 using SoundSystem = Sce.PlayStation4.Audio.SoundSystem;
 using UserService = Sce.PlayStation4.UserService;
-using MusicPlayer = Sce.PlayStation4.Media.MusicPlayer;
 
 namespace Microsoft.Xna.Framework
 {

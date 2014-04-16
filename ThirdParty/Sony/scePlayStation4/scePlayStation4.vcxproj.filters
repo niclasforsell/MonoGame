@@ -68,10 +68,10 @@
     <ClCompile Include="Media\stream.cpp">
       <Filter>Media</Filter>
     </ClCompile>
-    <ClCompile Include="Media\musicPlayer.cpp">
+    <ClCompile Include="Media\audio_output.cpp">
       <Filter>Media</Filter>
     </ClCompile>
-    <ClCompile Include="Media\audio_output.cpp">
+    <ClCompile Include="Media\song.cpp">
       <Filter>Media</Filter>
     </ClCompile>
   </ItemGroup>
@@ -195,10 +195,10 @@
     <ClInclude Include="Media\ring_buffer.h">
       <Filter>Media</Filter>
     </ClInclude>
-    <ClInclude Include="Media\musicPlayer.h">
+    <ClInclude Include="Media\audio_output.h">
       <Filter>Media</Filter>
     </ClInclude>
-    <ClInclude Include="Media\audio_output.h">
+    <ClInclude Include="Media\song.h">
       <Filter>Media</Filter>
     </ClInclude>
   </ItemGroup>

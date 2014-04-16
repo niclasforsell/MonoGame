@@ -105,7 +105,7 @@
     <ClCompile Include="Media\m4aac\audio_decoder_m4aac.cpp" />
     <ClCompile Include="Media\mp3\audio_decoder_mp3.cpp" />
     <ClCompile Include="Media\mp3\mpeg_audio_header_parser.cpp" />
-    <ClCompile Include="Media\musicPlayer.cpp" />
+    <ClCompile Include="Media\song.cpp" />
     <ClCompile Include="Media\ring_buffer.cpp" />
     <ClCompile Include="Media\stream.cpp" />
     <ClCompile Include="prx.cpp" />
@@ -143,7 +143,7 @@
     <ClInclude Include="Media\m4aac\audio_decoder_m4aac.h" />
     <ClInclude Include="Media\mp3\audio_decoder_mp3.h" />
     <ClInclude Include="Media\mp3\mpeg_audio_header_parser.h" />
-    <ClInclude Include="Media\musicPlayer.h" />
+    <ClInclude Include="Media\song.h" />
     <ClInclude Include="Media\predecls.h" />
     <ClInclude Include="Media\ring_buffer.h" />
     <ClInclude Include="Media\stream.h" />
