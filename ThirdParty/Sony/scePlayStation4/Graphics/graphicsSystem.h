@@ -63,6 +63,7 @@ public:
 	void SetSamplerState(int slot, uint32_t desc0, uint32_t desc1, uint32_t desc2, uint32_t desc3);
 
 	void SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth);
+	void SetScissorRectangle(int left, int top, int right, int bottom);
 
 	void SetVertexBuffer(VertexBuffer *buffer);
 	void SetIndexBuffer(IndexBuffer *buffer);

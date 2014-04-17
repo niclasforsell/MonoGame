@@ -709,6 +709,14 @@ void GraphicsSystem::SetViewport(int left, int top, int width, int height, float
 	gfxc.setupScreenViewport(left, top, left + width, top + height, 1.0f, 0.0f);
 }
 
+void GraphicsSystem::SetScissorRectangle(int left, int top, int right, int bottom)
+{
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+	Gnmx::GfxContext &gfxc = backBuffer->context;
+
+	gfxc.setViewportScissor(0, left, top, right, bottom, Gnm::WindowOffsetMode::kWindowOffsetDisable);
+}
+
 void GraphicsSystem::SetSamplerState(int slot, uint32_t desc0, uint32_t desc1, uint32_t desc2, uint32_t desc3)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
