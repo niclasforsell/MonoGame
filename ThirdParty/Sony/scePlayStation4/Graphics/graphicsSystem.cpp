@@ -892,8 +892,23 @@ void GraphicsSystem::SetRasterizerState(uint32_t prim0, uint32_t flag1, float de
 
 void GraphicsSystem::CreateDepthStencilState(	bool depthBufferEnable,
 												bool depthBufferWriteEnable,
+												StencilOperation ccwStencilDepthFail,
+												StencilOperation ccwStencilFail,
+												CompareFunction ccwStencilFunction,
+												StencilOperation ccwStencilPass,
 												CompareFunction depthBufferFunction,
-												uint32_t &depth0)
+												uint8_t referenceStencil,
+												StencilOperation stencilDepthBufferFail,
+												bool stencilEnable,
+												StencilOperation stencilFail,
+												CompareFunction stencilFunction,
+												uint8_t stencilMask,
+												StencilOperation stencilPass,
+												uint8_t stencilWriteMask,
+												bool twoSidedStencilMode,
+												uint32_t &depth0,
+												uint32_t &stencil0,
+												uint32_t &stencil1)
 {
 	Gnm::DepthStencilControl depthControl;
 	depthControl.init();
@@ -902,10 +917,34 @@ void GraphicsSystem::CreateDepthStencilState(	bool depthBufferEnable,
 									Gnm::kDepthControlZWriteEnable : Gnm::kDepthControlZWriteDisable, 
 									ToCompareFunction(depthBufferFunction));
 
+	depthControl.setStencilEnable(stencilEnable);
+	depthControl.setStencilFunction(ToCompareFunction(stencilFunction));
+	depthControl.setStencilFunctionBack(ToCompareFunction(ccwStencilFunction));
+
 	depth0 = depthControl.m_reg;
+
+	Gnm::StencilControl stencilControl;
+	stencilControl.init();
+	stencilControl.m_testVal = referenceStencil;
+	stencilControl.m_mask = stencilMask;
+	stencilControl.m_writeMask = stencilWriteMask;
+	stencilControl.m_opVal = referenceStencil;
+	stencil0 =	(stencilControl.m_testVal    << 0)  & 0x000000ff |
+				(stencilControl.m_mask       << 4)  & 0x0000ff00 |
+				(stencilControl.m_writeMask  << 8)  & 0x00ff0000 |
+				(stencilControl.m_opVal      << 12) & 0xff000000;
+
+	Gnm::StencilOpControl stencilOpControl;
+	stencilOpControl.init();
+	stencilOpControl.setStencilOps(ToStencilOp(stencilFail), ToStencilOp(stencilPass), ToStencilOp(stencilDepthBufferFail));
+	if (twoSidedStencilMode)
+	{
+		stencilOpControl.setStencilOpsBack(ToStencilOp(ccwStencilFail), ToStencilOp(ccwStencilPass), ToStencilOp(ccwStencilDepthFail));
+	}
+	stencil1 = stencilOpControl.m_reg;
 }
 
-void GraphicsSystem::SetDepthStencilState(uint32_t depth0)
+void GraphicsSystem::SetDepthStencilState(uint32_t depth0, uint32_t stencil0, uint32_t stencil1)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
@@ -920,10 +959,16 @@ void GraphicsSystem::SetDepthStencilState(uint32_t depth0)
 	depthControl.m_reg = depth0;
 	gfxc.setDepthStencilControl(depthControl);
 
-	// TODO: Add stencil support!
-	sce::Gnm::StencilControl stencilControl;
-	stencilControl.init();
+	Gnm::StencilControl stencilControl;
+	stencilControl.m_testVal =   (stencil0 & 0x000000ff) >> 0;
+	stencilControl.m_mask =      (stencil0 & 0x0000ff00) >> 4;
+	stencilControl.m_writeMask = (stencil0 & 0x00ff0000) >> 8;
+	stencilControl.m_opVal =     (stencil0 & 0xff000000) >> 12;
 	gfxc.setStencil(stencilControl);
+
+	Gnm::StencilOpControl stencilOpControl;
+	stencilOpControl.m_reg = stencil1;
+	gfxc.setStencilOpControl(stencilOpControl);
 }
 
 void GraphicsSystem::CreateBlendState(	Blend colorSourceBlend,

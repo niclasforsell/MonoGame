@@ -172,6 +172,37 @@ static inline Gnm::BlendFunc ToBlendFunc(BlendFunction blend)
     }
 }
 
+static inline Gnm::StencilOp ToStencilOp(StencilOperation stencilOp)
+{
+	switch (stencilOp)
+	{
+		default:
+		case StencilOperation_Keep:
+			return Gnm::StencilOp::kStencilOpKeep;
+
+		case StencilOperation_Zero:
+			return Gnm::StencilOp::kStencilOpZero;
+
+		case StencilOperation_Replace:
+			return Gnm::StencilOp::kStencilOpReplaceOp;
+
+		case StencilOperation_Increment:
+			return Gnm::StencilOp::kStencilOpAddWrap;
+
+		case StencilOperation_Decrement:
+			return Gnm::StencilOp::kStencilOpSubWrap;
+
+		case StencilOperation_IncrementSaturation:
+			return Gnm::StencilOp::kStencilOpAddClamp;
+
+		case StencilOperation_DecrementSaturation:
+			return Gnm::StencilOp::kStencilOpSubClamp;
+
+		case StencilOperation_Invert:
+			return Gnm::StencilOp::kStencilOpInvert;
+	}
+}
+
 static inline Gnm::BlendMultiplier ToBlendMultiplier(Blend blend, bool alpha)
 {
     switch (blend)

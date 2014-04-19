@@ -5,6 +5,7 @@
 using System;
 using PSGraphicsDevice = Sce.PlayStation4.Graphics.GraphicsSystem;
 using PSCompareFunction = Sce.PlayStation4.Graphics.CompareFunction;
+using PSStencilOperation = Sce.PlayStation4.Graphics.StencilOperation;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -12,37 +13,38 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private bool _dirty = true;
         private uint _depth0;
+        private uint _stencil0;
+        private uint _stencil1;
 
         internal void PlatformApplyState(GraphicsDevice device)
         {
             if (_dirty)
             {
-                /*
-                public bool StencilEnable { get; set; }
-                public int ReferenceStencil { get; set; }
-                public CompareFunction StencilFunction { get; set; }
-                public CompareFunction CounterClockwiseStencilFunction { get; set; }
-                public StencilOperation CounterClockwiseStencilDepthBufferFail { get; set; }
-                public StencilOperation CounterClockwiseStencilFail { get; set; }
-                public StencilOperation CounterClockwiseStencilPass { get; set; }
-                public StencilOperation StencilFail { get; set; }
-                public StencilOperation StencilDepthBufferFail { get; set; }
-                public int StencilMask { get; set; }
-                public StencilOperation StencilPass { get; set; }
-                public int StencilWriteMask { get; set; }
-                public bool TwoSidedStencilMode { get; set; }
-                */
-
                 PSGraphicsDevice.CreateDepthStencilState(
                     DepthBufferEnable,
                     DepthBufferWriteEnable,
+                    (PSStencilOperation)CounterClockwiseStencilDepthBufferFail,
+                    (PSStencilOperation)CounterClockwiseStencilFail,
+                    (PSCompareFunction)CounterClockwiseStencilFunction,
+                    (PSStencilOperation)CounterClockwiseStencilPass,
                     (PSCompareFunction)DepthBufferFunction,
-                    out _depth0);
+                    (byte)ReferenceStencil,
+                    (PSStencilOperation)StencilDepthBufferFail,
+                    StencilEnable,
+                    (PSStencilOperation)StencilFail,
+                    (PSCompareFunction)StencilFunction,
+                    (byte)StencilMask,
+                    (PSStencilOperation)StencilPass,
+                    (byte)StencilWriteMask,
+                    TwoSidedStencilMode,
+                    out _depth0,
+                    out _stencil0,
+                    out _stencil1);
 
                 _dirty = false;
             }
 
-            device._system.SetDepthStencilState(_depth0);
+            device._system.SetDepthStencilState(_depth0, _stencil0, _stencil1);
         }
     }
 }

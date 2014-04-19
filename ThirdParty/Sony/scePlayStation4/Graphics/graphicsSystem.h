@@ -97,10 +97,25 @@ public:
 
 	static void CreateDepthStencilState(	bool depthBufferEnable,
 											bool depthBufferWriteEnable,
+											StencilOperation ccwStencilDepthFail,
+											StencilOperation ccwStencilFail,
+											CompareFunction ccwStencilFunction,
+											StencilOperation ccwStencilPass,
 											CompareFunction depthBufferFunction,
-											CS_OUT uint32_t &depth0);
+											uint8_t referenceStencil,
+											StencilOperation stencilDepthBufferFail,
+											bool stencilEnable,
+											StencilOperation stencilFail,
+											CompareFunction stencilFunction,
+											uint8_t stencilMask,
+											StencilOperation stencilPass,
+											uint8_t stencilWriteMask,
+											bool twoSidedStencilMode,
+											CS_OUT uint32_t &depth0,
+											CS_OUT uint32_t &stencil0,
+											CS_OUT uint32_t &stencil1);
 
-	void SetDepthStencilState(uint32_t depth0);
+	void SetDepthStencilState(uint32_t depth0, uint32_t stencil0, uint32_t stencil1);
 
 
 	static void CreateBlendState(	Blend colorSourceBlend,
