@@ -94,6 +94,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void PlatformApplyState(bool applyShaders)
         {
+            if (_scissorRectangleDirty)
+            {
+                _system.SetScissorRectangle(_scissorRectangle.Left, _scissorRectangle.Top,
+                                            _scissorRectangle.Right, _scissorRectangle.Bottom);
+                _scissorRectangleDirty = false;
+            }
             if (_blendStateDirty)
             {
                 _blendState.PlatformApplyState(this);
