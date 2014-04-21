@@ -1,11 +1,8 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) The MonoGame Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using PSGamePad = Sce.PlayStation4.Input.GamePad;
 using PSGamePadState = Sce.PlayStation4.Input.GamePadState;
 
@@ -13,9 +10,9 @@ namespace Microsoft.Xna.Framework.Input
 {
     public static partial class GamePad
     {
-        public static GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
+        private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
-            var state = PSGamePad.GetState((int)playerIndex);
+            var state = PSGamePad.GetState(index);
             return new GamePadCapabilities
             {
                 IsConnected = state.IsConnected,
@@ -47,14 +44,9 @@ namespace Microsoft.Xna.Framework.Input
             };
         }
 
-        public static GamePadState GetState(PlayerIndex playerIndex)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
-            return GetState(playerIndex, GamePadDeadZone.None);
-        }
-
-        public static GamePadState GetState(PlayerIndex playerIndex, GamePadDeadZone deadZoneMode)
-        {
-            var state = PSGamePad.GetState((int)playerIndex);
+            var state = PSGamePad.GetState(index);
             return new GamePadState
             {
                 IsConnected = state.IsConnected,
@@ -100,9 +92,9 @@ namespace Microsoft.Xna.Framework.Input
             };
         }
 
-        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
+        private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
-            return PSGamePad.SetVibration((int)playerIndex, leftMotor, rightMotor);
+            return PSGamePad.SetVibration(index, leftMotor, rightMotor);
         }
 
         public static bool SetLightBar(PlayerIndex playerIndex, Color color)

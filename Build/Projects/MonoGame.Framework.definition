@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,PlayStation4">
+<?xml version="1.0" encoding="utf-8"?>
+<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,Web,PlayStation4">
 
   <ProjectGuids>
 	<Platform Name="Android">BA9476CF-99BA-4D03-92F2-73D2C5E58883</Platform>
@@ -28,15 +28,16 @@
 
     <CustomDefinitions>
       <Platform Name="Android">TRACE;ANDROID;GLES;OPENGL</Platform>
-      <Platform Name="iOS">IOS;GLES;OPENGL</Platform>
-      <Platform Name="Linux">TRACE;LINUX;OPENGL</Platform>
-      <Platform Name="MacOS">MONOMAC;OPENGL</Platform>
+      <Platform Name="iOS">IOS;GLES;OPENGL;OPENAL</Platform>
+      <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL</Platform>
+      <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL</Platform>
       <Platform Name="Ouya">TRACE;ANDROID;GLES;OPENGL;OUYA</Platform>
       <Platform Name="PSMobile">PSM</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
       <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
-      <Platform Name="WindowsGL">TRACE;WINDOWS;OPENGL</Platform>
+      <Platform Name="WindowsGL">TRACE;WINDOWS;OPENGL;OPENAL</Platform>
       <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</Platform>
+      <Platform Name="Web">TRACE;WEB</Platform>
       <Platform Name="PlayStation4">TRACE;PLAYSTATION4</Platform>
     </CustomDefinitions>
 
@@ -128,6 +129,9 @@
     <Compile Include="Audio\AudioEmitter.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\AudioListener.cs" />
+    <Compile Include="Audio\AudioLoader.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
+    </Compile>
     <Compile Include="Audio\AudioStopOptions.cs" />
     <Compile Include="Audio\AudioUtil.cs">
       <Platforms>Android,Ouya,PSMobile</Platforms>
@@ -135,9 +139,18 @@
     <Compile Include="Audio\Cue.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,PlayStation4</Platforms>
+      <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,Web,PlayStation4</Platforms>
     </Compile>
     <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Audio\OALSoundBuffer.cs">
+      <Platforms>iOS,Linux,MacOS,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Audio\OpenALSoundController.cs">
+      <Platforms>iOS,Linux,MacOS,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Audio\OpenALSupport.cs">
+      <Platforms>iOS,MacOS</Platforms>
+    </Compile>
     <Compile Include="Audio\SoundBank.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundEffect.OpenAL.cs">
@@ -152,6 +165,9 @@
     <Compile Include="Audio\SoundEffect.XAudio.cs">
       <Platforms>Windows,Windows8,WindowsPhone</Platforms>
     </Compile>
+    <Compile Include="Audio\SoundEffect.Web.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Audio\SoundEffectInstance.OpenAL.cs">
       <Platforms>Android,iOS,Ouya,Linux,WindowsGL,MacOS</Platforms>
@@ -164,6 +180,9 @@
     </Compile>
     <Compile Include="Audio\SoundEffectInstance.XAudio.cs">
       <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Audio\SoundEffectInstance.Web.cs">
+      <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffectInstancePool.cs" />
     <Compile Include="Audio\SoundState.cs" />
@@ -253,7 +272,7 @@
       <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\VideoReader.cs">
-      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone</ExcludePlatforms>
+      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
@@ -330,12 +349,6 @@
       <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
-    <Compile Include="GamerServices\MonoLiveClient.cs">
-      <Platforms>Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\MonoLive.cs">
-      <Platforms>Windows,WindowsGL</Platforms>
-    </Compile>
     <Compile Include="GamerServices\NotificationPosition.cs">
       <Platforms>iOS</Platforms>
     </Compile>
@@ -397,6 +410,9 @@
     <Compile Include="Graphics\GraphicsDevice.PSM.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\GraphicsDevice.Web.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\GraphicsDevice.PS4.cs">
       <Platforms>PlayStation4</Platforms>
     </Compile>
@@ -447,8 +463,11 @@
     <Compile Include="Graphics\RenderTarget2D.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\RenderTarget2D.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\RenderTarget2D.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\RenderTarget3D.cs">
         <Platforms>Windows,Windows8,WindowsPhone</Platforms>
@@ -471,8 +490,11 @@
     <Compile Include="Graphics\SamplerStateCollection.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\SamplerStateCollection.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\SamplerStateCollection.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\SetDataOptions.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
@@ -486,8 +508,11 @@
     <Compile Include="Graphics\Shader\ConstantBuffer.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\Shader\ConstantBuffer.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\Shader\ConstantBuffer.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\Shader\Shader.cs" />
     <Compile Include="Graphics\Shader\Shader.DirectX.cs">
@@ -499,8 +524,11 @@
     <Compile Include="Graphics\Shader\Shader.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\Shader\Shader.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\Shader\Shader.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs">
       <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
@@ -526,8 +554,11 @@
     <Compile Include="Graphics\States\BlendState.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\States\BlendState.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\BlendState.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\States\CompareFunction.cs" />
     <Compile Include="Graphics\States\CullMode.cs" />
@@ -542,8 +573,11 @@
     <Compile Include="Graphics\States\DepthStencilState.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\States\DepthStencilState.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\DepthStencilState.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\States\FillMode.cs" />
     <Compile Include="Graphics\States\RasterizerState.cs" />
@@ -556,8 +590,11 @@
     <Compile Include="Graphics\States\RasterizerState.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\States\RasterizerState.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\RasterizerState.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\States\SamplerState.DirectX.cs">
@@ -566,8 +603,11 @@
     <Compile Include="Graphics\States\SamplerState.OpenGL.cs">
         <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
     </Compile>
+    <Compile Include="Graphics\States\SamplerState.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\SamplerState.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\States\SaveStateMode.cs" />
     <Compile Include="Graphics\States\StencilOperation.cs" />
@@ -588,8 +628,11 @@
     <Compile Include="Graphics\Texture2D.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\Texture2D.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\Texture2D.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\Texture3D.cs" />
     <Compile Include="Graphics\Texture3D.DirectX.cs">
@@ -601,8 +644,11 @@
     <Compile Include="Graphics\Texture3D.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\Texture3D.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\Texture3D.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\TextureCollection.cs" />
     <Compile Include="Graphics\Texture.cs" />
@@ -611,6 +657,9 @@
     </Compile>
     <Compile Include="Graphics\Texture.OpenGL.cs">
         <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Texture.Web.cs">
+        <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Graphics\Texture.PSM.cs">
         <Platforms>PSMobile</Platforms>
@@ -628,8 +677,11 @@
     <Compile Include="Graphics\TextureCube.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\TextureCube.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\TextureCube.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\Vertices\BufferUsage.cs" />
@@ -645,9 +697,12 @@
     <Compile Include="Graphics\Vertices\IndexBuffer.PSM.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\Vertices\IndexBuffer.Web.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\Vertices\IndexBuffer.PS4.cs">
       <Platforms>PlayStation4</Platforms>
-    </Compile>
+    </Compile>>
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Graphics\Vertices\IVertexType.cs" />
     <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
@@ -660,6 +715,9 @@
     </Compile>
     <Compile Include="Graphics\Vertices\VertexBuffer.PSM.cs">
       <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexBuffer.Web.cs">
+      <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexBuffer.PS4.cs">
       <Platforms>PlayStation4</Platforms>
@@ -676,8 +734,11 @@
     <Compile Include="Graphics\Vertices\VertexDeclaration.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
+    <Compile Include="Graphics\Vertices\VertexDeclaration.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\Vertices\VertexDeclaration.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexElement.cs" />
     <Compile Include="Graphics\Vertices\VertexElementDeclaration.cs" />
@@ -701,6 +762,34 @@
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\ButtonState.cs" />
+    <Compile Include="Input\GamePad.cs" />
+    <Compile Include="Input\GamePad.Android.cs">
+      <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.IOS.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.Ouya.cs">
+      <Platforms>Ouya</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.PS4.cs">
+      <Platforms>PlayStation4</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.PSM.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.SDL.cs">
+      <Platforms>Linux,MacOS,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.Web.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.XInput.cs">
+      <Platforms>Windows8,Windows</Platforms>
+    </Compile>
     <Compile Include="Input\GamePadButtons.cs" />
     <Compile Include="Input\GamePadCapabilities.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
@@ -713,7 +802,7 @@
     <Compile Include="Input\GamePadTriggers.cs" />
     <Compile Include="Input\GamePadType.cs" />
     <Compile Include="Input\Keyboard.cs">
-      <Platforms>iOS,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <Platforms>iOS,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone,Web</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
@@ -749,7 +838,7 @@
       <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Media\MediaPlayer.Default.cs">
-      <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya,PSMobile,PlayStation4</Platforms>
+      <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya,PSMobile,Web,PlayStation4</Platforms>
     </Compile>
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaSource.cs">
@@ -766,7 +855,7 @@
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Media\Song.cs" />	
     <Compile Include="Media\Song.Default.cs">
-        <Platforms>WindowsGL,MacOS</Platforms>
+        <Platforms>WindowsGL,MacOS,Web</Platforms>
     </Compile>
     <Compile Include="Media\Song.Android.cs">
         <Platforms>Android,Ouya</Platforms>
@@ -788,7 +877,7 @@
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Media\Video.cs">
-      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone</ExcludePlatforms>
+      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\Video.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -803,7 +892,7 @@
         <Platforms>Android,Ouya</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.cs">
-      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,PlayStation4</ExcludePlatforms>
+      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,Web,PlayStation4</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -945,7 +1034,7 @@
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs">
-      <Platforms>Android,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,PlayStation4</Platforms>
+      <Platforms>Android,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,Web,PlayStation4</Platforms>
     </Compile>
 
     
@@ -982,9 +1071,6 @@
     <Compile Include="Android\GamerServices\SignedInGamer.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
-    <Compile Include="Android\Input\GamePad.cs">
-      <Platforms>Android</Platforms>
-    </Compile>
     <Compile Include="Android\Input\Keyboard.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
@@ -997,9 +1083,6 @@
     <Compile Include="Android\OrientationListener.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
-    <Compile Include="Android\Ouya\Input\GamePad.cs">
-      <Platforms>Ouya</Platforms>
-    </Compile>
     <Compile Include="Android\ResumeManager.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
@@ -1009,15 +1092,6 @@
 
 
     <!-- Common Desktop Platform -->
-    <Compile Include="Desktop\Audio\AudioLoader.cs">
-      <Platforms>Linux,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Audio\OALSoundBuffer.cs">
-      <Platforms>iOS,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Audio\OpenALSoundController.cs">
-      <Platforms>iOS,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
     <Compile Include="Desktop\Input\Axis.cs">
       <Platforms>Linux,MacOS,WindowsGL</Platforms>
     </Compile>
@@ -1025,9 +1099,6 @@
       <Platforms>Linux,MacOS,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Desktop\Input\DPad.cs">
-      <Platforms>Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\GamePad.cs">
       <Platforms>Linux,MacOS,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Desktop\Input\Input.cs">
@@ -1078,9 +1149,6 @@
     <Compile Include="iOS\GamerServices\TextFieldAlertView.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\Input\GamePad.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
     <Compile Include="iOS\iOSGamePlatform.cs">
       <Platforms>iOS</Platforms>
     </Compile>
@@ -1129,9 +1197,6 @@
 
 
     <!-- MacOS Platform -->
-    <Compile Include="MacOS\Audio\OpenALSupport.cs">
-      <Platforms>iOS,MacOS</Platforms>
-    </Compile>
     <Compile Include="MacOS\GamerServices\Guide.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
@@ -1189,9 +1254,6 @@
     <Compile Include="PSSuite\Input\AccelerometerState.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
-    <Compile Include="PSSuite\Input\GamePad.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
     <Compile Include="PSSuite\Input\Keyboard.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
@@ -1219,17 +1281,11 @@
     <Compile Include="PlayStation4\PS4GameWindow.cs">
         <Platforms>PlayStation4</Platforms>
     </Compile>
-    <Compile Include="PlayStation4\Input\GamePad.PS4.cs">
-        <Platforms>PlayStation4</Platforms>
-    </Compile>
 
 
     <!-- Windows 8 Platform -->
     <Compile Include="Windows8\GameFrameworkViewSource.cs">
       <Platforms>Windows8</Platforms>
-    </Compile>
-    <Compile Include="Windows8\GamePad.cs">
-      <Platforms>Windows8,Windows</Platforms>
     </Compile>
     <Compile Include="Windows8\GamerServices\SignedInGamer.cs">
       <Platforms>Windows8</Platforms>
@@ -1268,9 +1324,6 @@
     </Page>
 
     <!-- Windows Desktop Platfom -->
-    <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs">
-      <Platforms>Windows8,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
     <Compile Include="Windows\GamerServices\Guide.cs">
       <Platforms>Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
@@ -1301,9 +1354,6 @@
     <Compile Include="WindowsPhone\DrawingSurfaceUpdateHandler.cs">
       <Platforms>WindowsPhone</Platforms>
     </Compile>
-    <Compile Include="WindowsPhone\GamePad.cs">
-      <Platforms>WindowsPhone</Platforms>
-    </Compile>
     <Compile Include="WindowsPhone\SurfaceUpdateHandler.cs">
       <Platforms>WindowsPhone</Platforms>
     </Compile>
@@ -1317,8 +1367,15 @@
       <Platforms>WindowsPhone</Platforms>
     </Compile>
 
+    <!-- Web Platform -->
+    <Compile Include="Web\WebGamePlatform.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
+    <Compile Include="Web\WebGameWindow.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
 	
-	<!-- OpenGL Stock Effects -->
+    <!-- OpenGL Stock Effects -->
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">
       <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
     </EmbeddedResource>

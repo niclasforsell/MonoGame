@@ -113,6 +113,8 @@ namespace Microsoft.Xna.Framework
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
+            GraphicsProfile = GraphicsDevice.GetHighestSupportedGraphicsProfile(null);
+
             if (_game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
                 throw new ArgumentException("Graphics Device Manager Already Present");
 
@@ -235,6 +237,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
             _graphicsDevice.PresentationParameters.IsFullScreen = true;
 #elif WINDOWS_PHONE
+            _graphicsDevice.GraphicsProfile = GraphicsProfile;
             // Display orientation is always portrait on WP8
             _graphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
 #elif WINDOWS_STOREAPP
@@ -543,7 +546,7 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-#if LINUX
+#if LINUX || (WINDOWS && OPENGL)
                 return _game.Platform.VSyncEnabled;
 #else
                 return _synchronizedWithVerticalRetrace;
@@ -551,7 +554,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-#if LINUX
+#if LINUX || (WINDOWS && OPENGL)
                 // TODO: I'm pretty sure this shouldn't occur until ApplyChanges().
                 _game.Platform.VSyncEnabled = value;
 #else

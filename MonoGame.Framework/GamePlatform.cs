@@ -106,6 +106,8 @@ namespace Microsoft.Xna.Framework
             return new MonoGame.Framework.WindowsPhone.WindowsPhoneGamePlatform(game);
 #elif WINRT
             return new MetroGamePlatform(game);
+#elif WEB
+            return new WebGamePlatform(game);
 #elif PLAYSTATION4
             return new PS4GamePlatform(game);
 #endif
