@@ -164,6 +164,21 @@ enum BlendFunction
 	BlendFunction_Min,
 };
 
+enum StencilOperation
+{
+	// NOTE: This should match up with the MonoGame
+	// StencilOperation enum for easy interop!
+
+	StencilOperation_Keep,
+	StencilOperation_Zero,
+	StencilOperation_Replace,
+	StencilOperation_Increment,
+	StencilOperation_Decrement,
+	StencilOperation_IncrementSaturation,
+	StencilOperation_DecrementSaturation,
+	StencilOperation_Invert
+};
+
 enum Blend
 {
 	// NOTE: This should match up with the MonoGame 
