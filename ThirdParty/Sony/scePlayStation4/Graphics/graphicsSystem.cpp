@@ -929,10 +929,10 @@ void GraphicsSystem::CreateDepthStencilState(	bool depthBufferEnable,
 	stencilControl.m_mask = stencilMask;
 	stencilControl.m_writeMask = stencilWriteMask;
 	stencilControl.m_opVal = referenceStencil;
-	stencil0 =	(stencilControl.m_testVal    << 0)  & 0x000000ff |
-				(stencilControl.m_mask       << 4)  & 0x0000ff00 |
-				(stencilControl.m_writeMask  << 8)  & 0x00ff0000 |
-				(stencilControl.m_opVal      << 12) & 0xff000000;
+	stencil0 =	stencilControl.m_testVal |
+				stencilControl.m_mask       << 8 |
+				stencilControl.m_writeMask  << 16 |
+				stencilControl.m_opVal      << 24;
 
 	Gnm::StencilOpControl stencilOpControl;
 	stencilOpControl.init();
@@ -960,10 +960,10 @@ void GraphicsSystem::SetDepthStencilState(uint32_t depth0, uint32_t stencil0, ui
 	gfxc.setDepthStencilControl(depthControl);
 
 	Gnm::StencilControl stencilControl;
-	stencilControl.m_testVal =   (stencil0 & 0x000000ff) >> 0;
-	stencilControl.m_mask =      (stencil0 & 0x0000ff00) >> 4;
-	stencilControl.m_writeMask = (stencil0 & 0x00ff0000) >> 8;
-	stencilControl.m_opVal =     (stencil0 & 0xff000000) >> 12;
+	stencilControl.m_testVal =   stencil0 & 0xff;
+	stencilControl.m_mask =      (stencil0 >> 8) & 0xff;
+	stencilControl.m_writeMask = (stencil0 >> 16) & 0xff;
+	stencilControl.m_opVal =     (stencil0 >> 24) & 0xff;
 	gfxc.setStencil(stencilControl);
 
 	Gnm::StencilOpControl stencilOpControl;
