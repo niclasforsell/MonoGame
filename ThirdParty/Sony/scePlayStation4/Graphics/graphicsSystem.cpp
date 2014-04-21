@@ -280,15 +280,22 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 	prepareBackBuffer();
 }
 
-void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sce::Gnm::DepthRenderTarget *depthTarget)
+void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *render0,
+										sce::Gnm::RenderTarget *render1,
+										sce::Gnm::RenderTarget *render2,
+										sce::Gnm::RenderTarget *render3,
+										sce::Gnm::DepthRenderTarget *depthTarget)
 {
 	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
 	
-	_currentRenderTarget = renderTarget;
-	gfxc.setRenderTarget(0, renderTarget);
+	_currentRenderTarget = render0;
+	gfxc.setRenderTarget(0, render0);
+	gfxc.setRenderTarget(1, render1);
+	gfxc.setRenderTarget(2, render2);
+	gfxc.setRenderTarget(3, render3);
 	gfxc.setDepthRenderTarget(depthTarget);
 
-	SetViewport(0, 0, renderTarget->getWidth(), renderTarget->getHeight(), 0.0f, 1.0f);
+	SetViewport(0, 0, render0->getWidth(), render0->getHeight(), 0.0f, 1.0f);
 
 	// Do this now that the depth target changed and won't have to later.
 	if (depthTarget == NULL)
@@ -303,7 +310,7 @@ void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sc
 	gfxc.setClipControl(clip);
 }
 
-void GraphicsSystem::SetRenderTarget(RenderTarget *renderTarget_)
+void GraphicsSystem::SetRenderTarget(RenderTarget *target0, RenderTarget *target1, RenderTarget *target2, RenderTarget *target3)
 {
 	//printf("SettingRenderTarget to 0x%08X\n", renderTarget);
 
@@ -312,10 +319,10 @@ void GraphicsSystem::SetRenderTarget(RenderTarget *renderTarget_)
 	sce::Gnm::RenderTarget *renderTarget;
 	sce::Gnm::DepthRenderTarget *depthTarget;
 
-	if (renderTarget_)
+	if (target0)
 	{
-		renderTarget = renderTarget_->_renderTarget;
-		depthTarget = renderTarget_->_depthTarget;
+		renderTarget = target0->_renderTarget;
+		depthTarget = target0->_depthTarget;
 	}
 	else
 	{
@@ -323,7 +330,11 @@ void GraphicsSystem::SetRenderTarget(RenderTarget *renderTarget_)
 		depthTarget = backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL;
 	}
 
-	_applyRenderTarget(renderTarget, depthTarget);
+	_applyRenderTarget( renderTarget,
+						target1 != NULL ? target1->_renderTarget : NULL,
+						target2 != NULL ? target2->_renderTarget : NULL,
+						target3 != NULL ? target3->_renderTarget : NULL,
+						depthTarget);
 }
 
 void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, float a, float depth, int stencil)
@@ -339,7 +350,7 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 
 	// Are we clearing the color target?
 	if (options & ClearOptions_Target)
-		gfxc.setRenderTargetMask(0x0000000F);
+		gfxc.setRenderTargetMask(0x0000FFFF);
 	else
 		gfxc.setRenderTargetMask(0x00000000);
 
@@ -676,7 +687,7 @@ void GraphicsSystem::prepareBackBuffer()
 	// The z-scale and z-offset values are used to specify the transformation
 	// from clip-space to screen-space
 
-	_applyRenderTarget(	&backBuffer->renderTarget, 
+	_applyRenderTarget(	&backBuffer->renderTarget, NULL, NULL, NULL,
 						backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL);
 	
 	// Move all the previously discarded buffers to 

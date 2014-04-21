@@ -37,7 +37,11 @@ private:
 
 	void prepareBackBuffer();
 
-	void _applyRenderTarget(sce::Gnm::RenderTarget *renderTarget, sce::Gnm::DepthRenderTarget *depthTarget);
+	void _applyRenderTarget(sce::Gnm::RenderTarget *render0,
+							sce::Gnm::RenderTarget *render1,
+							sce::Gnm::RenderTarget *render2,
+							sce::Gnm::RenderTarget *render3,
+							sce::Gnm::DepthRenderTarget *depthTarget);
 
 	void _discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize);
 
@@ -50,7 +54,7 @@ public:
 
 	void Initialize(int backbufferWidth, int backbufferHeight, TextureFormat backbufferFormat, DepthFormat depthFormat);
 
-	void SetRenderTarget(RenderTarget *renderTarget);
+	void SetRenderTarget(RenderTarget *target0, RenderTarget *target1, RenderTarget *target2, RenderTarget *target3);
 
 	void Clear(ClearOptions options, float r, float g, float b, float a, float depth, int stencil);
 	void Present();
