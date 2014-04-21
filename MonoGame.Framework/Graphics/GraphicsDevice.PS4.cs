@@ -272,5 +272,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _system.DrawIndexedPrimitives((Sce.PlayStation4.Graphics.PrimitiveType)primitiveType, startVertex, startIndex, primitiveCount);
         }
+
+        private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        {
+            return GraphicsProfile.HiDef;
+        }
     }
 }
