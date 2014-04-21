@@ -772,6 +772,9 @@
     <Compile Include="Input\GamePad.Ouya.cs">
       <Platforms>Ouya</Platforms>
     </Compile>
+    <Compile Include="Input\GamePad.PS4.cs">
+      <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Input\GamePad.PSM.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
@@ -1276,9 +1279,6 @@
         <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="PlayStation4\PS4GameWindow.cs">
-        <Platforms>PlayStation4</Platforms>
-    </Compile>
-    <Compile Include="PlayStation4\Input\GamePad.PS4.cs">
         <Platforms>PlayStation4</Platforms>
     </Compile>
 
