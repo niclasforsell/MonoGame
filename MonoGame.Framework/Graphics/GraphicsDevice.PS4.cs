@@ -80,16 +80,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformApplyDefaultRenderTarget()
         {
-            _system.SetRenderTarget(null);
+            _system.SetRenderTarget(null, null, null, null);
         }
 
         private IRenderTarget PlatformApplyRenderTargets()
         {
-            // TODO: Need to support multiple render targets!
+            var target0 = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
+            var target1 = _currentRenderTargetBindings[1].RenderTarget as RenderTarget2D;
+            var target2 = _currentRenderTargetBindings[2].RenderTarget as RenderTarget2D;
+            var target3 = _currentRenderTargetBindings[3].RenderTarget as RenderTarget2D;
+            _system.SetRenderTarget(target0._target,
+                                    target1 != null ? target1._target : null,
+                                    target2 != null ? target2._target : null,
+                                    target3 != null ? target3._target : null);
 
-            var target = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
-            _system.SetRenderTarget(target._target);
-            return target;
+            return target0;
         }
 
         internal void PlatformApplyState(bool applyShaders)
