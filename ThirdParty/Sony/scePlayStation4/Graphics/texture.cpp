@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include "renderTarget.h"
 
 #include "graphicsHelpers.h"
 #include "../allocator.h"
@@ -8,13 +9,15 @@
 
 using namespace Graphics;
 
-Texture::Texture(TextureFormat format, int32_t width, int32_t height, int32_t mips)
+Texture* Texture::Create2D(TextureFormat format, int32_t width, int32_t height, int32_t mips)
 {
 	assert(mips >= 1);
 
-	_texture = new sce::Gnm::Texture();
+	auto texture = new sce::Gnm::Texture();
+	auto result = new Texture();
+	result->_texture = texture;
 
-	auto textureSizeAlign = _texture->initAs2d(
+	auto textureSizeAlign = texture->initAs2d(
 		width, height, mips,
 		ToDataFormat(format),
 		Gnm::kTileModeDisplay_LinearAligned,
@@ -22,7 +25,49 @@ Texture::Texture(TextureFormat format, int32_t width, int32_t height, int32_t mi
 
 	// Allocate the texture data using the alignment returned by initAs2d
 	void *textureData = Allocator::Get()->allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
-	_texture->setBaseAddress(textureData);
+	texture->setBaseAddress(textureData);
+
+	return result;
+}
+
+Texture* Texture::Create3D(TextureFormat format, int32_t width, int32_t height, int32_t depth, int32_t mips)
+{
+	assert(mips >= 1);
+
+	auto texture = new sce::Gnm::Texture();
+	auto result = new Texture();
+	result->_texture = texture;
+
+	auto textureSizeAlign = texture->initAs3d(
+		width, height, depth, mips,
+		ToDataFormat(format),
+		Gnm::kTileModeDisplay_LinearAligned);
+
+	// Allocate the texture data using the alignment returned by initAs3d
+	void *textureData = Allocator::Get()->allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
+	texture->setBaseAddress(textureData);
+
+	return result;
+}
+
+Texture* Texture::CreateCube(TextureFormat format, int32_t width, int32_t height, int32_t mips)
+{
+	assert(mips >= 1);
+
+	auto texture = new sce::Gnm::Texture();
+	auto result = new Texture();
+	result->_texture = texture;
+
+	auto textureSizeAlign = texture->initAsCubemap(
+		width, height, mips,
+		ToDataFormat(format),
+		Gnm::kTileModeDisplay_LinearAligned);
+
+	// Allocate the texture data using the alignment returned by initAsCubemap
+	void *textureData = Allocator::Get()->allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
+	texture->setBaseAddress(textureData);
+
+	return result;
 }
 
 Texture::~Texture()
