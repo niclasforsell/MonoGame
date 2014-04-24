@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.InteropServices;
 using PS4Texture = Sce.PlayStation4.Graphics.Texture;
 using PS4TextureFormat = Sce.PlayStation4.Graphics.TextureFormat;
 
@@ -16,16 +17,46 @@ namespace Microsoft.Xna.Framework.Graphics
             _texture = PS4Texture.Create3D((PS4TextureFormat)format, width, height, depth, mipMap ? _levelCount : 1);
         }
 
-        private void PlatformSetData(int level, int left, int top, int right, int bottom, int front, int back,
-            IntPtr dataPtr, int width, int height, int depth)
+        private void PlatformSetData<T>(int level, int left, int top, int right, int bottom, int front, int back,
+            T[] data, int startIndex, int elementCount)
         {
-            throw new NotImplementedException();
+            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            var startBytes = elementSizeInBytes * startIndex;
+
+            var pitchRow = GetPitch(width);
+            var pitchSlice = pitchRow * height;
+            startBytes += pitchSlice * front + pitchRow * top + left;
+
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
+
+            unsafe
+            {
+                _texture.SetData((uint)level, (byte*)dataPtr, (uint)startBytes, (uint)(elementSizeInBytes * elementCount));
+            }
+
+            dataHandle.Free();
         }
 
         private void PlatformGetData<T>(int level, int left, int top, int right, int bottom, int front, int back,
             T[] data, int startIndex, int elementCount) where T : struct
         {
-            throw new NotImplementedException();
+            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            var startBytes = elementSizeInBytes * startIndex;
+
+            var pitchRow = GetPitch(Width);
+            var pitchSlice = pitchRow * Height;
+            startBytes += pitchSlice * front + pitchRow * top + left;
+
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
+
+            unsafe
+            {
+                _texture.GetData((uint)level, (byte*)dataPtr, (uint)startBytes, (uint)(elementSizeInBytes * elementCount));
+            }
+
+            dataHandle.Free();
         }
     }
 }

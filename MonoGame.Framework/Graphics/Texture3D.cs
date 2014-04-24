@@ -58,23 +58,24 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			SetData<T>(0, 0, 0, Width, Height, 0, Depth, data, startIndex, elementCount);
 		}
-		
-		public void SetData<T> (int level,
-		                        int left, int top, int right, int bottom, int front, int back,
-		                        T[] data, int startIndex, int elementCount) where T : struct
-		{
-			if (data == null) 
-				throw new ArgumentNullException("data");
 
-			var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
-            int width = right - left;
-            int height = bottom - top;
-            int depth = back - front;
+        public void SetData<T>(int level,
+                                int left, int top, int right, int bottom, int front, int back,
+                                T[] data, int startIndex, int elementCount) where T : struct
+        {
+            if (data == null || data.Length == 0)
+                throw new ArgumentNullException("data");
 
-            PlatformSetData(level, left, top, right, bottom, front, back, dataPtr, width, height, depth);
-            dataHandle.Free ();
+            if ((data.Length - startIndex) < elementCount)
+                throw new ArgumentException("Not enough data in the array given startIndex and elementCount.");
+
+            // Disallow negative box size
+            if ((left < 0 || left >= right)
+                || (top < 0 || top >= bottom)
+                || (front < 0 || front >= back))
+                throw new ArgumentException("Neither box size nor box position can be negative");
+
+            PlatformSetData<T>(level, left, top, right, bottom, front, back, data, startIndex, elementCount);
 		}
 
         /// <summary>

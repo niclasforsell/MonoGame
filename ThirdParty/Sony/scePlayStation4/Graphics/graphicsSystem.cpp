@@ -280,7 +280,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 	prepareBackBuffer();
 }
 
-void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *render0,
+void GraphicsSystem::_applyRenderTargets(sce::Gnm::RenderTarget *render0,
 										sce::Gnm::RenderTarget *render1,
 										sce::Gnm::RenderTarget *render2,
 										sce::Gnm::RenderTarget *render3,
@@ -310,7 +310,7 @@ void GraphicsSystem::_applyRenderTarget(sce::Gnm::RenderTarget *render0,
 	gfxc.setClipControl(clip);
 }
 
-void GraphicsSystem::SetRenderTarget(RenderTarget *target0, RenderTarget *target1, RenderTarget *target2, RenderTarget *target3)
+void GraphicsSystem::SetRenderTargets(RenderTarget *target0, RenderTarget *target1, RenderTarget *target2, RenderTarget *target3)
 {
 	//printf("SettingRenderTarget to 0x%08X\n", renderTarget);
 
@@ -330,7 +330,7 @@ void GraphicsSystem::SetRenderTarget(RenderTarget *target0, RenderTarget *target
 		depthTarget = backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL;
 	}
 
-	_applyRenderTarget( renderTarget,
+	_applyRenderTargets( renderTarget,
 						target1 != NULL ? target1->_renderTarget : NULL,
 						target2 != NULL ? target2->_renderTarget : NULL,
 						target3 != NULL ? target3->_renderTarget : NULL,
@@ -687,7 +687,7 @@ void GraphicsSystem::prepareBackBuffer()
 	// The z-scale and z-offset values are used to specify the transformation
 	// from clip-space to screen-space
 
-	_applyRenderTarget(	&backBuffer->renderTarget, NULL, NULL, NULL,
+	_applyRenderTargets(	&backBuffer->renderTarget, NULL, NULL, NULL,
 						backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL);
 	
 	// Move all the previously discarded buffers to 

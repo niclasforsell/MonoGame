@@ -14,10 +14,8 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         protected void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
-            /*
             if (type != SurfaceType.Texture)
                 return;
-             */
 
             _texture = PS4Texture.Create2D((PS4TextureFormat)format, width, height, (mipmap ? _levelCount : 1));
         }
@@ -38,7 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 unsafe
                 {
-                    _texture.SetData((uint)level, (byte*)dataPtr, (uint)(elementSizeInByte * elementCount));
+                    _texture.SetData((uint)level, (byte*)dataPtr, 0, (uint)(elementSizeInByte * elementCount));
                 }
             }
 
@@ -61,7 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 unsafe
                 {
-                    _texture.GetData((uint)level, (byte*)dataPtr, (uint)(elementSizeInByte * elementCount));
+                    _texture.GetData((uint)level, (byte*)dataPtr, 0, (uint)(elementSizeInByte * elementCount));
                 }
             }
 
