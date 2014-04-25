@@ -18,13 +18,13 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         private void PlatformSetData<T>(int level, int left, int top, int right, int bottom, int front, int back,
-            T[] data, int startIndex, int elementCount)
+            T[] data, int startIndex, int elementCount, int width, int height, int depth)
         {
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
             var startBytes = elementSizeInBytes * startIndex;
 
-            var pitchRow = GetPitch(width);
-            var pitchSlice = pitchRow * height;
+            var pitchRow = GetPitch(_width);
+            var pitchSlice = pitchRow * _height;
             startBytes += pitchSlice * front + pitchRow * top + left;
 
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -44,8 +44,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
             var startBytes = elementSizeInBytes * startIndex;
 
-            var pitchRow = GetPitch(Width);
-            var pitchSlice = pitchRow * Height;
+            var pitchRow = GetPitch(_width);
+            var pitchSlice = pitchRow * _height;
             startBytes += pitchSlice * front + pitchRow * top + left;
 
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
