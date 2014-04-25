@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        protected override void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing && _target != null)
             {
@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _target = null;
             }
 
-            base.PlatformDispose(disposing);
+            base.Dispose(disposing);
         }
     }
 }

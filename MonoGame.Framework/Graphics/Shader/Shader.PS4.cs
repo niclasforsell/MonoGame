@@ -33,12 +33,17 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        private void PlatformDispose()
+        protected override void Dispose(bool disposing)
         {
-            if (_vertexShader != null)
-                _vertexShader.Dispose();
-            if (_pixelShader != null)
-                _pixelShader.Dispose();
+            if (disposing)
+            {
+                if (_vertexShader != null)
+                    _vertexShader.Dispose();
+                if (_pixelShader != null)
+                    _pixelShader.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

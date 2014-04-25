@@ -17,13 +17,15 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        protected virtual void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing && _texture != null)
             {
                 _texture.Dispose();
                 _texture = null;
             }
+
+            base.Dispose(disposing);
         }
     }
 }
