@@ -67,9 +67,5 @@ namespace Microsoft.Xna.Framework.Graphics
 
             device._system.SetBlendState(_blend0, _blend1, _blend2, _blend3, _colorWrites);            
         }
-
-        private void PlatformDispose()
-        {
-        }
     }
 }

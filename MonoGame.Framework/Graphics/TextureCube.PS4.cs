@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using PS4Texture = Sce.PlayStation4.Graphics.Texture;
+using PS4TextureFormat = Sce.PlayStation4.Graphics.TextureFormat;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -11,7 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int size, bool mipMap,
             SurfaceFormat format, bool renderTarget)
         {
-            throw new NotImplementedException();
+            _texture = PS4Texture.CreateCube((PS4TextureFormat)format, size, size, mipMap ? _levelCount : 1);
         }
 
         private void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data)

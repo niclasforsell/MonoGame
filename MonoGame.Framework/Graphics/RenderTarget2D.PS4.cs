@@ -3,20 +3,22 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Sce.PlayStation4.Graphics;
+using PS4RenderTarget = Sce.PlayStation4.Graphics.RenderTarget;
+using PS4Texture = Sce.PlayStation4.Graphics.Texture;
+using PS4DepthFormat = Sce.PlayStation4.Graphics.DepthFormat;
+using PS4TextureFormat = Sce.PlayStation4.Graphics.TextureFormat;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RenderTarget2D
     {
-        internal Sce.PlayStation4.Graphics.RenderTarget _target;
+        internal PS4RenderTarget _target;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount,
             RenderTargetUsage usage, bool shared)
         {
-            _target = new RenderTarget( (TextureFormat)preferredFormat, width, height, 
-                                        (Sce.PlayStation4.Graphics.DepthFormat)preferredDepthFormat);
+            _target = new PS4RenderTarget((PS4TextureFormat)preferredFormat, width, height, (PS4DepthFormat)preferredDepthFormat);
         }
 
         private void PlatformGraphicsDeviceResetting()
@@ -25,18 +27,15 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        // Use new to replace the PlatformDispose method in Texture2D.
-        // This could definitely use some cleanup.
-        private new void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-            if (disposing)
+            if (disposing && _target != null)
             {
                 _target.Dispose();
                 _target = null;
             }
 
-            // No need to call base PlatformDispose, we didn't allocate
-            // a texture there at construction.
+            base.Dispose(disposing);
         }
     }
 }

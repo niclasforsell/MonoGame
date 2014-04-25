@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include "renderTarget.h"
 
 #include "graphicsHelpers.h"
 #include "../allocator.h"
@@ -8,13 +9,15 @@
 
 using namespace Graphics;
 
-Texture::Texture(TextureFormat format, int32_t width, int32_t height, int32_t mips)
+Texture* Texture::Create2D(TextureFormat format, int32_t width, int32_t height, int32_t mips)
 {
 	assert(mips >= 1);
 
-	_texture = new sce::Gnm::Texture();
+	auto texture = new sce::Gnm::Texture();
+	auto result = new Texture();
+	result->_texture = texture;
 
-	auto textureSizeAlign = _texture->initAs2d(
+	auto textureSizeAlign = texture->initAs2d(
 		width, height, mips,
 		ToDataFormat(format),
 		Gnm::kTileModeDisplay_LinearAligned,
@@ -22,7 +25,49 @@ Texture::Texture(TextureFormat format, int32_t width, int32_t height, int32_t mi
 
 	// Allocate the texture data using the alignment returned by initAs2d
 	void *textureData = Allocator::Get()->allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
-	_texture->setBaseAddress(textureData);
+	texture->setBaseAddress(textureData);
+
+	return result;
+}
+
+Texture* Texture::Create3D(TextureFormat format, int32_t width, int32_t height, int32_t depth, int32_t mips)
+{
+	assert(mips >= 1);
+
+	auto texture = new sce::Gnm::Texture();
+	auto result = new Texture();
+	result->_texture = texture;
+
+	auto textureSizeAlign = texture->initAs3d(
+		width, height, depth, mips,
+		ToDataFormat(format),
+		Gnm::kTileModeDisplay_LinearAligned);
+
+	// Allocate the texture data using the alignment returned by initAs3d
+	void *textureData = Allocator::Get()->allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
+	texture->setBaseAddress(textureData);
+
+	return result;
+}
+
+Texture* Texture::CreateCube(TextureFormat format, int32_t width, int32_t height, int32_t mips)
+{
+	assert(mips >= 1);
+
+	auto texture = new sce::Gnm::Texture();
+	auto result = new Texture();
+	result->_texture = texture;
+
+	auto textureSizeAlign = texture->initAsCubemap(
+		width, height, mips,
+		ToDataFormat(format),
+		Gnm::kTileModeDisplay_LinearAligned);
+
+	// Allocate the texture data using the alignment returned by initAsCubemap
+	void *textureData = Allocator::Get()->allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
+	texture->setBaseAddress(textureData);
+
+	return result;
 }
 
 Texture::~Texture()
@@ -31,14 +76,17 @@ Texture::~Texture()
 	delete _texture;
 }
 
-void Texture::SetData(uint32_t level, uint8_t *data, uint32_t bytes)
+void Texture::SetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t length)
 {
 	auto width = _texture->getWidth();
 	auto height = _texture->getHeight();
+	auto depth = _texture->getDepth();
 	auto pixelBytes = _texture->getDataFormat().getBytesPerElement();
 	auto baseAddr = (unsigned char*)_texture->getBaseAddress();
 	auto pitch = _texture->getPitch();
-	auto levelZeroSize = pitch * height * pixelBytes;
+	auto levelZeroSize = pitch * height * depth * pixelBytes;
+
+	baseAddr += offset;
 
 	while (level > 0)
 	{
@@ -52,7 +100,7 @@ void Texture::SetData(uint32_t level, uint8_t *data, uint32_t bytes)
 	}
 
 	if (pitch == width)
-		memcpy(baseAddr, data, bytes);
+		memcpy(baseAddr, data, length);
 	else
 	{
 		for (auto h=0; h < height; h++)
@@ -64,13 +112,16 @@ void Texture::SetData(uint32_t level, uint8_t *data, uint32_t bytes)
 	}
 }
 
-void Texture::GetData(uint32_t level, uint8_t *data, uint32_t bytes)
+void Texture::GetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t length)
 {
 	auto height = _texture->getHeight();
+    auto depth = _texture->getDepth();
 	auto pixelBytes = _texture->getDataFormat().getBytesPerElement();
 	auto baseAddr = (unsigned char*)_texture->getBaseAddress();
 	auto pitch = _texture->getPitch();
-	auto levelZeroSize = pitch * height * pixelBytes;
+	auto levelZeroSize = pitch * height * depth * pixelBytes;
+
+	baseAddr += offset;
 
 	while (level > 0)
 	{
@@ -79,7 +130,7 @@ void Texture::GetData(uint32_t level, uint8_t *data, uint32_t bytes)
 		--level;
 	}
 
-	memcpy(data, baseAddr, bytes);
+	memcpy(data, baseAddr, length);
 }
 
 /*

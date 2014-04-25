@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformApplyDefaultRenderTarget()
         {
-            _system.SetRenderTarget(null, null, null, null);
+            _system.SetRenderTargets(null, null, null, null);
         }
 
         private IRenderTarget PlatformApplyRenderTargets()
@@ -89,7 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var target1 = _currentRenderTargetBindings[1].RenderTarget as RenderTarget2D;
             var target2 = _currentRenderTargetBindings[2].RenderTarget as RenderTarget2D;
             var target3 = _currentRenderTargetBindings[3].RenderTarget as RenderTarget2D;
-            _system.SetRenderTarget(target0._target,
+            _system.SetRenderTargets(target0._target,
                                     target1 != null ? target1._target : null,
                                     target2 != null ? target2._target : null,
                                     target3 != null ? target3._target : null);

@@ -44,13 +44,15 @@ namespace Microsoft.Xna.Framework.Graphics
             dataHandle.Free();
         }
 
-        private void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
                 _buffer.Dispose();
                 _buffer = null;
             }
+
+            base.Dispose(disposing);
         }
     }
 }

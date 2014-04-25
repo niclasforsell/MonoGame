@@ -5,35 +5,22 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Sce.PlayStation4.Graphics;
+using PS4Texture = Sce.PlayStation4.Graphics.Texture;
+using PS4TextureFormat = Sce.PlayStation4.Graphics.TextureFormat;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D
     {
-        internal Sce.PlayStation4.Graphics.Texture _texture;
-
-        private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
+        protected void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
             if (type != SurfaceType.Texture)
                 return;
 
-            _texture = new Sce.PlayStation4.Graphics.Texture((TextureFormat)format, width, height, (mipmap ? _levelCount : 1));
+            _texture = PS4Texture.Create2D((PS4TextureFormat)format, width, height, (mipmap ? _levelCount : 1));
         }
 
-        protected override void PlatformDispose(bool disposing)
-        {
-            // In this particular case, we can be called when _texture is null,
-            // because RenderTarget2D doesn't construct a texture with this class'
-            // PlatformConstruct method.
-            if (_texture != null)
-            {
-                _texture.Dispose();
-                _texture = null;
-            }
-        }
-
-        private void PlatformSetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
+        protected void PlatformSetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
         {
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
 
@@ -49,14 +36,14 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 unsafe
                 {
-                    _texture.SetData((uint)level, (byte*)dataPtr, (uint)(elementSizeInByte * elementCount));
+                    _texture.SetData((uint)level, (byte*)dataPtr, 0, (uint)(elementSizeInByte * elementCount));
                 }
             }
 
             dataHandle.Free();
         }
 
-        private void PlatformGetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
+        protected void PlatformGetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
         {
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
 
@@ -72,7 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 unsafe
                 {
-                    _texture.GetData((uint)level, (byte*)dataPtr, (uint)(elementSizeInByte * elementCount));
+                    _texture.GetData((uint)level, (byte*)dataPtr, 0, (uint)(elementSizeInByte * elementCount));
                 }
             }
 
