@@ -80,11 +80,13 @@ void Texture::SetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t l
 {
 	auto width = _texture->getWidth();
 	auto height = _texture->getHeight();
-    auto depth = _texture->getDepth();
+	auto depth = _texture->getDepth();
 	auto pixelBytes = _texture->getDataFormat().getBytesPerElement();
 	auto baseAddr = (unsigned char*)_texture->getBaseAddress();
 	auto pitch = _texture->getPitch();
 	auto levelZeroSize = pitch * height * depth * pixelBytes;
+
+	baseAddr += offset;
 
 	while (level > 0)
 	{
@@ -98,12 +100,12 @@ void Texture::SetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t l
 	}
 
 	if (pitch == width)
-		memcpy(baseAddr + offset, data, length);
+		memcpy(baseAddr, data, length);
 	else
 	{
 		for (auto h=0; h < height; h++)
 		{
-			memcpy(baseAddr + offset, data, width * pixelBytes);
+			memcpy(baseAddr, data, width * pixelBytes);
 			data += width * pixelBytes;
 			baseAddr += pitch * pixelBytes;
 		}
@@ -119,6 +121,8 @@ void Texture::GetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t l
 	auto pitch = _texture->getPitch();
 	auto levelZeroSize = pitch * height * depth * pixelBytes;
 
+	baseAddr += offset;
+
 	while (level > 0)
 	{
 		baseAddr += levelZeroSize;
@@ -126,7 +130,7 @@ void Texture::GetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t l
 		--level;
 	}
 
-	memcpy(data, baseAddr + offset, length);
+	memcpy(data, baseAddr, length);
 }
 
 /*
