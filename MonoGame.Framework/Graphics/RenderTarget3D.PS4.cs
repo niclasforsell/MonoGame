@@ -10,21 +10,14 @@ using PS4TextureFormat = Sce.PlayStation4.Graphics.TextureFormat;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public partial class RenderTarget2D
+    public partial class RenderTarget3D
     {
-        internal PS4RenderTarget _target;
+        private PS4RenderTarget _target;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
-            SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount,
-            RenderTargetUsage usage, bool shared)
+            SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
         {
-            _target = PS4RenderTarget.Create2D((PS4TextureFormat)preferredFormat, width, height, (PS4DepthFormat)preferredDepthFormat);
-        }
-
-        private void PlatformGraphicsDeviceResetting()
-        {
-            // Don't think this will happen on PS4.
-            throw new NotImplementedException();
+            _target = PS4RenderTarget.Create3D((PS4TextureFormat)preferredFormat, width, height, Depth, (PS4DepthFormat)preferredDepthFormat);
         }
 
         protected override void Dispose(bool disposing)

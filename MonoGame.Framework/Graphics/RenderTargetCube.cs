@@ -42,6 +42,12 @@ using SharpDX.DXGI;
 using SharpDX.Direct3D11;
 #endif
 
+#if PLAYSTATION4
+using PS4RenderTarget = Sce.PlayStation4.Graphics.RenderTarget;
+using PS4Texture = Sce.PlayStation4.Graphics.Texture;
+using PS4DepthFormat = Sce.PlayStation4.Graphics.DepthFormat;
+using PS4TextureFormat = Sce.PlayStation4.Graphics.TextureFormat;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -53,6 +59,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
         private RenderTargetView[] _renderTargetViews;
         private DepthStencilView _depthStencilView;
+#endif
+
+#if PLAYSTATION4
+        internal PS4RenderTarget _target;
 #endif
 
         /// <summary>
@@ -166,6 +176,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 };
                 _depthStencilView = new DepthStencilView(graphicsDevice._d3dDevice, depthBuffer, depthStencilViewDescription);
             }
+#elif PLAYSTATION4
+            _target = PS4RenderTarget.CreateCube((PS4TextureFormat)preferredFormat, size, size, (PS4DepthFormat)preferredDepthFormat);
 #else
             throw new NotImplementedException();
 #endif            
@@ -183,6 +195,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     _renderTargetViews = null;
                     SharpDX.Utilities.Dispose(ref _depthStencilView);
+                }
+#endif
+
+#if PLAYSTATION4
+                if (_target != null)
+                {
+                    _target.Dispose();
+                    _target = null;
                 }
 #endif
             }
