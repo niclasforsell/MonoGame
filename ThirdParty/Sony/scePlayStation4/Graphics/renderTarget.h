@@ -22,8 +22,13 @@ private:
 	RenderTarget() { }
 	RenderTarget( const RenderTarget & ) { }
 
+	static RenderTarget* Create(TextureFormat format, int32_t width, int32_t height, int32_t slices, DepthFormat depthFormat, bool isCubemap);
+
 public:
-	RenderTarget(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat);
+	static RenderTarget* Create2D(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat);
+	static RenderTarget* Create3D(TextureFormat format, int32_t width, int32_t height, int32_t slices, DepthFormat depthFormat);
+	static RenderTarget* CreateCube(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat);
+
 	virtual ~RenderTarget();
 
 };
