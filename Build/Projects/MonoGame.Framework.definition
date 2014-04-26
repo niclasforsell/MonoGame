@@ -470,10 +470,13 @@
       <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\RenderTarget3D.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\RenderTarget3D.DirectX.cs">
         <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\RenderTarget3D.PS4.cs">
+      <Platforms>PlayStation4</Platforms>
     </Compile>
     <Compile Include="Graphics\RenderTargetBinding.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
