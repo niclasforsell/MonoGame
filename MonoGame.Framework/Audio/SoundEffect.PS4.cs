@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Audio
                 sound.Volume = _masterVolume;
         }
 
-        private static void PlatformShutdown()
+        internal static void PlatformShutdown()
         {
         }
 
