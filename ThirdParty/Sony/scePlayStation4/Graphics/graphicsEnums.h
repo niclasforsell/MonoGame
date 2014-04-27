@@ -23,8 +23,8 @@ enum VertexElement
 
 enum TextureFormat
 {
-	// NOTE: This should match up with the
-	// MonoGame enum for easy interop!
+	// NOTE: This should match up with the MonoGame
+	// SurfaceFormat enum for easy interop!
 
     TextureFormat_Color = 0,
     TextureFormat_Bgr565 = 1,
@@ -46,6 +46,10 @@ enum TextureFormat
     TextureFormat_HalfVector2 = 17,
     TextureFormat_HalfVector4 = 18,
     TextureFormat_HdrBlendable = 19,
+
+	TextureFormat_PlayStation4_BC1Unorm = 400,
+	TextureFormat_PlayStation4_BC2Unorm = 401,
+	TextureFormat_PlayStation4_BC3Unorm = 402,
 };
 
 enum DepthFormat
