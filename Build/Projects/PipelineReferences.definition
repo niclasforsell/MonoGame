@@ -63,6 +63,14 @@
     <Binary
       Name="ManagedPVRTC"
       Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
+
+	<!-- PlayStation 4 Only Stuff -->
+    <Project
+      Name="scePlayStation4Tools"
+      Guid="80316BFA-C181-4977-BF9C-D68469101604"
+      Path="ThirdParty\Sony\scePlayStation4Tools\scePlayStation4Tools.vcxproj">
+    </Project>
+
   </Platform>
 	
 </ExternalProject>
