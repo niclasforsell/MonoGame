@@ -52,11 +52,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 #if WINDOWS
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
-            options.Profile =   context.TargetPlatform == TargetPlatform.Windows ||
-                                context.TargetPlatform == TargetPlatform.WindowsPhone8 ||
-                                context.TargetPlatform == TargetPlatform.WindowsStoreApp ||
-                                context.TargetPlatform == TargetPlatform.Xbox360 ? 
-                                ShaderProfile.DirectX_11 : ShaderProfile.OpenGL;
+
+            switch (context.TargetPlatform)
+            {
+                case TargetPlatform.Windows:
+                case TargetPlatform.WindowsPhone8:
+                case TargetPlatform.WindowsStoreApp:
+                case TargetPlatform.Xbox360:
+                    options.Profile = ShaderProfile.DirectX_11;
+                    break;
+                case TargetPlatform.PlayStation4:
+                    options.Profile = ShaderProfile.PlayStation4;
+                    break;
+                default:
+                    options.Profile = ShaderProfile.OpenGL;
+                    break;
+            }
+
             options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
             options.OutputFile = context.OutputFilename;
 
