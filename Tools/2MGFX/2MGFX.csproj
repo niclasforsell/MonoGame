@@ -224,6 +224,12 @@
     </None>
     <None Include="MGFX.tpg" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ThirdParty\Sony\scePlayStation4Tools\scePlayStation4Tools.vcxproj">
+      <Project>{80316bfa-c181-4977-bf9c-d68469101604}</Project>
+      <Name>scePlayStation4Tools</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(TargetDir)*.dll" "$(SolutionDir)..\bin\Windows\*.*" /Y /F /I
