@@ -55,6 +55,10 @@ namespace Microsoft.Xna.Framework.Audio
                 _pooledInstances.Add(inst);
 
             _playingInstances.Remove(inst);
+
+#if PLAYSTATION4
+            Sce.PlayStation4.Audio.SoundSystem.Instance.DestroyVoice(inst._voice);
+#endif
         }
 
         internal static void Remove(SoundEffectInstance inst)
