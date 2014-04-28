@@ -21,10 +21,13 @@ static inline sce::Gnm::DataFormat ToDataFormat(TextureFormat format)
 		return Gnm::kDataFormatB5G5R5A1Unorm;
 	case TextureFormat_Bgra4444:
 		return Gnm::kDataFormatB4G4R4A4Unorm;
+	case TextureFormat_PlayStation4_BC1Unorm:
 	case TextureFormat_Dxt1:
 		return Gnm::kDataFormatBc1Unorm;
+	case TextureFormat_PlayStation4_BC2Unorm:
 	case TextureFormat_Dxt3:
 		return Gnm::kDataFormatBc2Unorm;
+	case TextureFormat_PlayStation4_BC3Unorm:
 	case TextureFormat_Dxt5:
 		return Gnm::kDataFormatBc3Unorm;
 	case TextureFormat_NormalizedByte2:

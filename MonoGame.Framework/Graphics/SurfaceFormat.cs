@@ -83,6 +83,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         // DXT1 also has a 1-bit alpha form
         Dxt1a = 70,
+
+        // PlayStation 4 formats
+        PlayStation4_BC1Unorm = 400,
+        PlayStation4_BC2Unorm = 401,
+        PlayStation4_BC3Unorm = 402,
     }
     
     public enum SurfaceFormat_Legacy
