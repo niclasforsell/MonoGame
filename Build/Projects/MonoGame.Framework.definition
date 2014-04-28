@@ -21,7 +21,9 @@
   </References>
 
   <Properties>
-	
+    
+    <NoWarn>1591,0436</NoWarn>
+
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
 	<RemoveXnaAssembliesOnWP8>false</RemoveXnaAssembliesOnWP8>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
@@ -52,8 +54,12 @@
       <Link>Tao.Sdl.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
+      <Platforms>Linux,MacOS</Platforms>
+      <Link>OpenTK.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
-    
     <!-- Microsoft.Xna.Framework -->
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
