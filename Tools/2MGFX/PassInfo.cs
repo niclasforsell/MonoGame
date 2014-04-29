@@ -58,7 +58,9 @@ namespace TwoMGFX
                             throw new Exception(String.Format("Invalid profile '{0}'. Vertex shader '{1}' must be SM 3.0 or lower!", vsModel, vsFunction));
                         break;
                     case ShaderProfile.PlayStation4:
-                        throw new NotSupportedException("PlayStation 4 support isn't available in this build.");
+                        if (vsModel != "sce_vs_vs_orbis")
+                            throw new Exception(String.Format("Invalid profile '{0}'. Vertex shader '{1}' must be sce_vs_vs_orbis!", vsModel, vsFunction));
+                        break;
                 }
             }
 
@@ -77,7 +79,9 @@ namespace TwoMGFX
                             throw new Exception(String.Format("Invalid profile '{0}'. Pixel shader '{1}' must be SM 3.0 or lower!", vsModel, psFunction));
                         break;
                     case ShaderProfile.PlayStation4:
-                        throw new NotSupportedException("PlayStation 4 support isn't available in this build.");
+                        if (psModel != "sce_ps_orbis")
+                            throw new Exception(String.Format("Invalid profile '{0}'. Pixel shader '{1}' must be sce_ps_orbis!", psModel, psFunction));
+                        break;
                 }
             }
         }

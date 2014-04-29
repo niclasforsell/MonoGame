@@ -6,8 +6,13 @@ namespace TwoMGFX
     {
         private static byte[] CompilePSSL(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile)
         {
-            // This is only part of the private PS4 repository.
-            throw new NotImplementedException();
+            var compiler = new sce.PlayStation4.Tools.ShaderCompiler();
+
+            compiler.Compile(   shaderInfo.fileContent,
+                                shaderFunction,
+                                shaderProfile);
+
+            return compiler.Bytecode;
         }
     }
 }

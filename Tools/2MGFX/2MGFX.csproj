@@ -167,6 +167,7 @@
     <Compile Include="CompilerInclude.cs" />
     <Compile Include="ConstantBufferData.cs" />
     <Compile Include="ConstantBufferData.mojo.cs" />
+    <Compile Include="ConstantBufferData.pssl.cs" />
     <Compile Include="ConstantBufferData.sharpdx.cs" />
     <Compile Include="ConstantBufferData.writer.cs" />
     <Compile Include="EffectObject.cs" />
@@ -223,6 +224,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="MGFX.tpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ThirdParty\Sony\scePlayStation4Tools\scePlayStation4Tools.vcxproj">
+      <Project>{80316bfa-c181-4977-bf9c-d68469101604}</Project>
+      <Name>scePlayStation4Tools</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

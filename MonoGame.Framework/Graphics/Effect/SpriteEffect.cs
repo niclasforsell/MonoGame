@@ -26,21 +26,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #endregion
 
-#if PLAYSTATION4
-        static internal readonly byte[] Bytecode = GenerateSpriteEffect();
-#else
-
         static internal readonly byte[] Bytecode = LoadEffectResource(
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.dx11.mgfxo"
 #elif PSM
             "MonoGame.Framework.PSMobile.PSSuite.Graphics.Resources.SpriteEffect.cgx" //FIXME: This shader is totally incomplete
-#else
+#elif OPENGL
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.ogl.mgfxo"
+#elif PLAYSTATION4
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.ps4.mgfxo"
 #endif
         );
-
-#endif
 
         #region Methods
 
