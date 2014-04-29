@@ -42,6 +42,7 @@ namespace TwoMGFX
             }
             else if (options.Profile == ShaderProfile.PlayStation4)
             {
+                macros.Add(new SharpDX.Direct3D.ShaderMacro("__PSSL__", 1));               
             }
 
 			// If we're building shaders for debug set that flag too.
