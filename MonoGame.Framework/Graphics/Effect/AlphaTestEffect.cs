@@ -62,8 +62,10 @@ namespace Microsoft.Xna.Framework.Graphics
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.dx11.mgfxo"
 #elif PSM
             "MonoGame.Framework.PSMobile.PSSuite.Graphics.AlphaTestEffect.cgx" //FIXME: This shader is totally incomplete
-#else
+#elif OPENGL
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.ogl.mgfxo"
+#elif PLAYSTATION4
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.ps4.mgfxo"
 #endif
         );
 

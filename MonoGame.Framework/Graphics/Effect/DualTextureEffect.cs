@@ -55,9 +55,12 @@ namespace Microsoft.Xna.Framework.Graphics
         static readonly byte[] Bytecode = LoadEffectResource(
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.DualTextureEffect.dx11.mgfxo"
-#else
+#elif OPENGL
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.DualTextureEffect.ogl.mgfxo"
+#elif PLAYSTATION4
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.DualTextureEffect.ps4.mgfxo"
 #endif
+
         );
 
         #endregion

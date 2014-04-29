@@ -71,8 +71,10 @@ namespace Microsoft.Xna.Framework.Graphics
         static readonly byte[] Bytecode = LoadEffectResource(
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.dx11.mgfxo"
-#else
+#elif OPENGL
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.ogl.mgfxo"
+#elif PLAYSTATION4
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.ps4.mgfxo"
 #endif
         );
 

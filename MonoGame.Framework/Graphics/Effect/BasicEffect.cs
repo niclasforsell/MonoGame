@@ -75,8 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics
             "MonoGame.Framework.PSMobile.PSSuite.Graphics.Resources.BasicEffect.cgx" //FIXME: This shader is totally incomplete
 #elif OPENGL
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.ogl.mgfxo"
-#endif
-#if PLAYSTATION4
+#elif PLAYSTATION4
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.ps4.mgfxo"
 #endif
         );
