@@ -9,6 +9,8 @@ SET TWOMGFX="..\..\..\..\Tools\bin\Windows\2mgfx.exe"
 
   call %TWOMGFX% %%~nf.fx %%~nf.dx11.mgfxo /Profile:DirectX_11
 
+  call %TWOMGFX% %%~nf.fx %%~nf.ps4.mgfxo /Profile:PlayStation4
+
 )
 
 endlocal
