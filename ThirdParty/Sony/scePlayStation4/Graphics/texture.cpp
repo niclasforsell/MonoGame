@@ -17,10 +17,26 @@ Texture* Texture::Create2D(TextureFormat format, int32_t width, int32_t height, 
 	auto result = new Texture();
 	result->_texture = texture;
 
+
+	// BCn compressed textures come through the pipeline as
+	// tiled data, otherwise use linear for flexibility.
+	Gnm::TileMode tileMode;
+	switch(format)
+	{
+	case TextureFormat::TextureFormat_PlayStation4_BC1Unorm:
+	case TextureFormat::TextureFormat_PlayStation4_BC2Unorm:
+	case TextureFormat::TextureFormat_PlayStation4_BC3Unorm:
+		tileMode = Gnm::kTileModeThin_1dThin;
+		break;
+
+	default:
+		tileMode = Gnm::kTileModeDisplay_LinearAligned;
+	}
+
 	auto textureSizeAlign = texture->initAs2d(
 		width, height, mips,
 		ToDataFormat(format),
-		Gnm::kTileModeDisplay_LinearAligned,
+		tileMode,
 		Gnm::kNumSamples1);
 
 	// Allocate the texture data using the alignment returned by initAs2d
@@ -38,10 +54,25 @@ Texture* Texture::Create3D(TextureFormat format, int32_t width, int32_t height, 
 	auto result = new Texture();
 	result->_texture = texture;
 
+	// BCn compressed textures come through the pipeline as
+	// tiled data, otherwise use linear for flexibility.
+	Gnm::TileMode tileMode;
+	switch(format)
+	{
+	case TextureFormat::TextureFormat_PlayStation4_BC1Unorm:
+	case TextureFormat::TextureFormat_PlayStation4_BC2Unorm:
+	case TextureFormat::TextureFormat_PlayStation4_BC3Unorm:
+		tileMode = Gnm::kTileModeThin_1dThin;
+		break;
+
+	default:
+		tileMode = Gnm::kTileModeDisplay_LinearAligned;
+	}
+
 	auto textureSizeAlign = texture->initAs3d(
 		width, height, depth, mips,
 		ToDataFormat(format),
-		Gnm::kTileModeDisplay_LinearAligned);
+		tileMode);
 
 	// Allocate the texture data using the alignment returned by initAs3d
 	void *textureData = Allocator::Get()->allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
@@ -58,10 +89,25 @@ Texture* Texture::CreateCube(TextureFormat format, int32_t width, int32_t height
 	auto result = new Texture();
 	result->_texture = texture;
 
+	// BCn compressed textures come through the pipeline as
+	// tiled data, otherwise use linear for flexibility.
+	Gnm::TileMode tileMode;
+	switch(format)
+	{
+	case TextureFormat::TextureFormat_PlayStation4_BC1Unorm:
+	case TextureFormat::TextureFormat_PlayStation4_BC2Unorm:
+	case TextureFormat::TextureFormat_PlayStation4_BC3Unorm:
+		tileMode = Gnm::kTileModeThin_1dThin;
+		break;
+
+	default:
+		tileMode = Gnm::kTileModeDisplay_LinearAligned;
+	}
+
 	auto textureSizeAlign = texture->initAsCubemap(
 		width, height, mips,
 		ToDataFormat(format),
-		Gnm::kTileModeDisplay_LinearAligned);
+		tileMode);
 
 	// Allocate the texture data using the alignment returned by initAsCubemap
 	void *textureData = Allocator::Get()->allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
