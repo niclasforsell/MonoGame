@@ -88,6 +88,7 @@
     <Compile Include="Graphics\Dxt3BitmapContent.cs" />
     <Compile Include="Graphics\Dxt5BitmapContent.cs" />
     <Compile Include="Graphics\DxtBitmapContent.cs" />
+    <Compile Include="Graphics\BcBitmapContent.cs" />
     <Compile Include="Graphics\EffectContent.cs" />
     <Compile Include="Graphics\EffectMaterialContent.cs" />
     <Compile Include="Graphics\EnvironmentMapMaterialContent.cs" />

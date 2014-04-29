@@ -7,6 +7,8 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Nvidia.TextureTools;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -297,8 +299,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         private static void CompressGnf(TextureContent content, bool generateMipmaps)
         {
-            // TODO: Put PS4 specific stuff here
-            CompressDxt(content, generateMipmaps);
+            var face = content.Faces[0][0];
+            var pixelData = face.GetPixelData();
+
+            var containsFracAlpha = ContainsFractionalAlpha(pixelData);
+            var outputFormat = containsFracAlpha ? SurfaceFormat.PlayStation4_BC3Unorm : SurfaceFormat.PlayStation4_BC1Unorm;
+
+            var compressed = sce.PlayStation4.Tools.TextureTools.CompressImage2D(face.Width, face.Height, containsFracAlpha, pixelData);
+            var compressedFace = new BcBitmapContent(face.Width, face.Height, outputFormat);
+            compressedFace.SetPixelData(compressed);
+            content.Faces[0].Clear();
+            content.Faces[0].Add(compressedFace);
         }
 
         internal static bool ContainsFractionalAlpha(byte[] data)
