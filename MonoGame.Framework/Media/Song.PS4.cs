@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using Sce.PlayStation4.Media;
 using PS4Song = Sce.PlayStation4.Media.Song;
+using PS4SongFinishedHandler = Sce.PlayStation4.Media.SongFinishedHandler;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -23,6 +24,13 @@ namespace Microsoft.Xna.Framework.Media
 
         internal void SetEventHandler(Action<object, EventArgs> OnSongFinishedPlaying)
         {
+            // In our case, this is implemented indirectly with AnySongFinished
+        }
+
+        [MonoPInvokeCallback(typeof(PS4SongFinishedHandler))]
+        private static void AnySongFinished()
+        {
+            MediaPlayer.OnSongFinishedPlaying(null, EventArgs.Empty);
         }
 
         public void PlatformDispose(bool disposing)
@@ -40,6 +48,8 @@ namespace Microsoft.Xna.Framework.Media
                 throw new Exception();
 
             _player.Play();
+            _player.Volume = MediaPlayer.Volume;
+            _player.RegisterFinishedHandler(AnySongFinished);
         }
 
         internal void Resume()

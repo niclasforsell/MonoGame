@@ -7,6 +7,8 @@
 
 namespace Media {
 
+typedef void(*SongFinishedHandler)(void);
+
 class __declspec(dllexport) Song
 {
 private:
@@ -30,6 +32,8 @@ public:
 
 	bool GetIsRepeating();
 	void SetIsRepeating(bool value);
+
+	void RegisterFinishedHandler(SongFinishedHandler handler);
 };
 
 } // namespace Media

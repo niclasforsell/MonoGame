@@ -82,8 +82,8 @@ AudioOutput::AudioOutput(void)
 	m_param = 0;
 	m_numChannels = 0;
 
-	m_volume[0] = SCE_AUDIO_VOLUME_0dB / 4;
-	m_volume[1] = SCE_AUDIO_VOLUME_0dB / 4;
+	m_volume[0] = SCE_AUDIO_VOLUME_0dB;
+	m_volume[1] = SCE_AUDIO_VOLUME_0dB;
 }
 
 AudioOutput::~AudioOutput(void)
