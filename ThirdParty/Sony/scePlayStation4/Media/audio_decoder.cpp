@@ -109,7 +109,7 @@ AudioDecoder::AudioDecoder(uint32_t codecType) :
 	m_numFrames(0),
 	m_codecType(codecType)
 {
-	printf("  init: [%5u]\n", m_numFrames);
+	//printf("  init: [%5u]\n", m_numFrames);
 	memset(m_streamBuf, 0, SCE_AUDIODEC_AT9_MAX_FRAME_SIZE);
 	memset(&m_trickInfo, 0, sizeof(m_trickInfo));
 	// count of execution loop
@@ -131,7 +131,7 @@ AudioDecoder::~AudioDecoder(void)
 		m_instance = AUDIODEC_HANDLE_INVALID;
 	}
 
-	printf("  term: [%5u]\n", m_numFrames);
+	//printf("  term: [%5u]\n", m_numFrames);
 }
 
 void AudioDecoder::restart(InputStream *input)
@@ -178,7 +178,7 @@ int AudioDecoder::decodeNormal(InputStream *input, OutputStream *output, OutputS
 	}
 	m_numRemainData -= m_bst.uiAuSize;
 	if (((++m_numFrames) % 256) == 0) {
-		printf("decode: [%5u]\n", m_numFrames);
+		//printf("decode: [%5u]\n", m_numFrames);
 	}
 	if (m_numFrames != 1) {
 		// update offset
@@ -253,7 +253,7 @@ int AudioDecoder::decodeSeek(InputStream *input, OutputStream *output, OutputStr
 	}
 	m_numRemainData -= m_bst.uiAuSize;
 	if (((++m_numFrames) % 256) == 0) {
-		printf("decode: [%5u]\n", m_numFrames);
+		//printf("decode: [%5u]\n", m_numFrames);
 	}
 	if (m_numFrames != 1) {
 		if (m_numCancellFrame != 0) {

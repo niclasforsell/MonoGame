@@ -33,6 +33,7 @@ namespace {
 struct Media::SongState
 {
 	char* fileName;
+	SongFinishedHandler onSongFinished;
 
 	SceKernelEventFlag eventFlag;
 	ScePthreadBarrier barrier;
@@ -134,6 +135,12 @@ term:
 		state->inputStream = NULL;
 	}
 
+	if (state->onSongFinished != NULL)
+	{
+		state->onSongFinished();
+		state->onSongFinished = NULL;
+	}
+
 	return arg;
 }
 
@@ -197,6 +204,9 @@ Song::Song()
 
 Song::~Song()
 {
+	if (_state == NULL)
+		return;
+
 	Stop();
 
 	// join and detach a thread for audio decode
@@ -316,6 +326,9 @@ void Song::Stop()
 	if (_state == NULL)
 		return;
 
+	// We're stopping playback explicitly, so we don't need a
+	// notification that things have completed.
+	_state->onSongFinished = NULL;
 	_state->isRunning = false;
 }
 
@@ -366,3 +379,13 @@ void Song::SetIsRepeating(bool value)
 
 	_state->isLooping = value;
 }
+
+void Song::RegisterFinishedHandler(SongFinishedHandler handler)
+{
+	if (_state == NULL)
+		return;
+
+	assert(_state->onSongFinished == NULL);
+	_state->onSongFinished = handler;
+}
+
