@@ -138,7 +138,6 @@ term:
 	if (state->onSongFinished != NULL)
 	{
 		state->onSongFinished();
-		state->onSongFinished = NULL;
 	}
 
 	return arg;
