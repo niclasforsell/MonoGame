@@ -3,6 +3,7 @@
 #include <shader/binary.h>
 
 using namespace System;
+using namespace System::Runtime::InteropServices;
 
 namespace sce { namespace PlayStation4 { namespace Tools {
 
@@ -243,7 +244,7 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 	public:
 		ShaderCompiler();
 
-		bool Compile(String^ code, String^ entryPoint, String^ profile);
+		bool Compile(String^ code, String^ entryPoint, String^ profile, [Out]String^ %buildOutput);
 
 		bool Reflect(array<Byte>^ bytecode);
 

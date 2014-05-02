@@ -8,9 +8,18 @@ namespace TwoMGFX
         {
             var compiler = new sce.PlayStation4.Tools.ShaderCompiler();
 
-            compiler.Compile(   shaderInfo.fileContent,
-                                shaderFunction,
-                                shaderProfile);
+            try
+            {
+                string buildOutput;
+                compiler.Compile(   shaderInfo.fileContent,
+                                    shaderFunction,
+                                    shaderProfile,
+                                    out buildOutput);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
             return compiler.Bytecode;
         }

@@ -33,7 +33,7 @@
 
 #elif __PSSL__
 
-// Macros for targetting shader model 4.0 (DX11)
+// Macros for targetting PSSL for PlayStation 4.
 
 #define TECHNIQUE(name, vsname, psname ) \
 	technique name { pass { VertexShader = compile sce_vs_vs_orbis vsname (); PixelShader = compile sce_ps_orbis psname(); } }

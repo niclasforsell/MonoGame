@@ -6,7 +6,7 @@
 #include <shader/shader_parser.h>
 
 
-using namespace System::Runtime::InteropServices;
+using namespace System::Text;
 
 using namespace sce::Shader;
 using namespace sce::Shader::Binary;
@@ -44,7 +44,7 @@ Compiler::SourceFile* OpenFileCallback(
 	return sourceFile;
 }
 
-bool ShaderCompiler::Compile(String^ code, String^ entryPoint, String^ profile)
+bool ShaderCompiler::Compile(String^ code, String^ entryPoint, String^ profile, [Out]String^ %buildOutput)
 {
 	_reset();
 
@@ -59,7 +59,7 @@ bool ShaderCompiler::Compile(String^ code, String^ entryPoint, String^ profile)
 		options.targetProfile = Compiler::TargetProfile::kTargetProfilePs;
 	else
 	{
-		// Throw and exception?
+		throw gcnew Exception("Invalid target profile!");
 	}
 	
 	options.entryFunctionName = (const char*)(Marshal::StringToHGlobalAnsi(entryPoint).ToPointer());
@@ -79,28 +79,64 @@ bool ShaderCompiler::Compile(String^ code, String^ entryPoint, String^ profile)
 	auto output = Compiler::run(&options, &callbacks);
 	if (output == NULL) 
 	{
-		// Can i throw an exception?
-		return false;
+		throw gcnew Exception("Compiler failed to run!");
 	}
+
+	auto results = gcnew StringBuilder();
+	auto errorCount = 0;
 
 	for (auto i=0; i < output->diagnosticCount; i++)
 	{
 		auto message = output->diagnostics[i].message;
+		auto location = output->diagnostics[i].location;
 		auto level = output->diagnostics[i].level;
 		auto code = output->diagnostics[i].code;
-		auto location = output->diagnostics[i].location;
+
+		if (location != NULL)
+		{
+			auto file = gcnew String(location->file->fileName);
+			auto line = UInt32(location->lineNumber).ToString();
+			auto column = UInt32(location->columnNumber).ToString();
+
+			results->Append(file);
+			results->Append("(");
+			results->Append(line);
+			results->Append(",");
+			results->Append(column);
+			results->Append("): ");
+		}
+
+		switch(level)
+		{
+		case Compiler::kDiagnosticLevelInfo:
+			results->Append("info ");
+			break;
+		case Compiler::kDiagnosticLevelWarning:
+			results->Append("warning ");
+			break;
+		case Compiler::kDiagnosticLevelError:
+			++errorCount;
+			results->Append("error ");
+			break;
+		}
+
+		results->Append(UInt32(code).ToString());
+		results->Append(": ");
+		results->AppendLine(gcnew String(message));
 	}
 
-	if (output->programData == NULL || output->programSize == 0)
+	if (output->programData == NULL || output->programSize == 0 || errorCount > 0)
 	{
 		// Throw an exception.
-		return false;
+		throw gcnew Exception(results->ToString());
 	}
 
 	_bytecode = gcnew array<Byte>(output->programSize);
 	Marshal::Copy((IntPtr)(void*)output->programData, _bytecode, 0, output->programSize);
 
 	Compiler::destroyOutput(output);
+
+	buildOutput = results->ToString();
 
 	return true;
 }
