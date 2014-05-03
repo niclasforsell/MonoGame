@@ -16,7 +16,7 @@ namespace Media {
 class AudioDecoderAt9 : public AudioDecoder
 {
 public:
-	AudioDecoderAt9(InputStream *input, AudioDecoderTrickPlayPoint playPoint, int *pRet);
+	AudioDecoderAt9(InputStream *input);
 	~AudioDecoderAt9(void) {}
 };
 

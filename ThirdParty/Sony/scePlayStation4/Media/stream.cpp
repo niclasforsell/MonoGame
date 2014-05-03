@@ -9,27 +9,29 @@
 
 using namespace Media;
 
-int InputStream::input(char *pInputBuf, uint32_t size, off_t offset, int32_t whence)
+int FileInputStream::input(uint32_t size)
 {
-	int readSize = 0;
-	char tmp;
+	int ret = 0;
 
-	if (pInputBuf == NULL) {
-		if (size == 0) {
-			// control file point
-			readSize = m_file.read(&tmp, size, offset, whence);
-		} else {
-			printf("error: File::read() Buffer Error\n");
-			return -1;
+	void *p = m_buffer.lockWritingRoom(size);
+	if (p) {
+		ret = m_file.read(p, m_buffer.writingSize());
+		if (ret < 0) {
+			printf("error: File::read() failed: 0x%08X\n", ret);
+			goto term;
 		}
-	} else {
-		// read file data(and control file point)
-		readSize = m_file.read(pInputBuf, size, offset, whence);
 	}
-	if (readSize < 0) {
-		printf("error: File::read() failed: 0x%08X\n", readSize);
+
+term:
+	if (p) {
+		if (ret < 0) {
+			m_buffer.unlockWritingRoom(0);
+		} else {
+			m_buffer.unlockWritingRoom(ret);
+			ret = 0;
+		}
 	}
-	return readSize;
+	return ret;
 }
 
 int FileOutputStream::output(uint32_t size)

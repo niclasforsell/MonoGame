@@ -13,7 +13,7 @@ using namespace Media;
 
 #define MPEG_AUDIO_HEADER_SIZE (4)
 
-int MpegAudioHeaderParser::parse(InputStream *input)
+int MpegAudioHeaderParser::parse(const uint8_t *pBuffer, uint32_t bufferSize)
 {
 #ifdef DISPLAY_HEADER
 	const char *version[4] = {
@@ -42,31 +42,41 @@ int MpegAudioHeaderParser::parse(InputStream *input)
 		2, 2, 2, 1
 	};
 
-	assert(input);
+	assert(pBuffer);
 
-	if (input->size() < MPEG_AUDIO_HEADER_SIZE) {
+	if (bufferSize < MPEG_AUDIO_HEADER_SIZE) {
 		return -1;
 	}
 
-    char pBuffer[MPEG_AUDIO_HEADER_SIZE];
-    input->input(pBuffer, MPEG_AUDIO_HEADER_SIZE, 0, 0);
-
 	// clear MPEG header
 	memset(&m_header, 0, sizeof(m_header));
+
+	// Seek past metadata
+	uint32_t pos = -1;
+	uint32_t val = 0;
+	while (val != 0xFFE)
+	{
+		pos++;
+		val = (pBuffer[pos] & 0xFF) << 4 | (pBuffer[pos] & 0xE0) >> 4;
+
+		if (pos >= bufferSize)
+			return -1;
+	}
+
 	// get MPEG header
-	m_header.syncWord               = (pBuffer[0] & 0xFF) << 4 | (pBuffer[1] & 0xE0) >> 4;
-	m_header.version                = (pBuffer[1] & 0x18) >> 3;
-	m_header.layer                  = (pBuffer[1] & 0x06) >> 1;
-	m_header.protectionBit          = (pBuffer[1] & 0x01) >> 0;
-	m_header.bitRateIndex           = (pBuffer[2] & 0xF0) >> 4;
-	m_header.samplingFrequencyIndex = (pBuffer[2] & 0x06) >> 2;
-	m_header.paddingBit             = (pBuffer[2] & 0x02) >> 1;
-	m_header.privateBit             = (pBuffer[2] & 0x01) >> 0;
-	m_header.chMode                 = (pBuffer[3] & 0xC0) >> 6;
-	m_header.modeExtension          = (pBuffer[3] & 0x30) >> 4;
-	m_header.copyrightBit           = (pBuffer[3] & 0x08) >> 3;
-	m_header.originalBit            = (pBuffer[3] & 0x04) >> 2;
-	m_header.emphasis               = (pBuffer[3] & 0x03) >> 0;
+	m_header.syncWord               = (pBuffer[pos + 0] & 0xFF) << 4 | (pBuffer[pos + 1] & 0xE0) >> 4;
+	m_header.version                = (pBuffer[pos + 1] & 0x18) >> 3;
+	m_header.layer                  = (pBuffer[pos + 1] & 0x06) >> 1;
+	m_header.protectionBit          = (pBuffer[pos + 1] & 0x01) >> 0;
+	m_header.bitRateIndex           = (pBuffer[pos + 2] & 0xF0) >> 4;
+	m_header.samplingFrequencyIndex = (pBuffer[pos + 2] & 0x06) >> 2;
+	m_header.paddingBit             = (pBuffer[pos + 2] & 0x02) >> 1;
+	m_header.privateBit             = (pBuffer[pos + 2] & 0x01) >> 0;
+	m_header.chMode                 = (pBuffer[pos + 3] & 0xC0) >> 6;
+	m_header.modeExtension          = (pBuffer[pos + 3] & 0x30) >> 4;
+	m_header.copyrightBit           = (pBuffer[pos + 3] & 0x08) >> 3;
+	m_header.originalBit            = (pBuffer[pos + 3] & 0x04) >> 2;
+	m_header.emphasis               = (pBuffer[pos + 3] & 0x03) >> 0;
 
 	if (m_header.syncWord != 0xFFE) {
 		return -1;
@@ -94,8 +104,19 @@ int MpegAudioHeaderParser::parse(InputStream *input)
 	printf("===================================\n");
 #endif /* DISPLAY_HEADER */
 
+	// Seek to the next stream
+	val = 0;
+	while (val != 0xFFE)
+	{
+		pos++;
+		val = (pBuffer[pos] & 0xFF) << 4 | (pBuffer[pos] & 0xE0) >> 4;
+
+		if (pos >= bufferSize)
+			return -1;
+	}
+
 	// header size
-	m_headerSize = MPEG_AUDIO_HEADER_SIZE;
+	m_headerSize = pos;// + MPEG_AUDIO_HEADER_SIZE;
 
 	return 0;
 }

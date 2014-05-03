@@ -30,9 +30,6 @@ public:
 
 	float GetPosition();
 
-	bool GetIsRepeating();
-	void SetIsRepeating(bool value);
-
 	void RegisterFinishedHandler(SongFinishedHandler handler);
 };
 
