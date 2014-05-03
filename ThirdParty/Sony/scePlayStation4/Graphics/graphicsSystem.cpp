@@ -678,6 +678,11 @@ void GraphicsSystem::prepareBackBuffer()
 	gfxc.reset();
 	gfxc.initializeDefaultHardwareState();
 
+	// Make sure we are using DirectX style pixel centering.
+	gfxc.setVertexQuantization(	sce::Gnm::kVertexQuantizationMode16_8, 
+								sce::Gnm::kVertexQuantizationRoundModeRoundToEven, 
+								sce::Gnm::kVertexQuantizationCenterAtZero);
+
 	// The waitUntilSafeForRendering stalls the GPU until the scan-out
 	// operations on the current display buffer have been completed.
 	// This command is not blocking for the CPU.
