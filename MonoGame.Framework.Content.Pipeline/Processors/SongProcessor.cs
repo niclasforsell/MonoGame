@@ -54,18 +54,28 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     break;
 
                 case TargetPlatform.PlayStation4:
-                    targetFormat = ConversionFormat.Atrac9;
+                    targetFormat = ConversionFormat.PlayStation4;
                     break;
             }
 
             // Get the song output path with the target format extension.
-            var songFileName = Path.ChangeExtension(context.OutputFilename, AudioHelper.GetExtension(targetFormat));
+            var inputExtension = Path.GetExtension(input.FileName).TrimStart('.').ToLowerInvariant();
+            var targetExtension = AudioHelper.GetExtension(targetFormat);
+            var songFileName = Path.ChangeExtension(context.OutputFilename, targetExtension);
 
             // Make sure the output folder for the song exists.
             Directory.CreateDirectory(Path.GetDirectoryName(songFileName));
 
-            // Convert and write out the song media file.
-            input.ConvertFormat(targetFormat, quality, songFileName);
+            if (inputExtension != targetExtension)
+            {
+                // Convert and write out the song media file.
+                input.ConvertFormat(targetFormat, quality, songFileName);
+            }
+            else
+            {
+                // Pass the file through unmodified
+                File.Copy(input.FileName, songFileName, true);
+            }
 
             // Return the XNB song content.
             return new SongContent(PathHelper.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) + Path.DirectorySeparatorChar, songFileName), input.Duration);

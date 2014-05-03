@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework.Media
                 if (_player == null)
                     return TimeSpan.Zero;
 
-                return TimeSpan.FromMilliseconds(Duration.TotalMilliseconds * _player.Position);
+                return TimeSpan.FromSeconds(_player.Position);
             }
         }
     }

@@ -23,11 +23,14 @@ AudioDecoderMp3::AudioDecoderMp3(InputStream *input) : AudioDecoder(SCE_AUDIODEC
 	assert(input);
 
 	// parse the header
-	ret = parser.parse(input);
+	ret = parser.parse(input->lock(), input->readingSize());
 	if (ret < 0) {
 		printf("error: MpegAudioHeaderParser::parse() failed: 0x%08X\n", ret);
 		goto term;
 	}
+
+	// set the head of file to the read point
+	input->unlock(parser.headerSize());
 
 	// set initial values
 	m_ctrl.pParam = reinterpret_cast<void *>(&m_param.mp3);
@@ -46,7 +49,7 @@ AudioDecoderMp3::AudioDecoderMp3(InputStream *input) : AudioDecoder(SCE_AUDIODEC
 		printf("error: sceAudiodecCreateDecoder() failed: 0x%08X\n", ret);
 		goto term;
 	}
-	m_instance = ret;
+	m_handle = ret;
 
 	// sample rate
 	m_sampleRate = header.samplingFrequency;

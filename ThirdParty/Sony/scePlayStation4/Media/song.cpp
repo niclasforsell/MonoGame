@@ -25,7 +25,8 @@ namespace {
 		Decoder = 1 << 1,
 		Output  = 1 << 2,
 
-		AllDone = Decoder | Output
+		AllDone = Decoder | Output,
+		Everything = Loaded | Decoder | Output
 	};
 }
 
@@ -46,7 +47,6 @@ struct Media::SongState
 
 	bool isPaused;
 	bool isRunning;
-	bool isLooping;
 };
 
 void* decodeMain(void* arg)
@@ -65,18 +65,36 @@ void* decodeMain(void* arg)
 
 	assert(state->fileName != NULL);
 
-	state->inputStream = new InputStream();
+	const uint32_t inputStreamSize = File(state->fileName, "rb").size();
+
+	state->inputStream = new FileInputStream(inputStreamSize);
 	assert(state->inputStream);
 
 	ret = state->inputStream->open(state->fileName, "rb");
 	assert(ret >= 0);
 
-	state->inputStream->setIsEmpty(false);
+	ret = state->inputStream->input();
+	assert(ret >= 0);
+	state->inputStream->end();
 
-	//_state->decoder = new AudioDecoderM4aac(_state->inputStream);
-	AudioDecoderTrickPlayPoint point;
-	memset(&point, 0, sizeof(AudioDecoderTrickPlayPoint));
-	state->decoder = new AudioDecoderAt9(state->inputStream, point, &ret);
+	const char* fileExt = strrchr(state->fileName, '.');
+	if (strncmp(fileExt, ".aac", 4) == 0)
+	{
+		state->decoder = new AudioDecoderM4aac(state->inputStream);
+	}
+	else if (strncmp(fileExt, ".at9", 4) == 0)
+	{
+		state->decoder = new AudioDecoderAt9(state->inputStream);
+	}
+	else if (strncmp(fileExt, ".mp3", 4) == 0)
+	{
+		state->decoder = new AudioDecoderMp3(state->inputStream);
+	}
+	else
+	{
+		printf("ERROR: Unknown song format: %s", fileExt);
+		goto term;
+	}
 	assert(state->decoder);
 
 	// Signal we're loaded and wait for the sync point.
@@ -87,22 +105,13 @@ void* decodeMain(void* arg)
 	{
 		if (state->inputStream->isEmpty())
 		{
-			if (state->isLooping)
-			{
-				state->inputStream->input(NULL, 0, 0, SEEK_SET);
-				state->inputStream->setIsEmpty(false);
-				state->decoder->restart(state->inputStream);
-			}
-			else
-			{
-				break;
-			}
+			break;
 		}
 
 		if (state->isPaused)
 			continue;
 
-		auto ret = state->decoder->decodeNormal(state->inputStream, state->outputStream, NULL);
+		auto ret = state->decoder->decode(state->inputStream, state->outputStream);
 
 		if (ret < 0)
 		{
@@ -114,13 +123,7 @@ void* decodeMain(void* arg)
 	state->outputStream->end();
 
 term:
-	if (ret < 0)
-	{
-		sceKernelSetEventFlag(state->eventFlag, EventFlags::Decoder);
-		scePthreadBarrierWait(&state->barrier);
-	}
-
-	sceKernelClearEventFlag(state->eventFlag, EventFlags::Decoder);
+	sceKernelClearEventFlag(state->eventFlag, EventFlags::Everything);
 	scePthreadBarrierWait(&state->barrier);
 
 	if (state->decoder != NULL)
@@ -164,8 +167,8 @@ void* outputMain(void* arg)
 
 	while(state->isRunning)
 	{
-		//if (state->isPaused)
-		//	continue;
+		if (state->isPaused)
+			continue;
 
 		if (state->inputStream->isEmpty() && state->outputStream->isEmpty())
 			break;
@@ -179,12 +182,7 @@ void* outputMain(void* arg)
 	}
 
 term:
-	if (ret < 0)
-	{
-		sceKernelSetEventFlag(state->eventFlag, EventFlags::Output);
-		scePthreadBarrierWait(&state->barrier);
-	}
-
+	sceKernelSetEventFlag(state->eventFlag, EventFlags::Output);
 	scePthreadBarrierWait(&state->barrier);
 
 	if (state->outputStream)
@@ -329,6 +327,9 @@ void Song::Stop()
 	// notification that things have completed.
 	_state->onSongFinished = NULL;
 	_state->isRunning = false;
+
+	if (_state->outputStream != NULL)
+		_state->outputStream->end();
 }
 
 float Song::GetVolume()
@@ -360,23 +361,7 @@ float Song::GetPosition()
 	if (_state == NULL || _state->decoder == NULL || _state->outputStream == NULL)
 		return 0.0f;
 
-	return _state->decoder->getProgress();
-}
-
-bool Song::GetIsRepeating()
-{
-	if (_state == NULL)
-		return false;
-
-	return _state->isLooping;
-}
-
-void Song::SetIsRepeating(bool value)
-{
-	if (_state == NULL)
-		return;
-
-	_state->isLooping = value;
+	return _state->decoder->getElapsedSeconds();
 }
 
 void Song::RegisterFinishedHandler(SongFinishedHandler handler)

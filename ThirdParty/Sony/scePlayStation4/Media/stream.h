@@ -14,8 +14,6 @@
 
 namespace Media {
 
-#define STREAM_LOOPINFO_MAX (2)
-
 class Stream
 {
 public:
@@ -32,6 +30,17 @@ protected:
 	RingBuffer m_buffer;
 };
 
+class InputStream : public Stream
+{
+public:
+	InputStream(uint32_t size, uint32_t sizeHead) : Stream(size, sizeHead) {}
+	virtual ~InputStream(void) {}
+	virtual int input(uint32_t size = 0) = 0;
+	const uint8_t *lock(uint32_t size = 0) { return m_buffer.lockReadingRoom(size); }
+	int unlock(uint32_t size) { return m_buffer.unlockReadingRoom(size); }
+	uint32_t readingSize(void) { return m_buffer.readingSize(); }
+};
+
 class OutputStream : public Stream
 {
 public:
@@ -43,21 +52,18 @@ public:
 	uint32_t writingSize(void) { return m_buffer.writingSize(); }
 };
 
-class InputStream
+class FileInputStream : public InputStream
 {
 public:
-	InputStream(void) {}
-	~InputStream(void) {}
+	FileInputStream(uint32_t size, uint32_t sizeHead = 0) : InputStream(size, sizeHead) {}
+	~FileInputStream(void) {}
 	int open(const char *path, const char *mode) { return m_file.open(path, mode); }
 	int open(int32_t grain, int32_t sampleRate, int32_t param) { return -1; }
 	int close(void) { return m_file.close(); }
-	int input(char *pInputBuf, uint32_t size, off_t offset, int32_t whence);
+	int input(uint32_t size = 0);
 	uint32_t size(void) { return m_file.size(); }
-	bool isEmpty(void) { return emptyFlg; }
-	void setIsEmpty(bool value) { (emptyFlg = value); }
 private:
 	File m_file;
-	uint32_t emptyFlg;
 };
 
 class FileOutputStream : public OutputStream

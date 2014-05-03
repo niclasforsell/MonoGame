@@ -27,22 +27,6 @@ typedef union AudiodecInfo {
 	SceAudiodecM4aacInfo m4aac;
 } AudiodecInfo;
 
-#define ATRAC9_DECPLAY_NORMAL (0)
-#define ATRAC9_DECPLAY_SEEK (1)
-#define ATRAC9_DECPLAY_LOOP (2)
-
-typedef struct AudioDecoderTrickPlayPoint {
-	uint32_t startSampleNum;
-	uint32_t endSampleNum;
-} AudioDecoderTrickPlayPoint;
-
-typedef struct AudioDecoderTrickPlayMng {
-	uint32_t m_numLoop;
-	uint32_t m_cntLoop;
-	uint32_t m_partDecEnd;
-	AudioDecoderTrickPlayPoint m_play[STREAM_LOOPINFO_MAX];
-} AudioDecoderTrickPlayMng;
-
 class AudioCodecSystem
 {
 public:
@@ -58,17 +42,14 @@ class AudioDecoder
 public:
 	AudioDecoder(uint32_t codecType);
 	virtual ~AudioDecoder(void);
-	void restart(InputStream *input);
-	int decodeNormal(InputStream *input, OutputStream *output, OutputStream *outputFile);
-	int decodeSeek(InputStream *input, OutputStream *output, OutputStream *outputFile);
-	int decodeLoop(InputStream *input, OutputStream *output, OutputStream *outputFile);
-	float getProgress(void);
+	int decode(InputStream *input, OutputStream *output);
 	uint32_t codecType(void) { return m_codecType; }
 	uint32_t sampleRate(void) { return m_sampleRate; }
 	uint32_t numChannels(void) { return m_numChannels; }
+	float getElapsedSeconds(void);
 protected:
 	static AudioCodecSystem s_system;
-	int32_t m_instance;
+	int32_t m_handle;
 	SceAudiodecCtrl m_ctrl;
 	SceAudiodecAuInfo m_bst;
 	SceAudiodecPcmItem m_pcm;
@@ -76,24 +57,12 @@ protected:
 	AudiodecInfo m_info;
 	uint32_t m_sampleRate;
 	uint32_t m_numChannels;
-	uint32_t m_frameSize;
-	uint32_t m_supFrameCnt;
 	uint32_t m_maxBstSize;
 	uint32_t m_maxPcmSize;
-	uint32_t m_totalSamples;
-	uint32_t m_samplesPerBlock;
-	uint32_t m_headerSize;
-	uint32_t m_numTotalDecode;
-	uint32_t m_samplesLastFrame;
-	uint32_t m_numNeedlessDecodeFrame;
-	uint32_t m_numCancellFrame;
-	uint32_t m_numCancelSamples;
-	uint32_t m_numRemainData;
 	uint32_t m_numFrames;
-	uint8_t m_streamBuf[SCE_AUDIODEC_AT9_MAX_FRAME_SIZE];
-	AudioDecoderTrickPlayMng m_trickInfo;
 private:
 	const uint32_t m_codecType;
+	float m_elapsedSeconds;
 };
 
 } // namespace Media

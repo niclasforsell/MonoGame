@@ -8,7 +8,6 @@
 #define _ADTS_HEADER_PARSER_H
 
 #include <stdint.h>
-#include "../stream.h"
 
 namespace Media {
 
@@ -34,10 +33,11 @@ public:
 	~AdtsHeaderParser(void) {}
 	const AdtsHeader &header() { return m_header; }
 	uint32_t headerSize(void) { return m_headerSize; }
-	int parse(InputStream *input);
+	int parse(const uint8_t *pBuffer, uint32_t bufferSize);
 private:
 	AdtsHeader m_header;
 	uint32_t m_headerSize;
+	uint32_t m_skipSize;
 };
 
 } // namespace Media

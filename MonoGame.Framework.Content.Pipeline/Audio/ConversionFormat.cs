@@ -47,6 +47,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <summary>
         /// PlayStation4 audio format
         /// </summary>
-        Atrac9,
+        PlayStation4,
     }
 }
