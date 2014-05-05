@@ -78,7 +78,7 @@ void* decodeMain(void* arg)
 	state->inputStream->end();
 
 	const char* fileExt = strrchr(state->fileName, '.');
-	if (strncmp(fileExt, ".aac", 4) == 0)
+	if (strncmp(fileExt, ".mp4", 4) == 0)
 	{
 		state->decoder = new AudioDecoderM4aac(state->inputStream);
 	}

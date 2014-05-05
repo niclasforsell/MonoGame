@@ -258,25 +258,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 case ConversionFormat.Vorbis:
                     throw new NotImplementedException("Vorbis is not yet implemented as an encoding format.");
 
-                case ConversionFormat.PlayStation4:
+                case ConversionFormat.Mp3:
+                    ExternalTool.Run("ffmpeg", string.Format("-i \"{0}\" -ar 48000 -b:a 192k \"{1}\"", this.fileName, targetFileName));
+                    break;
+
+                case ConversionFormat.Atrac9:
 #if WINDOWS
-                    reader.Position = 0;
-
-                    //ExternalTool.Run("at9tool.exe", string.Format("-e \"{0}\" \"{1}\"", this.fileName, targetFileName));
-
-                    //var aacType = SelectMediaType (AudioSubtypes.MFAudioFormat_ADTS, reader.WaveFormat, QualityToBitRate (quality));
-                    //if (aacType == null)
-                    //{
-                    //    throw new InvalidDataException ("Could not find a suitable aacType to convert to.");
-                    //}
-                    //using (var encoder = new MediaFoundationEncoder (aacType))
-                    //    encoder.Encode (targetFileName, reader);
-
-                    MediaFoundationEncoder.EncodeToMp3(reader, targetFileName, QualityToBitRate(quality));
-
-                    // Can also try FFMPEG if the above isn't supported by the OS...
-                    //ExternalTool.Run("ffmpeg.exe", string.Format("-i \"{0}\" -ar 48000 -b:a 192k \"{1}\"", this.fileName, targetFileName));
-
+                    ExternalTool.Run("at9tool", string.Format("-e \"{0}\" \"{1}\"", this.fileName, targetFileName));
 #else
                 throw new NotImplementedException("Conversion to this format is only supported on Windows.");
 #endif
