@@ -45,8 +45,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         Vorbis,
 
         /// <summary>
+        /// MPEG-1 layer 3, patent encumbered
+        /// </summary>
+        Mp3,
+
+        /// <summary>
         /// PlayStation4 audio format
         /// </summary>
-        PlayStation4,
+        Atrac9,
     }
 }

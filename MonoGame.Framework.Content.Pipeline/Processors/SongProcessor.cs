@@ -24,6 +24,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public ConversionQuality Quality { get { return quality; } set { quality = value; } }
 
         /// <summary>
+        /// Gets or sets the desired format of the final audio content.
+        /// </summary>
+        public ConversionFormat? TargetFormat { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of SongProcessor.
         /// </summary>
         public SongProcessor()
@@ -38,29 +43,40 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <returns>The built audio.</returns>
         public override SongContent Process(AudioContent input, ContentProcessorContext context)
         {
-            // Most platforms will use AAC ("mp4") by default
-            var targetFormat = ConversionFormat.Aac;
-
-            switch (context.TargetPlatform)
+            if (!TargetFormat.HasValue)
             {
-                case TargetPlatform.Windows:
-                case TargetPlatform.WindowsPhone8:
-                case TargetPlatform.WindowsStoreApp:
-                    targetFormat = ConversionFormat.WindowsMedia;
-                    break;
+                // Most platforms will use AAC ("mp4") by default
+                TargetFormat = ConversionFormat.Aac;
 
-                case TargetPlatform.Linux:
-                    targetFormat = ConversionFormat.Vorbis;
-                    break;
+                switch (context.TargetPlatform)
+                {
+                    case TargetPlatform.Windows:
+                    case TargetPlatform.WindowsPhone8:
+                    case TargetPlatform.WindowsStoreApp:
+                        TargetFormat = ConversionFormat.WindowsMedia;
+                        break;
 
-                case TargetPlatform.PlayStation4:
-                    targetFormat = ConversionFormat.PlayStation4;
-                    break;
+                    case TargetPlatform.Linux:
+                        TargetFormat = ConversionFormat.Vorbis;
+                        break;
+
+                    case TargetPlatform.PlayStation4:
+                        TargetFormat = ConversionFormat.Atrac9;
+                        break;
+                }
             }
 
             // Get the song output path with the target format extension.
             var inputExtension = Path.GetExtension(input.FileName).TrimStart('.').ToLowerInvariant();
-            var targetExtension = AudioHelper.GetExtension(targetFormat);
+
+            // Allow PlayStation4 to override with an MP3 if it's provided instead of a WAV
+            if (inputExtension == AudioHelper.GetExtension(ConversionFormat.Mp3) &&
+                context.TargetPlatform == TargetPlatform.PlayStation4)
+            {
+                TargetFormat = ConversionFormat.Mp3;
+            }
+
+            var targetExtension = AudioHelper.GetExtension(TargetFormat.Value);
             var songFileName = Path.ChangeExtension(context.OutputFilename, targetExtension);
 
             // Make sure the output folder for the song exists.
@@ -69,7 +85,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             if (inputExtension != targetExtension)
             {
                 // Convert and write out the song media file.
-                input.ConvertFormat(targetFormat, quality, songFileName);
+                input.ConvertFormat(TargetFormat.Value, quality, songFileName);
             }
             else
             {
