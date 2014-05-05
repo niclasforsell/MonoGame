@@ -305,7 +305,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var containsFracAlpha = ContainsFractionalAlpha(pixelData);
             var outputFormat = containsFracAlpha ? SurfaceFormat.PlayStation4_BC3Unorm : SurfaceFormat.PlayStation4_BC1Unorm;
 
-            var compressed = sce.PlayStation4.Tools.TextureTools.CompressImage2D(face.Width, face.Height, containsFracAlpha, pixelData);
+            var compressed = sce.PlayStation4.Tools.TextureTools.CompressImage2D(face.Width, face.Height, containsFracAlpha, generateMipmaps, pixelData);
             var compressedFace = new BcBitmapContent(face.Width, face.Height, outputFormat);
             compressedFace.SetPixelData(compressed);
             content.Faces[0].Clear();
