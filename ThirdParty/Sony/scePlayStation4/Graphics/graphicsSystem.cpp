@@ -173,7 +173,8 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		_displayBuffers[i].renderTarget.setAddresses(_surfaceAddresses[i], 0, 0);
 
 		// Compute the tiling mode for the depth buffer		
-		if (_displayBuffers[i].hasDepthTarget = depthFormat_ != DepthFormat_None)
+		_displayBuffers[i].hasDepthTarget = depthFormat_ != DepthFormat_None;
+		if (_displayBuffers[i].hasDepthTarget)
 		{
 			auto depthFormat = ToDataFormat(depthFormat_);
 			Gnm::TileMode depthTileMode;
@@ -412,8 +413,6 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 void GraphicsSystem::SetVertexBuffer(VertexBuffer *buffer)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
-	Gnmx::GfxContext &gfxc = backBuffer->context;
-
 	backBuffer->currentVB = buffer;
 	backBuffer->currentVBDirty = true;
 }
@@ -421,8 +420,6 @@ void GraphicsSystem::SetVertexBuffer(VertexBuffer *buffer)
 void GraphicsSystem::SetIndexBuffer(IndexBuffer *buffer)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
-	Gnmx::GfxContext &gfxc = backBuffer->context;
-
 	backBuffer->currentIB = buffer;
 	backBuffer->currentIBDirty = true;
 }

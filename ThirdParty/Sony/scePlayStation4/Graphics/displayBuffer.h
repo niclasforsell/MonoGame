@@ -5,7 +5,7 @@
 
 namespace Graphics {
 
-typedef struct BufferInfo
+struct BufferInfo
 {
 	uint8_t *buffer;
 	uint32_t bufferSize;
@@ -14,7 +14,7 @@ typedef struct BufferInfo
 const int MAX_DISCARD_BUFFERS = 1000;
 
 
-typedef struct DisplayBuffer
+struct DisplayBuffer
 {
 	sce::Gnmx::GfxContext			context;
 	void							*cpRamShadow;
