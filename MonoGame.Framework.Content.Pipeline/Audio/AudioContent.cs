@@ -264,7 +264,44 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                 case ConversionFormat.Atrac9:
 #if WINDOWS
-                    ExternalTool.Run("at9tool", string.Format("-e \"{0}\" \"{1}\"", this.fileName, targetFileName));
+                    if (string.IsNullOrEmpty(targetFileName))
+                    {
+                        var tempName = Path.GetTempFileName();
+
+                        try
+                        {
+                            ExternalTool.Run("at9tool", string.Format("-e \"{0}\" \"{1}\"", this.fileName, tempName));
+
+                            using (var stream = new FileStream(tempName, FileMode.Open))
+                            using (var compressedReader = new BinaryReader(stream))
+                            {
+                                stream.Position = 16; // Skip RIFF + WAVE + header for fmt
+
+                                // Extract the format chunk manually - the WaveFormat class
+                                // doesn't like the ATRAC9 header.
+                                var fmtChunk = new byte[52];
+                                stream.Read(fmtChunk, 0, fmtChunk.Length);
+                                this.format = new AudioFormat(fmtChunk.ToList());
+
+                                // Just pack up the whole file for data - we let the runtime
+                                // parse the header for codec-specific information anyway.
+                                stream.Position = 0;
+                                var everything = new byte[stream.Length];
+                                stream.Read(everything, 0, everything.Length);
+                                this.data = new List<byte>();
+                                this.data.AddRange(BitConverter.GetBytes((int)everything.Length));
+                                this.data.AddRange(everything);
+                            }
+                        }
+                        finally
+                        {
+                            File.Delete(tempName);
+                        }
+                    }
+                    else
+                    {
+                        ExternalTool.Run("at9tool", string.Format("-e \"{0}\" \"{1}\"", this.fileName, targetFileName));
+                    }
 #else
                 throw new NotImplementedException("Conversion to this format is only supported on Windows.");
 #endif

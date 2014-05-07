@@ -11,14 +11,15 @@ class __declspec(dllexport) AudioBuffer
 	friend class SamplerVoice;
 
 public:
-	AudioBuffer(void *data, size_t dataSize);
-	AudioBuffer(void *data, size_t dataSize, int numChannels, int blockAlign, bool isMSADPCM);
+	static AudioBuffer* FromPCM(void* data, size_t dataSize, int sampleRate, int numChannels);
+	static AudioBuffer* FromRIFF(void* data, size_t dataSize);
+
 	~AudioBuffer(void);
 
-protected:
-	static void MSADPCM_to_PCM(void *data, size_t dataSize, int numChannels, int blockAlign, size_t *outDataSize, void **outData);
-
 private:
+	AudioBuffer() { }
+	AudioBuffer(const AudioBuffer&);
+
 	void *_waveformData;
 	SceNgs2WaveformInfo *_waveformInfo;
 	SceNgs2WaveformInfo *_loopedWaveformInfo;

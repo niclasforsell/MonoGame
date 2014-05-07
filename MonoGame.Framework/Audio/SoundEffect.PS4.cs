@@ -15,6 +15,19 @@ namespace Microsoft.Xna.Framework.Audio
     {
         private AudioBuffer _buffer;
 
+        internal SoundEffect(byte[] buffer, int durationMs)
+        {
+            _duration = TimeSpan.FromMilliseconds(durationMs);
+
+            unsafe
+            {
+                var handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+                var addr = (IntPtr)(handle.AddrOfPinnedObject().ToInt64());
+                _buffer = AudioBuffer.FromRIFF((void*)addr, (uint)buffer.Length);
+                handle.Free();
+            }
+        }
+
         private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
         {
             PlatformInitialize(buffer, 0, buffer.Length, sampleRate, channels, 0, buffer.Length);
@@ -26,7 +39,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 var handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
                 var addr = (IntPtr)(handle.AddrOfPinnedObject().ToInt64() + offset);
-                _buffer = new AudioBuffer((void*)addr, (uint)count, (int)channels, 16, false);
+                _buffer = AudioBuffer.FromPCM((void*)addr, (uint)count, sampleRate, (int)channels);
                 handle.Free();
             }
         }
