@@ -32,6 +32,7 @@ namespace Graphics {
 class Texture;
 class RenderTarget;
 class VertexShader;
+class FetchShader;
 class PixelShader;
 class VertexBuffer;
 class IndexBuffer;

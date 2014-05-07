@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly Dictionary<int, DynamicVertexBuffer> _userVertexBuffers = new Dictionary<int, DynamicVertexBuffer>();
         private readonly Dictionary<IndexElementSize, DynamicIndexBuffer> _userIndexBuffers = new Dictionary<IndexElementSize, DynamicIndexBuffer>();
 
+        private readonly Dictionary<ulong, FetchShader> _fetchShaders = new Dictionary<ulong, FetchShader>();
 
         private void PlatformSetup()
         {
@@ -49,6 +50,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDispose()
         {
+            foreach (var fetch in _fetchShaders)
+                fetch.Value.Dispose();
+            _fetchShaders.Clear();
+
             _system.Dispose();
             _system = null;
         }
@@ -97,6 +102,21 @@ namespace Microsoft.Xna.Framework.Graphics
             return target0;
         }
 
+        private FetchShader GetFetchShader(Shader shader, VertexDeclaration decl)
+        {
+            FetchShader fetch;
+
+            // Lookup the fetch shader using the shader and declaration as the key.
+            var key = (ulong)decl.HashKey << 32 | (uint)shader.HashKey;
+            if (!_fetchShaders.TryGetValue(key, out fetch))
+            {
+                fetch = new FetchShader(shader._vertexShader);
+                _fetchShaders.Add(key, fetch);
+            }
+
+            return fetch;
+        }
+
         internal void PlatformApplyState(bool applyShaders)
         {
             if (_scissorRectangleDirty)
@@ -129,7 +149,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (_vertexBuffer != null)
                     _system.SetVertexBuffer(_vertexBuffer._buffer);
-                _vertexBufferDirty = false;
             }
 
             if (_indexBufferDirty)
@@ -144,10 +163,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_pixelShader == null)
                 throw new InvalidOperationException("A pixel shader must be set!");
 
-            if (_vertexShaderDirty)
+            if (_vertexShaderDirty || _vertexBufferDirty)
             {
-                _system.SetVertexShader(_vertexShader._vertexShader);
-                _vertexShaderDirty = false;
+                var fetch = GetFetchShader(_vertexShader, _vertexBuffer.VertexDeclaration);
+                _system.SetVertexShader(_vertexShader._vertexShader, fetch);
+                _vertexShaderDirty = _vertexBufferDirty = false;
             }
 
             if (_pixelShaderDirty)

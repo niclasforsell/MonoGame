@@ -3,6 +3,7 @@
 
 #include "texture.h"
 #include "vertexShader.h"
+#include "fetchShader.h"
 #include "pixelShader.h"
 #include "renderTarget.h"
 #include "displayBuffer.h"
@@ -38,6 +39,7 @@ GraphicsSystem::GraphicsSystem()
 
 	_clearPS = new PixelShader(clear_p);
 	_clearVS = new VertexShader(clear_vv);
+	_clearFS = new FetchShader(_clearVS);
 }
 
 GraphicsSystem::~GraphicsSystem()
@@ -344,7 +346,7 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
 	// Setup the clear shader.
-	SetVertexShader(_clearVS);
+	SetVertexShader(_clearVS, _clearFS);
 	SetPixelShader(_clearPS);
 	float color[4] = {r, g, b, a};
 	SetShaderConstants(ShaderStage_Pixel, &color, sizeof(color));
@@ -1045,10 +1047,10 @@ void GraphicsSystem::SetBlendState(uint32_t blend0, uint32_t blend1, uint32_t bl
 	gfxc.setRenderTargetMask(colorWrites);
 }
 
-void GraphicsSystem::SetVertexShader(VertexShader *shader)
+void GraphicsSystem::SetVertexShader(VertexShader *shader, FetchShader *fetch)
 {
 	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
-	gfxc.setVsShader(shader->_shader, shader->_shaderModifier, shader->_fsMem);
+	gfxc.setVsShader(shader->_shader, fetch->_shaderModifier, fetch->_fsMem);
 }
 
 void GraphicsSystem::SetPixelShader(PixelShader *shader)

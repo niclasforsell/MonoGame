@@ -23,6 +23,7 @@ namespace BindingGen
             options.MicrosoftMode = false;
             options.NoBuiltinIncludes = true;
             options.WriteOnlyWhenChanged = true;
+            //options.CompileCode = false;
 
             // Flip on verbose mode if you have an issue to debug.
             options.Verbose = false;
@@ -54,6 +55,7 @@ namespace BindingGen
             options.Headers.Add(@"Graphics\GraphicsSystem.h");
             options.Headers.Add(@"Graphics\TextureFormat.h");
             options.Headers.Add(@"Graphics\VertexShader.h");
+            options.Headers.Add(@"Graphics\FetchShader.h");
             options.Headers.Add(@"Graphics\PixelShader.h");
             options.Headers.Add(@"Graphics\VertexBuffer.h");
             options.Headers.Add(@"Graphics\IndexBuffer.h");

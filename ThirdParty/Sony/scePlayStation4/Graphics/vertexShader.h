@@ -9,13 +9,12 @@ namespace Graphics {
 class __declspec(dllexport) VertexShader
 {
 	friend class GraphicsSystem;
+	friend class FetchShader;
 
 private:
 
 	sce::Gnmx::VsShader *_shader;
 	void *_binary;
-	void *_fsMem;
-	uint32_t _shaderModifier;
 
 public:
 	

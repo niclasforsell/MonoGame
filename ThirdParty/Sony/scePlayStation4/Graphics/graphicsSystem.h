@@ -34,6 +34,7 @@ private:
 
 	PixelShader *_clearPS;
 	VertexShader *_clearVS;
+	FetchShader *_clearFS;
 
 	void prepareBackBuffer();
 
@@ -75,7 +76,7 @@ public:
 	void CS_IGNORE _discardBuffer(VertexBuffer *buffer);
 	void CS_IGNORE _discardBuffer(IndexBuffer *buffer);
 
-	void SetVertexShader(VertexShader *shader);
+	void SetVertexShader(VertexShader *shader, FetchShader *fetch);
 	void SetPixelShader(PixelShader *shader);
 	void SetShaderConstants(ShaderStage stage, void *data, uint32_t sizeInBytes);
 
