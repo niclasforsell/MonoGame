@@ -88,10 +88,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 nativeWaveFormat = new List<byte>(stream.ToArray());
             }
         }
-#elif MACOS
+#endif
+
 		internal AudioFormat(List<byte> nativeWaveFormat) {
 			this.nativeWaveFormat = nativeWaveFormat;
 		}
-#endif
     }
 }

@@ -48,6 +48,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         targetFormat = ConversionFormat.ImaAdpcm;
                     else
                         targetFormat = ConversionFormat.Adpcm;
+
+                    if (context.TargetPlatform == TargetPlatform.PlayStation4)
+                        targetFormat = ConversionFormat.Atrac9;
                     break;
             }
 
