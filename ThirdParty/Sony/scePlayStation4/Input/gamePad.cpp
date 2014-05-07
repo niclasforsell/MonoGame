@@ -90,12 +90,11 @@ void copyState(const ScePadData& data, GamePadState* state)
 	state->Buttons |= (buttons & SCE_PAD_BUTTON_R2) != 0 ? 4194304 : 0;
 	state->Buttons |= (buttons & SCE_PAD_BUTTON_L1) != 0 ? 256 : 0;
 	state->Buttons |= (buttons & SCE_PAD_BUTTON_R1) != 0 ? 512 : 0;
-	state->Buttons |= (buttons & SCE_PAD_BUTTON_L2) != 0 ?  8388608 : 0;
-	state->Buttons |= (buttons & SCE_PAD_BUTTON_R2) != 0 ? 4194304 : 0;
 	state->Buttons |= (buttons & SCE_PAD_BUTTON_CROSS) != 0 ? 4096 : 0;
 	state->Buttons |= (buttons & SCE_PAD_BUTTON_CIRCLE) != 0 ? 8192 : 0;
 	state->Buttons |= (buttons & SCE_PAD_BUTTON_SQUARE) != 0 ? 16384 : 0;
 	state->Buttons |= (buttons & SCE_PAD_BUTTON_TRIANGLE) != 0 ? 32768 : 0;
+	state->Buttons |= (buttons & SCE_PAD_BUTTON_TOUCH_PAD) != 0 ? 2048 : 0;
 
 	// Motion sensor data
 	state->OrientationX = data.orientation.x;
