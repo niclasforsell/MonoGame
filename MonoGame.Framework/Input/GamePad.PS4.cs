@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Input
             {
                 IsConnected = state.IsConnected,
                 HasAButton = true,
-                HasBackButton = false, // No equivalent for PS4 as far as I can tell
+                HasBackButton = false, // No equivalent for PS4
                 HasBButton = true,
                 HasDPadDownButton = true,
                 HasDPadLeftButton = true,
@@ -27,10 +27,10 @@ namespace Microsoft.Xna.Framework.Input
                 HasLeftStickButton = true,
                 HasRightShoulderButton = true,
                 HasRightStickButton = true,
-                HasStartButton = true, // TODO: Verify this maps semantics with Options button
+                HasStartButton = true, // Mapped to Options
                 HasXButton = true,
                 HasYButton = true,
-                HasBigButton = false,
+                HasBigButton = true, // Mapped to touchpad button
                 HasLeftXThumbStick = true,
                 HasLeftYThumbStick = true,
                 HasRightXThumbStick = true,

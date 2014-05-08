@@ -85,12 +85,11 @@ namespace Microsoft.Xna.Framework.Content
             //  WORD  wBitsPerSample;   // byte[14] +2
             //  WORD  cbSize;           // byte[16] +2
             //} WAVEFORMATEX;
-            
 			byte[] header = input.ReadBytes(input.ReadInt32());
 			byte[] data = input.ReadBytes(input.ReadInt32());
 			int loopStart = input.ReadInt32();
 			int loopLength = input.ReadInt32();
-			input.ReadInt32();
+			int duration = input.ReadInt32();
 
 #if DIRECTX            
             var count = data.Length;
@@ -114,6 +113,24 @@ namespace Microsoft.Xna.Framework.Content
                 _format = waveFormat,
                 Name = input.AssetName,
             };
+#elif PLAYSTATION4
+            var formatTag = BitConverter.ToUInt16(header, 0);
+            switch (formatTag)
+            {
+                // This is the fast path, a simple uncompressed sound.
+                case 0x0001: // WAVE_FORMAT_PCM
+                    var numChannels = BitConverter.ToUInt16(header, 2);
+                    var sampleRate = (int)BitConverter.ToUInt32(header, 4);
+                    return new SoundEffect(data, sampleRate, (AudioChannels)numChannels);
+
+                // If we're using compression, there's some additional data for
+                // each codec that the system will want, so we use the whole file.
+                case 0xFFFE: // WAVE_FORMAT_EXTENSIBLE
+                    return new SoundEffect(data, duration);
+
+                default:
+                    throw new InvalidDataException("Unknown SoundEffect format: 0x" + formatTag.ToString("X"));
+            }
 #else
             if(loopStart == loopLength) 
             {
