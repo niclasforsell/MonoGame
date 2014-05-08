@@ -182,6 +182,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     break;
 
                 case TargetPlatform.PlayStation4:
+                    context.Logger.LogMessage("Using GNF Compression");
                     CompressGnf(content, generateMipmaps);
                     break;
 
