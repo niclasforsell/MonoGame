@@ -131,8 +131,6 @@ int AudioDecoder::decode(InputStream *input, OutputStream *output)
 	m_bst.uiAuSize = input->readingSize();
 	m_pcm.pPcmAddr = output->lock(m_maxPcmSize);
 	m_pcm.uiPcmSize = output->writingSize();
-	if (m_pcm.uiPcmSize == 0)
-		goto term;
 
 	// decode audio bitstream
 	ret = sceAudiodecDecode(m_handle, &m_ctrl);
