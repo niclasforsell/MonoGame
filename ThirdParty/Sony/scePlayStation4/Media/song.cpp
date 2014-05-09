@@ -132,6 +132,7 @@ void* decodeMain(void* arg)
 
 	printf("Exiting decode loop.\n");
 	state->isRunning = false;
+	state->inputStream->end();
 	state->outputStream->end();
 
 term:
@@ -195,6 +196,9 @@ void* outputMain(void* arg)
 	}
 
 	printf("Exiting output loop.\n");
+	state->isRunning = false;
+	state->inputStream->end();
+	state->outputStream->end();
 
 term:
 	sceKernelSetEventFlag(state->eventFlag, EventFlags::Output);
