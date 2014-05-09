@@ -93,6 +93,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 File.Copy(input.FileName, songFileName, true);
             }
 
+            // Let the pipeline know about the song file so it can clean things up.
+            context.AddOutputFile(songFileName);
+
             // Return the XNB song content.
             return new SongContent(PathHelper.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) + Path.DirectorySeparatorChar, songFileName), input.Duration);
         }
