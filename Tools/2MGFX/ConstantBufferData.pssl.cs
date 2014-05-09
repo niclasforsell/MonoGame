@@ -23,16 +23,6 @@ namespace TwoMGFX
                 var elem = cb.GetElement(i);
 
                 var param = GetParameterElem(elem);
-
-                // Setup default value.
-                var size = param.columns * param.rows * 4;
-                var data = new byte[size];
-                if (elem.DefaultValue != null)
-                    Array.Copy(elem.DefaultValue, data, data.Length);
-
-                // Set the data.
-                param.data = data;
-
                 parameters.Add(param);
             }
 
@@ -203,23 +193,18 @@ namespace TwoMGFX
 		                //SamplerState,
                      */
             }
-            
-            //param.member_count = (uint)type.Description.MemberCount;
-            //param.element_count = (uint)type.Description.ElementCount;
 
-            /*
+            param.member_count = 0; // (uint)type.Description.MemberCount;
+            param.element_count = (uint)elem.ArraySize;
+
             if (param.member_count > 0)
             {
-                param.member_handles = new EffectObject.d3dx_parameter[param.member_count];
-                for (var i = 0; i < param.member_count; i++)
-                {
-                    var mparam = GetParameterFromType(type.GetMemberType(i));
-                    mparam.name = type.GetMemberTypeName(i) ?? string.Empty;
-                    param.member_handles[i] = mparam;
-                }
+                throw new NotImplementedException("Struct uniforms are not implemented!");
             }
-            else
+            else if (param.element_count > 0)
             {
+                var defaultOffset = 0;
+
                 param.member_handles = new EffectObject.d3dx_parameter[param.element_count];
                 for (var i = 0; i < param.element_count; i++)
                 {
@@ -231,12 +216,30 @@ namespace TwoMGFX
                     mparam.class_ = param.class_;
                     mparam.rows = param.rows;
                     mparam.columns = param.columns;
-                    mparam.data = new byte[param.columns * param.rows * 4];
 
+                    var size = (int)(((param.rows-1) * 16) + (param.columns * 4));
+                    var data = new byte[size];
+
+                    if (elem.DefaultValue != null)
+                        Array.Copy(elem.DefaultValue, defaultOffset, data, 0, size);
+
+                    defaultOffset += (int)param.rows * 16;
+                    mparam.data = data;
                     param.member_handles[i] = mparam;
                 }
             }
-            */
+            else
+            {
+                var size = param.columns * param.rows * 4;
+                var data = new byte[size];
+
+                // Set the default value.
+                if (elem.DefaultValue != null)
+                    Array.Copy(elem.DefaultValue, data, size);
+
+                // Set the data.
+                param.data = data;
+            }
 
             return param;
         }

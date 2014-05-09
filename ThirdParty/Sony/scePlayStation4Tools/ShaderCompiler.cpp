@@ -209,6 +209,7 @@ ElementDesc^ BufferDesc::GetElement(int index)
 	auto element = gcnew ElementDesc();
 	element->Name = gcnew String(name);
 	element->Type = (ElementType)psElement->m_type;
+	element->ArraySize = psElement->m_arraySize;
 	element->OffsetInBytes = psElement->m_byteOffset;
 	element->SizeInBytes = psElement->m_size;
 
