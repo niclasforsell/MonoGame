@@ -27,8 +27,8 @@ namespace TwoMGFX
                 // Setup default value.
                 var size = param.columns * param.rows * 4;
                 var data = new byte[size];
-                //if (elem.Description.DefaultValue != IntPtr.Zero)
-                    //Marshal.Copy(elem.Description.DefaultValue, data, 0, (int)size);
+                if (elem.DefaultValue != null)
+                    Array.Copy(elem.DefaultValue, data, data.Length);
 
                 // Set the data.
                 param.data = data;
