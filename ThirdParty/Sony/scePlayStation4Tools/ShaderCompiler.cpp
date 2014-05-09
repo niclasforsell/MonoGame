@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ShaderCompiler.h"
 
+#include <memory.h>
 #include <shader/compiler.h>
 #include <shader/binary.h>
 #include <shader/shader_parser.h>
@@ -174,6 +175,9 @@ BufferDesc^ ShaderCompiler::GetBufferDesc(int index)
 		elements = _program->m_elements + psBuffer->m_elementOffset;
 	buffer->_elements = elements;
 
+	if (_program->m_valueTableSize > 0)
+		buffer->_defaults = (Byte*)_program->m_valueTable;
+
 	return buffer;
 }
 
@@ -198,15 +202,26 @@ ElementDesc^ BufferDesc::GetElement(int index)
 	if (_elements == NULL || index < 0 || index >= ElementCount)
 		return nullptr;
 
-	auto psElement = ((Element*)_elements)+index;
+	auto psElement = _elements+index;
 	auto name = psElement->getName();
 	auto typeName = psElement->getTypeName();
 
 	auto element = gcnew ElementDesc();
 	element->Name = gcnew String(name);
 	element->Type = (ElementType)psElement->m_type;
+	element->ArraySize = psElement->m_arraySize;
 	element->OffsetInBytes = psElement->m_byteOffset;
 	element->SizeInBytes = psElement->m_size;
+
+	// If we have a default value copy it.
+	if (_defaults != NULL && psElement->m_defaultValueOffset != -1)
+	{
+		element->DefaultValue = gcnew array<Byte>(element->SizeInBytes);
+		pin_ptr<System::Byte> pinned = &element->DefaultValue[0];
+
+		auto default = _defaults + (psElement->m_defaultValueOffset*4);
+		memcpy((void*)pinned, default, element->SizeInBytes);
+	}
 
 	return element;
 }

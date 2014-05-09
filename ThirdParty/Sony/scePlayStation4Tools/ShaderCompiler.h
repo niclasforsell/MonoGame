@@ -204,6 +204,8 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 	public:
 		String^ Name;
 		ElementType Type;
+		array<Byte>^ DefaultValue;
+		int ArraySize;
 		int OffsetInBytes;
 		int SizeInBytes;
 	};
@@ -211,7 +213,8 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 	public ref class BufferDesc
 	{
 	internal:
-		void *_elements;
+		sce::Shader::Binary::Element* _elements;
+		Byte* _defaults;
 
 	public:
 		BufferType Type;

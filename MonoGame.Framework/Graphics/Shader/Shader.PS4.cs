@@ -25,6 +25,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         _pixelShader = new PixelShader(data);
                 }
             }
+
+            HashKey = MonoGame.Utilities.Hash.ComputeHash(shaderBytecode);
         }
 
         private void PlatformGraphicsDeviceResetting()

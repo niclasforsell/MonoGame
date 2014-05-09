@@ -88,6 +88,7 @@
     <ClCompile Include="Audio\audioBuffer.cpp" />
     <ClCompile Include="Audio\samplerVoice.cpp" />
     <ClCompile Include="Audio\soundSystem.cpp" />
+    <ClCompile Include="Graphics\fetchShader.cpp" />
     <ClCompile Include="Graphics\graphicsSystem.cpp" />
     <ClCompile Include="Graphics\indexBuffer.cpp" />
     <ClCompile Include="Graphics\pixelShader.cpp" />
@@ -121,6 +122,7 @@
     <ClInclude Include="Audio\soundSystem.h" />
     <ClInclude Include="Graphics\defaultShaders.h" />
     <ClInclude Include="Graphics\displayBuffer.h" />
+    <ClInclude Include="Graphics\fetchShader.h" />
     <ClInclude Include="Graphics\graphicsEnums.h" />
     <ClInclude Include="Graphics\graphicsHelpers.h" />
     <ClInclude Include="Graphics\graphicsSystem.h" />

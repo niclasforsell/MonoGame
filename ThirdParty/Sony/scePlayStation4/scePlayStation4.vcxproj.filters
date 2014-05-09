@@ -74,6 +74,7 @@
     <ClCompile Include="Media\song.cpp">
       <Filter>Media</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\fetchShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -201,5 +202,6 @@
     <ClInclude Include="Media\song.h">
       <Filter>Media</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\fetchShader.h" />
   </ItemGroup>
 </Project>

@@ -25,18 +25,10 @@ VertexShader::VertexShader(const void *data)
 
 	_shader = static_cast<Gnmx::VsShader*>(shaderHeader);
 	_shader->patchShaderGpuAddress(_binary);
-
-	_fsMem = Allocator::Get()->allocate(
-		Gnmx::computeVsFetchShaderSize(_shader),
-		Gnm::kAlignmentOfFetchShaderInBytes,
-		SCE_KERNEL_WC_GARLIC);
-
-	Gnmx::generateVsFetchShader(_fsMem, &_shaderModifier, _shader, NULL);
 }
 
 VertexShader::~VertexShader()
 {
-	Allocator::Get()->release(_fsMem);
 	Allocator::Get()->release(_binary);
 	Allocator::Get()->release(_shader);
 }
