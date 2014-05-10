@@ -198,7 +198,74 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 		Buffer,
 		TypeEnd
 	};
-	
+
+	public enum struct SemanticUsage
+	{
+		Position,
+		Normal,
+		Color,
+		Binormal,
+		Tangent,
+		Texcoord0,
+		Texcoord1,
+		Texcoord2,
+		Texcoord3,
+		Texcoord4,
+		Texcoord5,
+		Texcoord6,
+		Texcoord7,
+		Texcoord8,
+		Texcoord9,
+		TexcoordEnd,
+		Implicit,
+		Nonreferencable,
+		Clip,
+		Fog,
+		Pointsize,
+		Fragcoord,
+		Target0,
+		Target1,
+		Target2,
+		Target3,
+		Target4,
+		Target5,
+		Target6,
+		Target7,
+		Target8,
+		Target9,
+		Target10,
+		Target11,
+		Depth,
+		Lastcg,
+		UserDefined,
+		SClipDistance,
+		SCullDistance,
+		SCoverage,
+		SDepthOutput,
+		SDispatchthreadId,
+		SDomainLocation,
+		SGroupId,
+		SGroupIndex,
+		SGroupThreadId,
+		SPosition,
+		SVertexId,
+		SInstanceId,
+		SSampleIndex,
+		SPrimitiveId,
+		SGsinstanceId,
+		SOutputControlPointId,
+		SFrontFace,
+		SRenderTargetIndex,
+		SViewportIndex,
+		STargetOutput,
+		SEdgeTessFactor,
+		SInsideTessFactor,
+		SpriteCoord,
+		SDepthGEOutput,
+		SDepthLEOutput,
+		SemanticEnd 
+	};
+
 
 	public ref class ElementDesc
 	{
@@ -241,6 +308,7 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 		String^ Name;
 		String^ SemanticName;
 		int SemanticIndex;
+		SemanticUsage Usage;
 	};
 
 	public ref class ShaderCompiler

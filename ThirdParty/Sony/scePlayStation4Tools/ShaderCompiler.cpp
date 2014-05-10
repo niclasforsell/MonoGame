@@ -239,6 +239,7 @@ AttributeDesc^ ShaderCompiler::GetAttributeDesc(int index)
 	auto attribute = gcnew AttributeDesc();
 	attribute->Name = gcnew String(name);
 	attribute->SemanticName = gcnew String(semanticName);
+	attribute->Usage = (SemanticUsage)psAttribute->m_psslSemantic;
 	attribute->SemanticIndex = psAttribute->m_semanticIndex;
 
 	return attribute;
