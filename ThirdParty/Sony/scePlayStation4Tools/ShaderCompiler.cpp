@@ -226,6 +226,24 @@ ElementDesc^ BufferDesc::GetElement(int index)
 	return element;
 }
 
+AttributeDesc^ ShaderCompiler::GetAttributeDesc(int index)
+{
+	if (_program == NULL || index < 0 || index >= _program->m_numInputAttributes)
+		return nullptr;
+
+	auto psAttribute = _program->m_inputAttributes + index;
+	auto stringTable = (const char*)(_program->m_stringTable);
+	auto name = psAttribute->getName();
+	auto semanticName = psAttribute->getSemanticName();
+	
+	auto attribute = gcnew AttributeDesc();
+	attribute->Name = gcnew String(name);
+	attribute->SemanticName = gcnew String(semanticName);
+	attribute->SemanticIndex = psAttribute->m_semanticIndex;
+
+	return attribute;
+}
+
 array<Byte>^ ShaderCompiler::Strip()
 {
 	if (_program == NULL)

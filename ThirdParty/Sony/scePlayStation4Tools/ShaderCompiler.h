@@ -198,6 +198,7 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 		Buffer,
 		TypeEnd
 	};
+	
 
 	public ref class ElementDesc
 	{
@@ -234,6 +235,14 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 	};
 
 
+	public ref class AttributeDesc
+	{
+	public:
+		String^ Name;
+		String^ SemanticName;
+		int SemanticIndex;
+	};
+
 	public ref class ShaderCompiler
 	{
 	private:
@@ -257,6 +266,12 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 
 		SamplerDesc^ GetSamplerDesc(int index);
 
+		AttributeDesc^ GetAttributeDesc(int index);
+
+		property int AttributeCount
+		{
+			int get() { return _program->m_numInputAttributes; }
+		}
 
 		property int BufferCount
 		{
