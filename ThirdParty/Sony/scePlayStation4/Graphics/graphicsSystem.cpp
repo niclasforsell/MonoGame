@@ -39,7 +39,7 @@ GraphicsSystem::GraphicsSystem()
 
 	_clearPS = new PixelShader(clear_p);
 	_clearVS = new VertexShader(clear_vv);
-	_clearFS = new FetchShader(_clearVS);
+	_clearFS = new FetchShader(_clearVS, NULL, 0);
 }
 
 GraphicsSystem::~GraphicsSystem()

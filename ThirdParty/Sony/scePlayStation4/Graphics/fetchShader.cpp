@@ -13,14 +13,16 @@ using namespace sce::Gnmx;
 using namespace Graphics;
 
 
-FetchShader::FetchShader(VertexShader *shader)
+FetchShader::FetchShader(VertexShader *shader, const uint32_t* remap, int32_t count)
 {
+	auto fetchSize = Gnmx::computeVsFetchShaderSize(shader->_shader);
+
 	_fsMem = Allocator::Get()->allocate(
-		Gnmx::computeVsFetchShaderSize(shader->_shader),
+		fetchSize,
 		Gnm::kAlignmentOfFetchShaderInBytes,
 		SCE_KERNEL_WC_GARLIC);
 
-	Gnmx::generateVsFetchShader(_fsMem, &_shaderModifier, shader->_shader, NULL);
+	Gnmx::generateVsFetchShader(_fsMem, &_shaderModifier, shader->_shader, NULL, remap, count);
 }
 
 FetchShader::~FetchShader()

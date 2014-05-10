@@ -17,7 +17,7 @@ private:
 
 public:
 	
-	FetchShader(VertexShader *shader);
+	FetchShader(VertexShader *shader, const uint32_t* remap, int32_t count);
 
 	virtual ~FetchShader();
 
