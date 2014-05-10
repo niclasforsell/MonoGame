@@ -13,6 +13,15 @@ namespace Microsoft.Xna.Framework.Graphics
         internal VertexShader _vertexShader;
         internal PixelShader _pixelShader;
 
+        private struct Attribute
+        {
+            public VertexElementUsage usage;
+            public int index;
+            public string name;
+        }
+
+        private Attribute[] _attributes;
+
         private void PlatformConstruct(BinaryReader reader, bool isVertexShader, byte[] shaderBytecode)
         {
             unsafe
@@ -27,6 +36,49 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             HashKey = MonoGame.Utilities.Hash.ComputeHash(shaderBytecode);
+
+            // TODO: This should simply move to the common code
+            // and we should load shader input attributes for
+            // all platforms.
+
+            var attributeCount = (int)reader.ReadByte();
+            _attributes = new Attribute[attributeCount];
+            for (var a = 0; a < attributeCount; a++)
+            {
+                _attributes[a].name = reader.ReadString();
+                _attributes[a].usage = (VertexElementUsage)reader.ReadByte();
+                _attributes[a].index = reader.ReadByte();
+                reader.ReadInt16(); //format, unused
+            }
+        }
+
+        internal uint[] GenerateFetchRemap(VertexDeclaration decl)
+        {
+            var elements = decl.GetVertexElements();
+            var remap = new uint[elements.Length];
+
+            // Match each vertex element to an input shader attribute.
+            for (var e=0; e < elements.Length; e++)
+            {
+                var elem = elements[e];
+
+                // If no remap is found we default to unused.
+                remap[e] = 0xFFFFFFFF;
+
+                for (var a = 0; a < _attributes.Length; a++)
+                {
+                    var attr = _attributes[a];
+
+                    if (elem.VertexElementUsage != attr.usage ||
+                        elem.UsageIndex != attr.index)
+                        continue;
+
+                    remap[e] = (uint)a;
+                    break;
+                }
+            }
+
+            return remap;
         }
 
         private void PlatformGraphicsDeviceResetting()

@@ -110,7 +110,14 @@ namespace Microsoft.Xna.Framework.Graphics
             var key = (ulong)decl.HashKey << 32 | (uint)shader.HashKey;
             if (!_fetchShaders.TryGetValue(key, out fetch))
             {
-                fetch = new FetchShader(shader._vertexShader);
+                var remap = shader.GenerateFetchRemap(decl);
+                unsafe
+                {
+                    fixed (uint* ptr = remap)
+                    {
+                        fetch = new FetchShader(shader._vertexShader, ptr, remap.Length);
+                    }
+                }
                 _fetchShaders.Add(key, fetch);
             }
 
