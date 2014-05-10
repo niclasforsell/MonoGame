@@ -42,10 +42,13 @@ namespace TwoMGFX
             foreach (var cb in _cbuffers)
                 writer.Write((byte)cb);
 
-            if (options.Profile != ShaderProfile.OpenGL)
+            // TODO: We should fix this in upstream where all
+            // platforms write the shader input attributes!
+
+            if (options.Profile == ShaderProfile.DirectX_11)
                 return;
 
-            // The rest of this is for GL only!
+            // The rest of this is for GL only!                       
 
             writer.Write((byte)_attributes.Length);
             foreach (var attrib in _attributes)
