@@ -81,6 +81,10 @@
       <OutputFile>bin\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>-lSceVideoOut_stub_weak;-lSceGnmDriver_stub_weak;-lSceGnmx;-lSceGnm;-lSceNgs2_stub_weak;-lSceAudioOut_stub_weak;-lSceAudiodec_stub_weak;-lSceGpuAddress;-lScePngDec_stub_weak;-lSceSysmodule_stub_weak;-lScePad_stub_weak;-lSceUserService_stub_weak;-lSceSaveData_stub_weak;-lSceSystemService_stub_weak;-lSceNpTrophy_stub_weak;-lSceNpCommon_stub_weak;-lSceNpManager_stub_weak;-lSceVideoRecording_stub_weak;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>..\BindingGen\bin\$(Configuration)\BindingGen.exe</Command>
+      <Message>Generating C# Bindings!</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="allocator.cpp" />
