@@ -160,6 +160,9 @@ bool ShaderCompiler::Reflect(array<Byte>^ bytecode)
 
 BufferDesc^ ShaderCompiler::GetBufferDesc(int index)
 {
+	if (_program == NULL || index < 0 || index >= _program->m_numBuffers)
+		return nullptr;
+
 	auto psBuffer = _program->m_buffers+index;
 	auto name = psBuffer->getName();
 

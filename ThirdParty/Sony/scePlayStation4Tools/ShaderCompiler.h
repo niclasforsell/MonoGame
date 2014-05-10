@@ -341,6 +341,11 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 			int get() { return _program->m_numInputAttributes; }
 		}
 
+		property int SamplerCount
+		{
+			int get() { return _program->m_numSamplerStates; }
+		}
+
 		property int BufferCount
 		{
 			int get() { return _program->m_numBuffers; }

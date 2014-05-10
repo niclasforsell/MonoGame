@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using sce.PlayStation4.Tools;
@@ -31,31 +32,31 @@ namespace TwoMGFX
                         desc.Type != BufferType.TextureCube)
                     continue;
 
-                var samplerDesc = compiler.GetSamplerDesc(desc.Index);
-
                 var sampler = new Sampler
                 {
-                    textureSlot = desc.Index,
+                    // This is the Texture1D/2D/3D/Cube name which
+                    // is what ends up being the Effect parameter name.
                     parameterName = desc.Name,
-                    samplerName = samplerDesc.Name,
-                    samplerSlot = samplerDesc.Index,
+
+                    // The texture register.
+                    textureSlot = desc.Index,
+
+                    // Setup defaults for the sampler.
+                    samplerName = string.Empty,
+                    samplerSlot = desc.Index,
                 };
 
-                SamplerStateInfo state;
-                if (samplerStates.TryGetValue(sampler.samplerName, out state))
-                    sampler.state = state.State;
-                
                 switch (desc.Type)
                 {
                     case BufferType.Texture1d:
-                    //case BufferType.Texture1dArray:
+                        //case BufferType.Texture1dArray:
                         sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D;
                         break;
 
                     case BufferType.Texture2d:
-                    //case ShaderResourceViewDimension.Texture2DArray:
-                    //case ShaderResourceViewDimension.Texture2DMultisampled:
-                    //case ShaderResourceViewDimension.Texture2DMultisampledArray:
+                        //case ShaderResourceViewDimension.Texture2DArray:
+                        //case ShaderResourceViewDimension.Texture2DMultisampled:
+                        //case ShaderResourceViewDimension.Texture2DMultisampledArray:
                         sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D;
                         break;
 
@@ -64,11 +65,28 @@ namespace TwoMGFX
                         break;
 
                     case BufferType.TextureCube:
-                    //case ShaderResourceViewDimension.TextureCubeArray:
+                        //case ShaderResourceViewDimension.TextureCubeArray:
                         sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE;
                         break;
                 }
 
+                // Look for the sampler for this texture slot.
+                for (var s=0; s < compiler.SamplerCount; s++)
+                {
+                    var samplerDesc = compiler.GetSamplerDesc(s);
+
+                    // Lookup the sampler state by the texture/parameter name.
+                    SamplerStateInfo state;
+                    if (    !samplerStates.TryGetValue(samplerDesc.Name, out state) || 
+                            state.TextureName != sampler.parameterName)
+                        continue;
+
+                    sampler.samplerName = samplerDesc.Name;
+                    sampler.samplerSlot = samplerDesc.Index;
+                    sampler.state = state.State;
+                    break;
+                }
+                
                 samplers.Add(sampler);
             }
             shader._samplers = samplers.ToArray();
