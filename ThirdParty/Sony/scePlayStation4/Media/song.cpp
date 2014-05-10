@@ -7,6 +7,7 @@
 #include "mp3/audio_decoder_mp3.h"
 
 #include <assert.h>
+#include <atomic>
 #include <libsysmodule.h>
 #include <audiodec.h>
 #include <audioout.h>
@@ -45,8 +46,8 @@ struct Media::SongState
 	AudioOutputStream* outputStream;
 	AudioDecoder* decoder;
 
-	bool isPaused;
-	bool isRunning;
+	std::atomic<bool> isPaused;
+	std::atomic<bool> isRunning;
 };
 
 void* decodeMain(void* arg)
@@ -59,25 +60,32 @@ void* decodeMain(void* arg)
 	assert(state->outputStream == NULL);
 
 	sceKernelWaitEventFlag(state->eventFlag, EventFlags::Loaded, SCE_KERNEL_EVF_WAITMODE_AND, 0, 0);
-
-	if (state->inputStream != NULL)
-		return false;
-
 	assert(state->fileName != NULL);
 
+	const char* fileExt = strrchr(state->fileName, '.');
+
 	const uint32_t inputStreamSize = File(state->fileName, "rb").size();
+	assert(inputStreamSize > 0);
+	if (inputStreamSize < 0)
+	{
+		printf("ERROR: Failed to open song file '%s'\n", state->fileName);
+		goto term;
+	}
 
 	state->inputStream = new FileInputStream(inputStreamSize);
 	assert(state->inputStream);
-
 	ret = state->inputStream->open(state->fileName, "rb");
+	if (ret < 0)
+	{
+		printf("ERROR: Failed to open input stream for song '%s'\n", state->fileName);
+		goto term;
+	}
 	assert(ret >= 0);
 
 	ret = state->inputStream->input();
 	assert(ret >= 0);
 	state->inputStream->end();
 
-	const char* fileExt = strrchr(state->fileName, '.');
 	if (strncmp(fileExt, ".mp4", 4) == 0)
 	{
 		state->decoder = new AudioDecoderM4aac(state->inputStream);
@@ -92,10 +100,15 @@ void* decodeMain(void* arg)
 	}
 	else
 	{
-		printf("ERROR: Unknown song format: %s", fileExt);
+		printf("ERROR: Unknown song format: %s\n", fileExt);
 		goto term;
 	}
 	assert(state->decoder);
+	if (state->decoder == NULL)
+	{
+		printf("ERROR: Couldn't create decoder for %s\n", state->fileName);
+		goto term;
+	}
 
 	// Signal we're loaded and wait for the sync point.
 	sceKernelSetEventFlag(state->eventFlag, EventFlags::Decoder);
@@ -104,15 +117,12 @@ void* decodeMain(void* arg)
 	while (state->isRunning)
 	{
 		if (state->inputStream->isEmpty())
-		{
 			break;
-		}
 
 		if (state->isPaused)
 			continue;
 
 		auto ret = state->decoder->decode(state->inputStream, state->outputStream);
-
 		if (ret < 0)
 		{
 			printf("ERROR: MusicPlayer decode failed: 0x%08X\n", ret);
@@ -120,6 +130,9 @@ void* decodeMain(void* arg)
 		}
 	}
 
+	printf("Exiting decode loop.\n");
+	state->isRunning = false;
+	state->inputStream->end();
 	state->outputStream->end();
 
 term:
@@ -143,6 +156,7 @@ term:
 		state->onSongFinished();
 	}
 
+	printf("Decode thread exiting.\n");
 	return arg;
 }
 
@@ -181,6 +195,11 @@ void* outputMain(void* arg)
 		}
 	}
 
+	printf("Exiting output loop.\n");
+	state->isRunning = false;
+	state->inputStream->end();
+	state->outputStream->end();
+
 term:
 	sceKernelSetEventFlag(state->eventFlag, EventFlags::Output);
 	scePthreadBarrierWait(&state->barrier);
@@ -191,6 +210,7 @@ term:
 		state->outputStream = NULL;
 	}
 
+	printf("Output thread exiting.\n");
 	return arg;
 }
 
@@ -206,16 +226,18 @@ Song::~Song()
 
 	Stop();
 
-	// join and detach a thread for audio decode
-	if (_state->threadDecode) {
-		scePthreadJoin(_state->threadDecode, 0);
-		_state->threadDecode = NULL;
-	}
-
 	// join and detach a thread for audio output
+	printf("Joining output thread.\n");
 	if (_state->threadOutput) {
 		scePthreadJoin(_state->threadOutput, 0);
 		_state->threadOutput = NULL;
+	}
+
+	// join and detach a thread for audio decode
+	printf("Joining decode thread.\n");
+	if (_state->threadDecode) {
+		scePthreadJoin(_state->threadDecode, 0);
+		_state->threadDecode = NULL;
 	}
 
 	if (_state->barrier) {
@@ -230,6 +252,8 @@ Song::~Song()
 
 	Allocator::Get()->release(_state->fileName);
 	Allocator::Get()->release(_state);
+
+	printf("Song cleanup complete.\n");
 }
 
 bool Song::Load(const char* fileName)
@@ -327,9 +351,6 @@ void Song::Stop()
 	// notification that things have completed.
 	_state->onSongFinished = NULL;
 	_state->isRunning = false;
-
-	if (_state->outputStream != NULL)
-		_state->outputStream->end();
 }
 
 float Song::GetVolume()
