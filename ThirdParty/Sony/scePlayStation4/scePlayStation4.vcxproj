@@ -102,6 +102,7 @@
     <ClCompile Include="Graphics\vertexShader.cpp" />
     <ClCompile Include="Input\gamePad.cpp" />
     <ClCompile Include="Input\keyboard.cpp" />
+    <ClCompile Include="Input\vkeys.h" />
     <ClCompile Include="Media\at9\audio_decoder_at9.cpp" />
     <ClCompile Include="Media\at9\riff_wave_header_at9_parser.cpp" />
     <ClCompile Include="Media\audio_decoder.cpp" />

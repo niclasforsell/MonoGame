@@ -9,6 +9,7 @@ class __declspec(dllexport) Keyboard
 public:
 	static void Initialize();
 	static void Terminate();
+	static void Restart();
 	static void Update();
 
 	static int Enable(SceUserServiceUserId userId);

@@ -80,6 +80,9 @@
     <ClCompile Include="Input\keyboard.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="Input\vkeys.h">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
