@@ -54,7 +54,7 @@
     </ClCompile>
     <Link>
       <OutputFile>bin\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>-lSceVideoOut_stub_weak;-lSceGnmDriver_stub_weak;-lSceGnmx;-lSceGnm;-lSceNgs2_stub_weak;-lSceAudioOut_stub_weak;-lSceAudiodec_stub_weak;-lSceGpuAddress;-lScePngDec_stub_weak;-lSceSysmodule_stub_weak;-lScePad_stub_weak;-lSceUserService_stub_weak;-lSceSaveData_stub_weak;-lSceSystemService_stub_weak;-lSceNpTrophy_stub_weak;-lSceNpCommon_stub_weak;-lSceNpManager_stub_weak;-lSceVideoRecording_stub_weak;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>-lSceVideoOut_stub_weak;-lSceGnmDriver_stub_weak;-lSceGnmx;-lSceGnm;-lSceNgs2_stub_weak;-lSceAudioOut_stub_weak;-lSceAudiodec_stub_weak;-lSceGpuAddress;-lScePngDec_stub_weak;-lSceSysmodule_stub_weak;-lScePad_stub_weak;-lSceUserService_stub_weak;-lSceSaveData_stub_weak;-lSceSystemService_stub_weak;-lSceNpTrophy_stub_weak;-lSceNpCommon_stub_weak;-lSceNpManager_stub_weak;-lSceVideoRecording_stub_weak;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;-lSceIme_stub_weak;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>..\BindingGen\bin\$(Configuration)\BindingGen.exe</Command>
@@ -79,7 +79,7 @@
     </ClCompile>
     <Link>
       <OutputFile>bin\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>-lSceVideoOut_stub_weak;-lSceGnmDriver_stub_weak;-lSceGnmx;-lSceGnm;-lSceNgs2_stub_weak;-lSceAudioOut_stub_weak;-lSceAudiodec_stub_weak;-lSceGpuAddress;-lScePngDec_stub_weak;-lSceSysmodule_stub_weak;-lScePad_stub_weak;-lSceUserService_stub_weak;-lSceSaveData_stub_weak;-lSceSystemService_stub_weak;-lSceNpTrophy_stub_weak;-lSceNpCommon_stub_weak;-lSceNpManager_stub_weak;-lSceVideoRecording_stub_weak;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>-lSceVideoOut_stub_weak;-lSceGnmDriver_stub_weak;-lSceGnmx;-lSceGnm;-lSceNgs2_stub_weak;-lSceAudioOut_stub_weak;-lSceAudiodec_stub_weak;-lSceGpuAddress;-lScePngDec_stub_weak;-lSceSysmodule_stub_weak;-lScePad_stub_weak;-lSceUserService_stub_weak;-lSceSaveData_stub_weak;-lSceSystemService_stub_weak;-lSceNpTrophy_stub_weak;-lSceNpCommon_stub_weak;-lSceNpManager_stub_weak;-lSceVideoRecording_stub_weak;-lSceSaveDataDialog_stub_weak;-lSceCommonDialog_stub_weak;-lSceIme_stub_weak;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>..\BindingGen\bin\$(Configuration)\BindingGen.exe</Command>
@@ -101,6 +101,7 @@
     <ClCompile Include="Graphics\vertexBuffer.cpp" />
     <ClCompile Include="Graphics\vertexShader.cpp" />
     <ClCompile Include="Input\gamePad.cpp" />
+    <ClCompile Include="Input\keyboard.cpp" />
     <ClCompile Include="Media\at9\audio_decoder_at9.cpp" />
     <ClCompile Include="Media\at9\riff_wave_header_at9_parser.cpp" />
     <ClCompile Include="Media\audio_decoder.cpp" />
@@ -139,6 +140,8 @@
     <ClInclude Include="Graphics\vertexShader.h" />
     <ClInclude Include="Input\gamePad.h" />
     <ClInclude Include="Input\gamePadState.h" />
+    <ClInclude Include="Input\keyboard.h" />
+    <ClInclude Include="Input\keyboardState.h" />
     <ClInclude Include="Input\predecls.h" />
     <ClInclude Include="Media\at9\audio_decoder_at9.h" />
     <ClInclude Include="Media\at9\riff_wave_header_at9_parser.h" />

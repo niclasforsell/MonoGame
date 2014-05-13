@@ -166,6 +166,21 @@ namespace Microsoft.Xna.Framework.Input
                     InternalSetKey(k);
         }
 
+#if PLAYSTATION4
+        [System.CLSCompliant(false)]
+        public KeyboardState(uint arg0, uint arg1, uint arg2, uint arg3, uint arg4, uint arg5, uint arg6, uint arg7)
+        {
+            keys0 = arg0;
+            keys1 = arg1;
+            keys2 = arg2;
+            keys3 = arg3;
+            keys4 = arg4;
+            keys5 = arg5;
+            keys6 = arg6;
+            keys7 = arg7;
+        }
+#endif
+
         /// <summary>
         /// Returns the state of a specified key.
         /// </summary>

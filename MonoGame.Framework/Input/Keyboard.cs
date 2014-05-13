@@ -41,6 +41,9 @@
 
 using System;
 using System.Collections.Generic;
+#if PLAYSTATION4
+using PS4Keyboard = Sce.PlayStation4.Input.Keyboard;
+#endif
 
 namespace Microsoft.Xna.Framework.Input
 {
@@ -57,7 +60,11 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>Current keyboard state.</returns>
 		public static KeyboardState GetState()
 		{
+#if PLAYSTATION4
+            return GetState(PlayerIndex.One);
+#else
             return new KeyboardState(_keys);
+#endif
 		}
 		
         /// <summary>
@@ -65,10 +72,14 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
         /// <param name="playerIndex">Player index of the keyboard.</param>
         /// <returns>Current keyboard state.</returns>
-        [Obsolete("Use GetState() instead. In future versions this method can be removed.")]
         public static KeyboardState GetState(PlayerIndex playerIndex)
 		{
+#if PLAYSTATION4
+            var state = PS4Keyboard.GetState((int)playerIndex);
+            return new KeyboardState(state.keys0, state.keys1, state.keys2, state.keys3, state.keys4, state.keys5, state.keys6, state.keys7);
+#else
             return new KeyboardState(_keys);
+#endif
 		}
 
         internal static void SetKeys(List<Keys> keys)
