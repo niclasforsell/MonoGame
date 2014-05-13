@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections.Generic;
+
 namespace MonoGame.Tools.Pipeline
 {
     delegate void SelectionChanged();
@@ -21,7 +23,7 @@ namespace MonoGame.Tools.Pipeline
 
         AskResult AskSaveOrCancel();
 
-        bool AskSaveName(ref string filePath);
+        bool AskSaveName(ref string filePath, string title);
 
         bool AskOpenProject(out string projectFilePath);
 
@@ -30,6 +32,8 @@ namespace MonoGame.Tools.Pipeline
         void ShowError(string title, string message);
 
         void ShowMessage(string message);
+
+        void BeginTreeUpdate();
 
         void SetTreeRoot(IProjectItem item);
 
@@ -41,6 +45,8 @@ namespace MonoGame.Tools.Pipeline
     
         void UpdateTreeItem(IProjectItem item);
 
+        void EndTreeUpdate();
+
         void ShowProperties(IProjectItem item);
 
         void UpdateProperties(IProjectItem item);
@@ -49,6 +55,6 @@ namespace MonoGame.Tools.Pipeline
 
         void OutputClear();
 
-        bool ChooseContentFile(string initialDirectory, out string file);        
+        bool ChooseContentFile(string initialDirectory, out List<string> files);        
     }
 }

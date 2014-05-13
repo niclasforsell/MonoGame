@@ -118,14 +118,25 @@ namespace MonoGame.Tools.Pipeline
             Description = "Build the content source file using the previously set switches and options.")]
         public void OnBuild(string sourceFile)
         {
+            AddContent(sourceFile, false);
+        }
+
+        public bool AddContent(string sourceFile, bool skipDuplicates)
+        {
             // Make sure the source file is relative to the project.
             var projectDir = ProjectDirectory + "\\";
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
-            // Remove duplicates... keep this new one.
+            // Do we have a duplicate?
             var previous = _project.ContentItems.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
             if (previous != -1)
+            {
+                if (skipDuplicates)
+                    return false;
+
+                // Replace the duplicate.
                 _project.ContentItems.RemoveAt(previous);
+            }
 
             // Create the item for processing later.
             var item = new ContentItem
@@ -144,6 +155,8 @@ namespace MonoGame.Tools.Pipeline
             // the build process later.
             foreach (var pair in _processorParams)
                 item.ProcessorParams.Add(pair.Key, pair.Value);
+
+            return true;
         }
 
         [CommandLineParameter(
@@ -381,7 +394,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void ReadIncludeReference(XmlReader io, out string include, out string hintPath)
         {
-            include = io.GetAttribute("Include");
+            include = io.GetAttribute("Include").Unescape();            
             hintPath = null;
 
             if (!io.IsEmptyElement)
@@ -393,7 +406,7 @@ namespace MonoGame.Tools.Pipeline
                     if (io.IsStartElement("HintPath"))
                     {
                         io.Read();
-                        hintPath = io.Value;
+                        hintPath = io.Value.Unescape();
                     }
                 }
             }
@@ -402,7 +415,7 @@ namespace MonoGame.Tools.Pipeline
         private void ReadIncludeContent(XmlReader io, out string include, out string copyToOutputDirectory)
         {
             copyToOutputDirectory = null;
-            include = io.GetAttribute("Include");
+            include = io.GetAttribute("Include").Unescape();
 
             if (!io.IsEmptyElement)
             {
@@ -417,7 +430,7 @@ namespace MonoGame.Tools.Pipeline
                         {
                             case "CopyToOutputDirectory":
                                 io.Read();
-                                copyToOutputDirectory = io.Value;
+                                copyToOutputDirectory = io.Value.Unescape();
                                 break;
                         }
                     }
@@ -436,7 +449,7 @@ namespace MonoGame.Tools.Pipeline
             importer = null;
             processor = null;
 
-            include = io.GetAttribute("Include");
+            include = io.GetAttribute("Include").Unescape();
             var parameters = new List<string>();
 
             if (!io.IsEmptyElement)
@@ -452,15 +465,15 @@ namespace MonoGame.Tools.Pipeline
                         {
                             case "Name":
                                 io.Read();
-                                name = io.Value;
+                                name = io.Value.Unescape();
                                 break;
                             case "Importer":
                                 io.Read();
-                                importer = io.Value;
+                                importer = io.Value.Unescape();
                                 break;
                             case "Processor":
                                 io.Read();
-                                processor = io.Value;
+                                processor = io.Value.Unescape();
                                 break;
                             default:
                                 if (io.LocalName.Contains("ProcessorParameters_"))
@@ -469,7 +482,7 @@ namespace MonoGame.Tools.Pipeline
                                     line += "=";
                                     io.Read();
                                     line += io.Value;
-                                    parameters.Add(line);
+                                    parameters.Add(line.Unescape());
                                 }
                                 break;
                         }
