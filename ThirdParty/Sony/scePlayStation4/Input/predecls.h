@@ -6,6 +6,7 @@
 // Include all pre-declarations used from header files.
 
 typedef int32_t ControllerHandle;
+typedef int32_t MouseHandle;
 typedef int32_t SceUserServiceUserId;
 
 namespace Input {
@@ -14,4 +15,7 @@ namespace Input {
 
 	struct CS_VALUE_TYPE KeyboardState;
 	class Keyboard;
+
+	struct CS_VALUE_TYPE MouseState;
+	class Mouse;
 }

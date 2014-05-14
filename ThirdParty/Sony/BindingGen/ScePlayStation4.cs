@@ -63,6 +63,8 @@ namespace BindingGen
             options.Headers.Add(@"Input\GamePad.h");
             options.Headers.Add(@"Input\KeyboardState.h");
             options.Headers.Add(@"Input\Keyboard.h");
+            options.Headers.Add(@"Input\MouseState.h");
+            options.Headers.Add(@"Input\Mouse.h");
             options.Headers.Add(@"Media\Song.h");
             options.Headers.Add(@"UserService.h");
 

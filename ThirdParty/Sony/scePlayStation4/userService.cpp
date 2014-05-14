@@ -1,6 +1,7 @@
 #include "userService.h"
 #include "Input/gamePad.h"
 #include "Input/keyboard.h"
+#include "Input/mouse.h"
 
 #include <assert.h>
 #include <user_service.h>
@@ -20,12 +21,14 @@ void UserService::Initialize()
 
 	Input::GamePad::Initialize();
 	Input::Keyboard::Initialize();
+	Input::Mouse::Initialize();
 }
 
 void UserService::Terminate()
 {
 	Input::GamePad::Terminate();
 	Input::Keyboard::Terminate();
+	Input::Mouse::Terminate();
 
 	auto ret = sceUserServiceTerminate();
 	assert(ret == SCE_OK);
@@ -48,6 +51,7 @@ void UserService::Update(float elapsedSeconds)
 
 			Input::GamePad::Enable(event.userId);
 			Input::Keyboard::Enable(event.userId);
+			Input::Mouse::Enable(event.userId);
 
 			break;
 
@@ -57,6 +61,7 @@ void UserService::Update(float elapsedSeconds)
 
 			Input::GamePad::Disable(event.userId);
 			Input::Keyboard::Disable(event.userId);
+			Input::Mouse::Disable(event.userId);
 
 			break;
 		}
@@ -64,6 +69,7 @@ void UserService::Update(float elapsedSeconds)
 
 	Input::GamePad::Update(elapsedSeconds);
 	Input::Keyboard::Update();
+	Input::Mouse::Update();
 }
 
 void UserService::SetLoginCallback(user_event_callback callback)

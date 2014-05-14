@@ -83,6 +83,9 @@
     <ClCompile Include="Input\vkeys.h">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="Input\mouse.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -217,6 +220,12 @@
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="Input\keyboardState.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\mouse.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\mouseState.h">
       <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
