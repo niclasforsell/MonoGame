@@ -405,6 +405,7 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 	Gnm::BlendControl blendControl;
 	blendControl.init();
 	gfxc.setBlendControl(0, blendControl);
+	gfxc.setScanModeControl(Gnm::kScanModeControlAaDisable, Gnm::kScanModeControlViewportScissorDisable);
 
 	// We do the draw using a rect primitive and a vertex
 	// shader that generates the position from ids.
