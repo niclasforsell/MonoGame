@@ -157,6 +157,16 @@ namespace Microsoft.Xna.Framework.Input
 	    window.MouseState.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
 #endif
 
+#if PLAYSTATION4
+            var state = Sce.PlayStation4.Input.Mouse.GetState((int)PlayerIndex.One);
+            window.MouseState.LeftButton = (state.Buttons & 0x1) != 0 ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.RightButton = (state.Buttons & 0x2) != 0 ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.MiddleButton = (state.Buttons & 0x4) != 0 ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.ScrollWheelValue += state.Wheel;
+            window.MouseState.X = MathHelper.Clamp(window.MouseState.X + state.XAxis, window.ClientBounds.Left, window.ClientBounds.Right);
+            window.MouseState.Y = MathHelper.Clamp(window.MouseState.Y + state.YAxis, window.ClientBounds.Top, window.ClientBounds.Bottom);
+#endif
+
             return window.MouseState;
         }
 
