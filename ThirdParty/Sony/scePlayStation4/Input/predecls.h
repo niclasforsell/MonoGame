@@ -10,4 +10,8 @@ typedef int32_t SceUserServiceUserId;
 
 namespace Input {
 	struct CS_VALUE_TYPE GamePadState;
+	class GamePad;
+
+	struct CS_VALUE_TYPE KeyboardState;
+	class Keyboard;
 }

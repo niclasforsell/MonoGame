@@ -77,6 +77,12 @@
     <ClCompile Include="Graphics\fetchShader.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Input\keyboard.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\vkeys.h">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -206,6 +212,12 @@
     </ClInclude>
     <ClInclude Include="Graphics\fetchShader.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\keyboard.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\keyboardState.h">
+      <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
