@@ -36,9 +36,18 @@ namespace Microsoft.Xna.Framework.Graphics
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
+            // TODO: We need to figure out the correct behavior 
+            // for SetDataOptions.None on a dynamic buffer.
+            //
+            // For now we always discard as it is a pretty safe default.
+            //
+            var discard =   _isDynamic &&
+                            (   options == SetDataOptions.Discard ||
+                                options == SetDataOptions.None);
+
             unsafe
             {
-                _buffer.SetData(GraphicsDevice._system, offsetInBytes, (byte*)dataPtr, dataBytes, (options & SetDataOptions.Discard) != 0);
+                _buffer.SetData(GraphicsDevice._system, offsetInBytes, (byte*)dataPtr, dataBytes, discard);
             }
 
             dataHandle.Free();
