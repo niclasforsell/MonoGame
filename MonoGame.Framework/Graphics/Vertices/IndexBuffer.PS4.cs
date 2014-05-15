@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-            var elementSizeInBytes = IndexElementSize == IndexElementSize.SixteenBits ? sizeof(Int16) : sizeof(Int32);
+            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
             var startBytes = startIndex * elementSizeInBytes;
             var dataBytes = elementCount * elementSizeInBytes;
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
