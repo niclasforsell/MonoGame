@@ -1,7 +1,7 @@
 #include "mouse.h"
 #include "mouseState.h"
-#include "../allocator.h"
 
+#include <memory.h>
 #include <assert.h>
 #include <sceerror.h>
 #include <libsysmodule.h>
@@ -13,32 +13,15 @@ namespace {
 	const int PLAYER_MAX = 4;
 
 	MouseHandle handles[PLAYER_MAX];
-	MouseState* states[PLAYER_MAX];
-	SceUserServiceUserId users[PLAYER_MAX];
-
-	int findOpenSlot()
-	{
-		for (auto i = 0; i < PLAYER_MAX; i++)
-		{
-			if (handles[i] == -1)
-				return i;
-		}
-
-		return -1;
-	}
+	MouseState states[PLAYER_MAX];
 }
 
 void Mouse::Initialize()
 {
-	for (auto i = 0; i < PLAYER_MAX; i++)
-	{
-		handles[i] = -1;
-		states[i] = (MouseState*)Allocator::Get()->allocate(sizeof(MouseState));
-		memset(states[i], 0, sizeof(MouseState));
-		users[i] = -1;
-	}
+	memset(handles, -1, sizeof(MouseHandle) * PLAYER_MAX);
+	memset(states, 0, sizeof(MouseState));
 
-    auto ret = sceSysmoduleLoadModule(SCE_SYSMODULE_MOUSE);
+	auto ret = sceSysmoduleLoadModule(SCE_SYSMODULE_MOUSE);
 	if (ret < 0)
 	{
 		printf("ERROR: Couldn't initialize mouse input library: 0x%08X\n", ret);
@@ -55,9 +38,6 @@ void Mouse::Initialize()
 void Mouse::Terminate()
 {
 	sceSysmoduleUnloadModule(SCE_SYSMODULE_MOUSE);
-
-	for (auto i = 0; i < PLAYER_MAX; i++)
-		Allocator::Get()->release(states[i]);
 }
 
 void Mouse::Update()
@@ -70,7 +50,7 @@ void Mouse::Update()
 		if (handle == -1)
 			continue;
 
-		auto state = states[i];
+		auto state = &states[i];
 		SceMouseData data;
 		memset(&data, 0, sizeof(SceMouseData));
 		const int desiredSamples = 1;
@@ -105,46 +85,27 @@ void Mouse::Update()
 	}
 }
 
-int Mouse::Enable(SceUserServiceUserId userId)
+int Mouse::Enable(SceUserServiceUserId userId, int playerIndex)
 {
-	// Is this user already enabled?
-	for (auto i = 0; i < PLAYER_MAX; i++)
-	{
-		if (users[i] == userId)
-			return i;
-	}
+	auto handle = sceMouseOpen(userId, SCE_MOUSE_PORT_TYPE_STANDARD, 0, NULL);
+	assert(handle >= 0);
 
-	auto playerIndex = findOpenSlot();
-	if (playerIndex >= 0)
-	{
-		auto handle = sceMouseOpen(userId, SCE_MOUSE_PORT_TYPE_STANDARD, 0, NULL);
-		assert(handle >= 0);
+	handles[playerIndex] = handle;
+	memset(&states[playerIndex], 0, sizeof(MouseState));
 
-		handles[playerIndex] = handle;
-		users[playerIndex] = userId;
-	}
-
-	return playerIndex;
+	return 0;
 }
 
-int Mouse::Disable(SceUserServiceUserId userId)
+int Mouse::Disable(int playerIndex)
 {
-	for (auto i = 0; i < PLAYER_MAX; i++)
-	{
-		if (users[i] != userId)
-			continue;
+	auto handle = handles[playerIndex];
+	auto ret = sceMouseClose(handle);
+	assert (ret == SCE_OK);
 
-		auto handle = handles[i];
-		auto ret = sceMouseClose(handle);
-		assert (ret == SCE_OK);
+	handles[playerIndex] = -1;
+	memset(&states[playerIndex], 0, sizeof(MouseState));
 
-		handles[i] = -1;
-		users[i] = -1;
-
-		return i;
-	}
-
-	return -1;
+	return 0;
 }
 
 MouseState* Mouse::GetState(int playerIndex)
@@ -152,6 +113,6 @@ MouseState* Mouse::GetState(int playerIndex)
 	assert(playerIndex >= 0);
 	assert(playerIndex < PLAYER_MAX);
 
-	return states[playerIndex];
+	return &states[playerIndex];
 }
 
