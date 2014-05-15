@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 typedef int32_t SceUserServiceUserId;
-typedef void (*user_event_callback)(SceUserServiceUserId userId);
+typedef void (*user_event_callback)(SceUserServiceUserId userId, int playerIndex);
 
 class __declspec(dllexport) UserService
 {

@@ -1,11 +1,12 @@
 #include "keyboard.h"
 #include "keyboardState.h"
-#include "../allocator.h"
+#include "../userService.h"
 #include "vkeys.h"
 
 #include <cstdio>
 #include <assert.h>
 #include <sceerror.h>
+#include <kernel.h>
 #include <libsysmodule.h>
 #include <libime.h>
 #include <system_service.h>
@@ -17,34 +18,12 @@ namespace {
 	const int SYSTEM_UI_SLEEP_MICROSEC = 5000;
 
 	bool isActive;
-	KeyboardState* states[PLAYER_MAX];
-	SceUserServiceUserId users[PLAYER_MAX];
-
-	int findOpenSlot()
-	{
-		for (auto i = 0; i < PLAYER_MAX; i++)
-		{
-			if (users[i] == -1)
-				return i;
-		}
-
-		return -1;
-	}
-
-	KeyboardState* findStateByUser(SceUserServiceUserId userId)
-	{
-		for (auto i = 0; i < PLAYER_MAX; i++)
-		{
-			if (users[i] == userId)
-				return states[i];
-		}
-
-		return nullptr;
-	}
+	KeyboardState states[PLAYER_MAX];
 
 	void HandleKeyboard(void* arg, const SceImeEvent* e)
 	{
 		auto userId = e->param.keycode.userId;
+		auto playerIndex = UserService::GetPlayerIndexByUserId(userId);
 
 		auto usbKeyCode = (uint8_t)e->param.keycode.keycode;
 		auto virtKeyCode = toVKcode[usbKeyCode];
@@ -61,13 +40,13 @@ namespace {
 
 		case SCE_IME_KEYBOARD_EVENT_KEYCODE_DOWN:
 			{
-				auto state = findStateByUser(userId);
-				if (state == nullptr)
+				if (playerIndex < 0)
 				{
 					printf("WARNING: User %d not found for keydown event.\n", userId);
 					return;
 				}
 
+				auto state = &states[playerIndex];
 				switch(keys)
 				{
 				case 0: state->keys0 |= mask; break;
@@ -84,13 +63,13 @@ namespace {
 
 		case SCE_IME_KEYBOARD_EVENT_KEYCODE_UP:
 			{
-				auto state = findStateByUser(userId);
-				if (state == nullptr)
+				if (playerIndex < 0)
 				{
 					printf("WARNING: User %d not found for keyup event.\n", userId);
 					return;
 				}
 
+				auto state = &states[playerIndex];
 				switch(keys)
 				{
 				case 0: state->keys0 &= ~mask; break;
@@ -104,6 +83,9 @@ namespace {
 				}
 			}
 			break;
+
+		default:
+			break;
 		}
 	}
 }
@@ -112,12 +94,7 @@ void Keyboard::Initialize()
 {
 	if (sceSysmoduleIsLoaded(SCE_SYSMODULE_LIBIME) != SCE_OK)
 	{
-		for (auto i = 0; i < PLAYER_MAX; i++)
-		{
-			states[i] = (KeyboardState*)Allocator::Get()->allocate(sizeof(KeyboardState));
-			memset(states[i], 0, sizeof(KeyboardState));
-			users[i] = -1;
-		}
+		memset(states, 0, sizeof(KeyboardState) * PLAYER_MAX);
 
 		auto ret = sceSysmoduleLoadModule(SCE_SYSMODULE_LIBIME);
 		if (ret < 0)
@@ -161,9 +138,6 @@ void Keyboard::Terminate()
 {
 	isActive = false;
 	sceSysmoduleUnloadModule(SCE_SYSMODULE_LIBIME);
-
-	for (auto i = 0; i < PLAYER_MAX; i++)
-		Allocator::Get()->release(states[i]);
 }
 
 void Keyboard::Restart()
@@ -193,38 +167,18 @@ void Keyboard::Update()
 	}
 }
 
-int Keyboard::Enable(SceUserServiceUserId userId)
+int Keyboard::Enable(SceUserServiceUserId userId, int playerIndex)
 {
-	// Is this user already enabled?
-	for (auto i = 0; i < PLAYER_MAX; i++)
-	{
-		if (users[i] == userId)
-			return i;
-	}
+	memset(&states[playerIndex], 0, sizeof(KeyboardState));
 
-	auto playerIndex = findOpenSlot();
-	if (playerIndex >= 0)
-	{
-		users[playerIndex] = userId;
-		memset(states[playerIndex], 0, sizeof(KeyboardState));
-	}
-
-	return playerIndex;
+	return 0;
 }
 
-int Keyboard::Disable(SceUserServiceUserId userId)
+int Keyboard::Disable(int playerIndex)
 {
-	for (auto i = 0; i < PLAYER_MAX; i++)
-	{
-		if (users[i] != userId)
-			continue;
+	memset(&states[playerIndex], 0, sizeof(KeyboardState));
 
-		users[i] = -1;
-		memset(states[i], 0, sizeof(KeyboardState));
-		return i;
-	}
-
-	return -1;
+	return 0;
 }
 
 KeyboardState* Keyboard::GetState(int playerIndex)
@@ -232,5 +186,5 @@ KeyboardState* Keyboard::GetState(int playerIndex)
 	assert(playerIndex >= 0);
 	assert(playerIndex < PLAYER_MAX);
 
-	return states[playerIndex];
+	return &states[playerIndex];
 }

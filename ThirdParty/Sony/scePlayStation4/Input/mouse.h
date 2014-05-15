@@ -7,12 +7,12 @@ namespace Input {
 class __declspec(dllexport) Mouse
 {
 public:
-	static void Initialize();
-	static void Terminate();
-	static void Update();
+	CS_IGNORE static void Initialize();
+	CS_IGNORE static void Terminate();
+	CS_IGNORE static void Update();
 
-	static int Enable(SceUserServiceUserId userId);
-	static int Disable(SceUserServiceUserId userId);
+	CS_IGNORE static int Enable(SceUserServiceUserId userId, int playerIndex);
+	CS_IGNORE static int Disable(int playerIndex);
 
 	static MouseState* GetState(int playerIndex);
 };

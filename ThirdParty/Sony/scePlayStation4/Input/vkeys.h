@@ -1,6 +1,4 @@
-#pragma once
-
-#include "predecls.h"
+#include <stdint.h>
 
 uint8_t toVKcode[256] = {
 	0,      // SCE_IME_KEYCODE_NOEVENT

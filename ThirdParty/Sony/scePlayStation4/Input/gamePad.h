@@ -7,12 +7,12 @@ namespace Input {
 class __declspec(dllexport) GamePad
 {
 public:
-	static void Initialize();
-	static void Terminate();
-	static void Update(float elapsedSeconds);
+	CS_IGNORE static void Initialize();
+	CS_IGNORE static void Terminate();
+	CS_IGNORE static void Update();
 
-	static int Enable(SceUserServiceUserId userId);
-	static int Disable(SceUserServiceUserId userId);
+	CS_IGNORE static int Enable(SceUserServiceUserId userId, int playerIndex);
+	CS_IGNORE static int Disable(int playerIndex);
 
 	static GamePadState* GetState(int playerIndex);
 	static bool SetVibration(int playerIndex, float smallMotor, float largeMotor);

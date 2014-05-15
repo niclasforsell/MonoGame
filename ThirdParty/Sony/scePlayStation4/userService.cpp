@@ -34,11 +34,11 @@ namespace {
 			users[playerIndex] = userId;
 
 			if (loginCallback != NULL)
-				loginCallback(userId);
+				loginCallback(userId, playerIndex);
 
-			Input::GamePad::Enable(userId);
-			Input::Keyboard::Enable(userId);
-			Input::Mouse::Enable(userId);
+			Input::GamePad::Enable(userId, playerIndex);
+			Input::Keyboard::Enable(userId, playerIndex);
+			Input::Mouse::Enable(userId, playerIndex);
 		}
 		else
 		{
@@ -48,19 +48,19 @@ namespace {
 
 	void OnLogout(SceUserServiceUserId userId)
 	{
-		for (auto i = 0; i < PLAYER_MAX; i++)
+		for (auto playerIndex = 0; playerIndex < PLAYER_MAX; playerIndex++)
 		{
-			if (users[i] != userId)
+			if (users[playerIndex] != userId)
 				continue;
 
 			if (logoutCallback != NULL)
-				logoutCallback(userId);
+				logoutCallback(userId, playerIndex);
 
-			Input::GamePad::Disable(userId);
-			Input::Keyboard::Disable(userId);
-			Input::Mouse::Disable(userId);
+			Input::GamePad::Disable(playerIndex);
+			Input::Keyboard::Disable(playerIndex);
+			Input::Mouse::Disable(playerIndex);
 
-			users[i] = -1;
+			users[playerIndex] = -1;
 		}
 	}
 }
@@ -124,7 +124,7 @@ void UserService::Update(float elapsedSeconds)
 		}
 	}
 
-	Input::GamePad::Update(elapsedSeconds);
+	Input::GamePad::Update();
 	Input::Keyboard::Update();
 	Input::Mouse::Update();
 }
