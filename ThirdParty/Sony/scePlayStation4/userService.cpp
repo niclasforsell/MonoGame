@@ -147,7 +147,6 @@ int UserService::GetPlayerIndexByUserId(SceUserServiceUserId userId)
 			return i;
 	}
 
-	printf("WARNING: Unable to find user %d in %s\n", userId, __FUNCTION__);
 	return -1;
 }
 
