@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Content.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Windows", "..\..\MonoGame.Framework\MonoGame.Framework.Windows.csproj", "{7DE47032-A904-4C29-BD22-2D235E8D91BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Windows", "..\..\ThirdParty\Lidgren.Network\Lidgren.Network.Windows.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "scePlayStation4Tools", "..\..\ThirdParty\Sony\scePlayStation4Tools\scePlayStation4Tools.vcxproj", "{80316BFA-C181-4977-BF9C-D68469101604}"
 EndProject
 Global
@@ -29,10 +27,6 @@ Global
 		{7DE47032-A904-4C29-BD22-2D235E8D91BA}.Debug|x64.Build.0 = Debug|Any CPU
 		{7DE47032-A904-4C29-BD22-2D235E8D91BA}.Release|x64.ActiveCfg = Release|Any CPU
 		{7DE47032-A904-4C29-BD22-2D235E8D91BA}.Release|x64.Build.0 = Release|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|x64.Build.0 = Debug|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x64.ActiveCfg = Release|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x64.Build.0 = Release|Any CPU
 		{80316BFA-C181-4977-BF9C-D68469101604}.Debug|x64.ActiveCfg = Debug|x64
 		{80316BFA-C181-4977-BF9C-D68469101604}.Debug|x64.Build.0 = Debug|x64
 		{80316BFA-C181-4977-BF9C-D68469101604}.Release|x64.ActiveCfg = Release|x64
