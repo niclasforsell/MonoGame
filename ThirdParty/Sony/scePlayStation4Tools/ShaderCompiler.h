@@ -318,13 +318,14 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 		sce::Shader::Binary::Program *_program;
 
 		array<Byte>^ _bytecode;
+		array<Byte>^ _shaderDebugData;
 
 		void _reset();
 
 	public:
 		ShaderCompiler();
 
-		bool Compile(String^ code, String^ entryPoint, String^ profile, [Out]String^ %buildOutput);
+		bool Compile(String^ filePath, String^ code, String^ entryPoint, String^ profile, bool debug, [Out]String^ %buildOutput);
 
 		bool Reflect(array<Byte>^ bytecode);
 
@@ -356,6 +357,10 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 			array<Byte>^ get() { return _bytecode; }
 		}
 
+		property array<Byte>^ ShaderDebugData
+		{ 
+			array<Byte>^ get() { return _shaderDebugData; }
+		}
 	};
 
 }}}

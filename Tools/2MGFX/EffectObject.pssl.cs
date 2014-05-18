@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace TwoMGFX
 {
@@ -11,10 +12,25 @@ namespace TwoMGFX
             try
             {
                 string buildOutput;
-                compiler.Compile(   shaderInfo.fileContent,
+                compiler.Compile(   shaderInfo.FilePath,
+                                    shaderInfo.FileContent,
                                     shaderFunction,
                                     shaderProfile,
+                                    shaderInfo.Debug,
                                     out buildOutput);
+
+                if (shaderInfo.Debug && compiler.ShaderDebugData != null)
+                {
+                    var baseFile = Path.GetFileName(shaderInfo.FilePath);
+                    var baseFolder = Path.GetDirectoryName(shaderInfo.OutputFilePath);
+                    var shaderDebugFile = Path.Combine( baseFolder,
+                                                        baseFile + "." + shaderFunction + ".sdb");
+                    File.WriteAllBytes(shaderDebugFile, compiler.ShaderDebugData);
+
+                    // Register the additional output file
+                    // so that MGCB can do cleanup later.
+                    shaderInfo.AdditionalOutputFiles.Add(shaderDebugFile);
+                }
             }
             catch (Exception ex)
             {

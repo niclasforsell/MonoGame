@@ -17,6 +17,7 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 ShaderCompiler::ShaderCompiler()
 {
 	_bytecode = nullptr;
+	_shaderDebugData = nullptr;
 	_program = NULL;
 }
 
@@ -26,6 +27,12 @@ void ShaderCompiler::_reset()
 	{
 		delete _bytecode;
 		_bytecode = nullptr;
+	}
+
+	if (_shaderDebugData != nullptr)
+	{
+		delete _shaderDebugData;
+		_shaderDebugData = nullptr;
 	}
 
 	if (_program != NULL)
@@ -45,11 +52,9 @@ Compiler::SourceFile* OpenFileCallback(
 	return sourceFile;
 }
 
-bool ShaderCompiler::Compile(String^ code, String^ entryPoint, String^ profile, [Out]String^ %buildOutput)
+bool ShaderCompiler::Compile(String^ filePath, String^ code, String^ entryPoint, String^ profile, bool debug, [Out]String^ %buildOutput)
 {
 	_reset();
-
-	auto fileName = "main_source_file.fx";
 
 	Compiler::Options options;
 	Compiler::initializeOptions(&options);
@@ -62,16 +67,34 @@ bool ShaderCompiler::Compile(String^ code, String^ entryPoint, String^ profile, 
 	{
 		throw gcnew Exception("Invalid target profile!");
 	}
-	
+
+	auto sourceFilePath = (const char*)(Marshal::StringToHGlobalAnsi(filePath).ToPointer());
+
 	options.entryFunctionName = (const char*)(Marshal::StringToHGlobalAnsi(entryPoint).ToPointer());
-	options.mainSourceFile = fileName;
+	options.mainSourceFile = sourceFilePath;
 	options.sourceLanguage = Compiler::SourceLanguage::kSourceLanguagePssl;
 
 	Compiler::SourceFile sourceFile;
-	sourceFile.fileName = fileName;
+	sourceFile.fileName = sourceFilePath;
 	sourceFile.text = (const char*)(Marshal::StringToHGlobalAnsi(code).ToPointer());
 	sourceFile.size = _mbstrlen(sourceFile.text);
 	options.userData = &sourceFile;
+
+	if (debug)
+	{
+		// Generate the cache file for shader association, including the 
+		// abstract syntax tree of the shader source.
+		options.sdbCache = 2;
+
+		// Add extra debug instrumentation.
+		options.addInstrumentation = 1;
+
+		// Reduce optimization levels.
+		options.optimizationLevel = 0;
+		options.useFastmath = 0;
+		options.useFastprecision = 0;
+		options.useFastint = 0;
+	}
 
 	Compiler::CallbackList callbacks;
 	Compiler::initializeCallbackList(&callbacks, Compiler::CallbackDefaults::kCallbackDefaultsTrivial);
@@ -134,6 +157,12 @@ bool ShaderCompiler::Compile(String^ code, String^ entryPoint, String^ profile, 
 
 	_bytecode = gcnew array<Byte>(output->programSize);
 	Marshal::Copy((IntPtr)(void*)output->programData, _bytecode, 0, output->programSize);
+
+	if (output->sdbData != NULL)
+	{
+		_shaderDebugData = gcnew array<Byte>(output->sdbDataSize);
+		Marshal::Copy((IntPtr)(void*)output->sdbData, _shaderDebugData, 0, output->sdbDataSize);
+	}
 
 	Compiler::destroyOutput(output);
 
