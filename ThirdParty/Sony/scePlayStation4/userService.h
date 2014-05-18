@@ -7,10 +7,9 @@ typedef void (*user_event_callback)(SceUserServiceUserId userId, int playerIndex
 
 class __declspec(dllexport) UserService
 {
-public:
-	UserService();
-	~UserService();
+	UserService() {}
 
+public:
 	static void Initialize();
 	static void Terminate();
 	static void Update(float elapsedSeconds);

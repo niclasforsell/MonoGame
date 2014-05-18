@@ -6,6 +6,8 @@ namespace Input {
 
 class __declspec(dllexport) GamePad
 {
+	GamePad() {}
+
 public:
 	CS_IGNORE static void Initialize();
 	CS_IGNORE static void Terminate();
