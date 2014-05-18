@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <kernel.h>
+#include <assert.h>
 
 // RegionAllocator
 using namespace sce;
