@@ -385,14 +385,19 @@ void GraphicsSystem::Clear(ClearOptions options, float r, float g, float b, floa
 	// Are we clearing stencil?
 	sce::Gnm::StencilControl stencilControl;
 	stencilControl.init();
+	sce::Gnm::StencilOpControl stencilOpControl;
+	stencilOpControl.init();
 	if (clearStencil)
 	{
 		stencilControl.m_testVal = 0xFF;
 		stencilControl.m_mask = 0xFF;
 		stencilControl.m_writeMask = 0xFF;
 		stencilControl.m_opVal = 0xFF;
+		stencilOpControl.setStencilOps(Gnm::StencilOp::kStencilOpReplaceOp, Gnm::StencilOp::kStencilOpReplaceOp, Gnm::StencilOp::kStencilOpReplaceOp);
+		stencilOpControl.setStencilOpsBack(Gnm::StencilOp::kStencilOpReplaceOp, Gnm::StencilOp::kStencilOpReplaceOp, Gnm::StencilOp::kStencilOpReplaceOp);
 	}
 	gfxc.setStencil(stencilControl);
+	gfxc.setStencilOpControl(stencilOpControl);
 
 	gfxc.setStencilClearValue(stencil);
 	gfxc.setDepthClearValue(depth);
