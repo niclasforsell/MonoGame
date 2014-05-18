@@ -83,6 +83,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             try
             {
                 shaderInfo = ShaderInfo.FromFile(options.SourceFile, options);
+
+                // Add the include dependencies so that if they change
+                // it will trigger a rebuild of this effect.
                 foreach (var dep in shaderInfo.Dependencies)
                     context.AddDependency(dep);
             }
@@ -97,6 +100,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             try
             {
                 effect = EffectObject.FromShaderInfo(shaderInfo);
+
+                // If there were any additional output files we register
+                // them so that the cleanup process can manage them.
+                foreach (var outfile in shaderInfo.AdditionalOutputFiles)
+                    context.AddOutputFile(outfile);
             }
             catch (Exception ex)
             {
