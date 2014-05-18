@@ -22,6 +22,8 @@
 #include <video_out.h>
 #include <gnm.h>
 #include <gnmx.h>
+#include <assert.h>
+#include <scebase.h>
 
 
 using namespace sce;
@@ -146,8 +148,18 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		// Compute the tiling mode for the render target
 		Gnm::TileMode tileMode;
 		auto format = ToSwapchainDataFormat(backbufferFormat);
-		if( !GpuAddress::computeSurfaceTileMode(&tileMode,
-			GpuAddress::kSurfaceTypeColorTargetDisplayable, format, 1) )
+
+		bool tileSurfaceFailed;
+
+#if SCE_ORBIS_SDK_VERSION >= 0x01700081u // SDK Version 1.7
+
+		tileSurfaceFailed = GpuAddress::computeSurfaceTileMode(&tileMode, GpuAddress::kSurfaceTypeColorTargetDisplayable, format, 1) != SCE_OK;
+#else
+		tileSurfaceFailed = !GpuAddress::computeSurfaceTileMode(&tileMode, GpuAddress::kSurfaceTypeColorTargetDisplayable, format, 1);
+
+#endif
+
+		if( tileSurfaceFailed )
 		{
 			printf("Cannot compute the tile mode for the render target surface\n");
 			return; // SCE_KERNEL_ERROR_UNKNOWN;
@@ -180,8 +192,16 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		{
 			auto depthFormat = ToDataFormat(depthFormat_);
 			Gnm::TileMode depthTileMode;
-			if( !GpuAddress::computeSurfaceTileMode(&depthTileMode,
-				GpuAddress::kSurfaceTypeDepthOnlyTarget, depthFormat, 1) )
+
+#if SCE_ORBIS_SDK_VERSION >= 0x01700081u // SDK Version 1.7
+
+			tileSurfaceFailed = GpuAddress::computeSurfaceTileMode(&depthTileMode, GpuAddress::kSurfaceTypeDepthOnlyTarget, depthFormat, 1) != SCE_OK;
+#else
+			tileSurfaceFailed = !GpuAddress::computeSurfaceTileMode(&depthTileMode, GpuAddress::kSurfaceTypeDepthOnlyTarget, depthFormat, 1);
+
+#endif
+
+			if( tileSurfaceFailed )
 			{
 				printf("Cannot compute the tile mode for the depth stencil surface\n");
 				return; // SCE_KERNEL_ERROR_UNKNOWN;
