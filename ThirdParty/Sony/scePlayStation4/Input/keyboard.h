@@ -6,6 +6,8 @@ namespace Input {
 
 class __declspec(dllexport) Keyboard
 {
+	Keyboard() { }
+
 public:
 	CS_IGNORE static void Initialize();
 	CS_IGNORE static void Terminate();
