@@ -155,13 +155,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_vertexBufferDirty)
             {
                 if (_vertexBuffer != null)
-                    _system.SetVertexBuffer(_vertexBuffer._buffer);
+                    _system.VertexBuffer = _vertexBuffer._buffer;
             }
 
             if (_indexBufferDirty)
             {
                 if (_indexBuffer != null)
-                    _system.SetIndexBuffer(_indexBuffer._buffer);
+                    _system.IndexBuffer = _indexBuffer._buffer;
                 _indexBufferDirty = false;
             }
 
@@ -179,7 +179,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_pixelShaderDirty)
             {
-                _system.SetPixelShader(_pixelShader._pixelShader);
+                _system.PixelShader = _pixelShader._pixelShader;
                 _pixelShaderDirty = false;
             }
 

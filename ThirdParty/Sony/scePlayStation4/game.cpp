@@ -4,7 +4,7 @@
 
 collect_function Game::_collect = NULL;
 
-bool Game::IsActive()
+bool Game::GetIsActive()
 {
 	SceSystemServiceStatus status;
 	sceSystemServiceGetStatus(&status);

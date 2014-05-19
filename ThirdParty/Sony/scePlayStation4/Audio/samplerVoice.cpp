@@ -191,7 +191,7 @@ float SamplerVoice::GetPitch()
 
 SamplerVoice::~SamplerVoice(void)
 {
-	SoundSystem::Instance()->DestroyVoice(this);
+	SoundSystem::GetInstance()->DestroyVoice(this);
 
 	_voiceHandleID = 0;
 }

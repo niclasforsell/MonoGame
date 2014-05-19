@@ -12,7 +12,7 @@
 
 using namespace Audio;
 
-SoundSystem* SoundSystem::Instance()
+SoundSystem* SoundSystem::GetInstance()
 {
 	static SoundSystem instance;
 
@@ -256,6 +256,3 @@ void SoundSystem::CloseControllerPort(int playerIdx)
 	_masteringPadVoiceHandle[playerIdx] = 0;
 }
 
-SoundSystem::~SoundSystem(void)
-{
-}

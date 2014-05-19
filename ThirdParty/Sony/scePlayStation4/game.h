@@ -11,7 +11,8 @@ private:
 
 public:
 
-	static bool IsActive();
+	static bool GetIsActive();
+
 	static void HideSplashScreen();
 	
 	static void SetManagedCollect(collect_function func);

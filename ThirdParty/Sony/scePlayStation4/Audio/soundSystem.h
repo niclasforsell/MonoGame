@@ -10,7 +10,7 @@ class __declspec(dllexport) SoundSystem
 
 private:
 	
-	SoundSystem(void);
+	SoundSystem();
 
 	unsigned int _currentVoiceHandle;
 
@@ -37,7 +37,7 @@ public:
 	void DestroyVoice(SamplerVoice* voice);
 	SamplerVoice* CreateVoice(AudioBuffer* buffer);
 
-	static SoundSystem* Instance();
+	static SoundSystem* GetInstance();
 
 	void Initialize();
 
@@ -46,7 +46,6 @@ public:
 	void OpenControllerPort(int playerIdx, uint32_t userID);
 	void CloseControllerPort(int playerIdx);
 
-	~SoundSystem(void);
 };
 
 } // namespace Audio

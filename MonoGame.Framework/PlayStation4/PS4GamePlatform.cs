@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework
             SoundSystem.Instance.Initialize();
             UserService.Initialize();
 //            SaveDataSystem.Initialize();
-            Sce.PlayStation4.Game.SetManagedCollect(CollectAndWait);
+            Sce.PlayStation4.Game.ManagedCollect = CollectAndWait;
 
             base.BeforeInitialize();
         }
