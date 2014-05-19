@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CppSharp">
-      <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.dll</HintPath>
-    </Reference>
     <Reference Include="CppSharp.AST">
       <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.AST.dll</HintPath>
     </Reference>
@@ -43,9 +40,6 @@
     </Reference>
     <Reference Include="CppSharp.Parser">
       <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.Parser.dll</HintPath>
-    </Reference>
-    <Reference Include="CppSharp.Runtime">
-      <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

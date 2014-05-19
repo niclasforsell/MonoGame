@@ -23,7 +23,7 @@ namespace BindingGen
             options.MicrosoftMode = false;
             options.NoBuiltinIncludes = true;
             options.WriteOnlyWhenChanged = true;
-            //options.CompileCode = false;
+            options.CompileCode = false;
 
             // Flip on verbose mode if you have an issue to debug.
             options.Verbose = false;
