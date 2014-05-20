@@ -5,7 +5,7 @@
 
 namespace Audio {
 
-class __declspec(dllexport) AudioBuffer
+class CS_API AudioBuffer
 {
 	friend class SoundSystem;
 	friend class SamplerVoice;

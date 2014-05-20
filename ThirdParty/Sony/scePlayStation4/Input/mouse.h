@@ -4,7 +4,7 @@
 
 namespace Input {
 
-class __declspec(dllexport) Mouse
+class CS_API Mouse
 {
 	Mouse() {}
 

@@ -4,7 +4,7 @@
 
 namespace Input {
 
-class __declspec(dllexport) Keyboard
+class CS_API Keyboard
 {
 	Keyboard() { }
 

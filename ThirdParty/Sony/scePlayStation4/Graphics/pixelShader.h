@@ -6,7 +6,7 @@
 namespace Graphics {
 
 	
-class __declspec(dllexport) PixelShader
+class CS_API PixelShader
 {
 	friend class GraphicsSystem;
 

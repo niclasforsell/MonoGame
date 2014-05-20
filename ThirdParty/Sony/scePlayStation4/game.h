@@ -1,8 +1,9 @@
 #pragma once
+#include "predecls.h"
 
 typedef void (*collect_function)(void);
 
-class __declspec(dllexport) Game
+class CS_API Game
 {
 private:
 	static collect_function _collect;

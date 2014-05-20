@@ -1,5 +1,5 @@
 #pragma once
-#include <stdint.h>
+#include "../predecls.h"
 
 // Include all pre-declarations used from header files.
 

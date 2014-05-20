@@ -6,7 +6,7 @@
 namespace Graphics {
 
 
-class __declspec(dllexport) IndexBuffer
+class CS_API IndexBuffer
 {
 	friend class GraphicsSystem;
 

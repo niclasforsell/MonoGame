@@ -9,7 +9,7 @@ namespace Media {
 
 typedef void(*SongFinishedHandler)(void);
 
-class __declspec(dllexport) Song
+class CS_API Song
 {
 private:
 	SongState* _state;

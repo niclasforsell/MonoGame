@@ -1,4 +1,5 @@
 #pragma once
+#include "../predecls.h"
 
 // Include all pre-declarations used from header files.
 

@@ -8,14 +8,14 @@ namespace Audio {
 class AudioBuffer;
 
 // This enum mirrors the one in XNA
-__declspec(dllexport) enum class SoundState
+enum class SoundState
 {
     Playing,
     Paused,
     Stopped
 };
 
-class __declspec(dllexport) SamplerVoice
+class CS_API SamplerVoice
 {
 	friend class SoundSystem;
 

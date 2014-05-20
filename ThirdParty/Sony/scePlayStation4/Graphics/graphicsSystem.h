@@ -6,7 +6,7 @@
 namespace Graphics {
 
 
-class __declspec(dllexport) GraphicsSystem
+class CS_API GraphicsSystem
 {
 private:
 
