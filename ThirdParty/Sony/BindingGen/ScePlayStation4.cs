@@ -70,7 +70,7 @@ namespace BindingGen
             options.Headers.Add(@"Input\MouseState.h");
             options.Headers.Add(@"Input\Mouse.h");
             options.Headers.Add(@"Media\Song.h");
-            options.Headers.Add(@"UserService.h");
+            options.Headers.Add(@"System\UserService.h");
             options.Headers.Add(@"System\SaveData.h");
 
             // Make sure any system headers needed is available.

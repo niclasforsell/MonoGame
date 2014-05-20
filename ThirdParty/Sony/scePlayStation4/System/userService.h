@@ -1,5 +1,7 @@
 #pragma once
-#include "common.h"
+#include "predecls.h"
+
+namespace System {
 
 typedef int32_t SceUserServiceUserId;
 typedef void (*user_event_callback)(SceUserServiceUserId userId, int playerIndex);
@@ -19,3 +21,5 @@ public:
 	static int GetPlayerIndexByUserId(SceUserServiceUserId userId);
 	static SceUserServiceUserId GetUserByPlayerIndex(int playerIndex);
 };
+
+} // namespace System

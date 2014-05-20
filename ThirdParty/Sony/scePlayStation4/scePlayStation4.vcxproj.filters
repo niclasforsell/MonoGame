@@ -34,7 +34,6 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="game.cpp" />
-    <ClCompile Include="userService.cpp" />
     <ClCompile Include="Input\gamePad.cpp">
       <Filter>Input</Filter>
     </ClCompile>
@@ -87,6 +86,9 @@
       <Filter>Input</Filter>
     </ClCompile>
     <ClCompile Include="System\saveData.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="System\userService.cpp">
       <Filter>System</Filter>
     </ClCompile>
   </ItemGroup>
@@ -170,7 +172,6 @@
     <ClInclude Include="Graphics\defaultShaders.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="userService.h" />
     <ClInclude Include="Input\predecls.h">
       <Filter>Input</Filter>
     </ClInclude>
@@ -244,5 +245,8 @@
       <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="common.h" />
+    <ClInclude Include="System\userService.h">
+      <Filter>System</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

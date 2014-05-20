@@ -1,12 +1,14 @@
 #include "userService.h"
-#include "Input/gamePad.h"
-#include "Input/keyboard.h"
-#include "Input/mouse.h"
+#include "../Input/gamePad.h"
+#include "../Input/keyboard.h"
+#include "../Input/mouse.h"
 
 #include <assert.h>
 #include <memory>
 #include <user_service.h>
 #include <sceerror.h>
+
+using namespace System;
 
 namespace {
 	const int PLAYER_MAX = 4;
