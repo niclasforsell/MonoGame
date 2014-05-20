@@ -6,8 +6,8 @@
 #define CS_VALUE_TYPE
 #define CS_FLAGS
 
-#if defined(_MSC_VER) && !defined(__clang__)
+#if !defined(CS_BINDING_GEN)
 #define CS_API __declspec(dllexport)
 #else
-#define CS_API __declspec(dllexport)
+#define CS_API
 #endif
