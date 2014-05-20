@@ -70,6 +70,7 @@
     <Compile Include="Song.cs" />
     <Compile Include="SoundSystem.cs" />
     <Compile Include="RenderTarget.cs" />
+    <Compile Include="SystemService.cs" />
     <Compile Include="Texture.cs" />
     <Compile Include="threadPrio.cs" />
     <Compile Include="UserService.cs" />

@@ -11,11 +11,6 @@ bool Game::GetIsActive()
 	return !status.isInBackgroundExecution;
 }
 
-void Game::HideSplashScreen()
-{
-	sceSystemServiceHideSplashScreen();
-}
-
 void Game::SetManagedCollect(collect_function func)
 {
 	_collect = func;

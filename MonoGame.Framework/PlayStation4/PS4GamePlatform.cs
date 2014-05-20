@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            Sce.PlayStation4.Game.HideSplashScreen();
+            SystemService.HideSplashScreen();
             _window.RunLoop();
         }
 
