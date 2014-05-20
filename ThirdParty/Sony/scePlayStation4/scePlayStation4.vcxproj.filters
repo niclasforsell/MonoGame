@@ -86,6 +86,9 @@
     <ClCompile Include="Input\mouse.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="System\saveData.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -108,6 +111,9 @@
     </Filter>
     <Filter Include="Media\mp3">
       <UniqueIdentifier>{6893d4ef-a490-45d1-bc3a-db39b7b460c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{c98e8bba-adbd-4dd4-a19e-51dd6879e084}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -228,5 +234,15 @@
     <ClInclude Include="Input\mouseState.h">
       <Filter>Input</Filter>
     </ClInclude>
+    <ClInclude Include="System\saveData.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\threadPrio.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\predecls.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h" />
   </ItemGroup>
 </Project>
