@@ -1,5 +1,5 @@
 #pragma once
-#include "predecls.h"
+#include "common.h"
 
 typedef int32_t SceUserServiceUserId;
 typedef void (*user_event_callback)(SceUserServiceUserId userId, int playerIndex);

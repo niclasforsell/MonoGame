@@ -1,5 +1,5 @@
 #pragma once
-#include "predecls.h"
+#include "common.h"
 
 typedef void (*collect_function)(void);
 
