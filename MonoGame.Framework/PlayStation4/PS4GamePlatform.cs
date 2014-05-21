@@ -26,6 +26,8 @@ namespace Microsoft.Xna.Framework
 
         private PS4GameWindow _window;
 
+        private bool _isSplashHidden;
+
         public PS4GamePlatform(Game game)
             : base(game)
         {
@@ -68,7 +70,6 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            SystemService.HideSplashScreen();
             _window.RunLoop();
         }
 
@@ -119,8 +120,19 @@ namespace Microsoft.Xna.Framework
         public override void Present()
         {
             var device = Game.GraphicsDevice;
-            if ( device != null )
-                device.Present();
+            if (device == null)
+                return;
+
+            device.Present();
+
+            // We wait until after the first frame is presented to
+            // hide the splash screen.  This reduces the time with
+            // nothing drawn to the screen to the very minimum.
+            if (!_isSplashHidden)
+            {
+                SystemService.HideSplashScreen();
+                _isSplashHidden = true;
+            }
         }
 
         protected override void Dispose(bool disposing)
