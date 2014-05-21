@@ -25,19 +25,12 @@ namespace Microsoft.Xna.Framework
         internal static string LaunchParameters;
 
         private PS4GameWindow _window;
-        private readonly List<Keys> _keyState;
 
         public PS4GamePlatform(Game game)
             : base(game)
         {
-//            _keyState = new List<Keys>();
-//            Keyboard.SetKeys(_keyState);
-
             _window = new PS4GameWindow(this);
-            _window.KeyState = _keyState;
 
-            //Mouse.SetWindows(_window._form);
-            
             Window = _window;
         }
 
