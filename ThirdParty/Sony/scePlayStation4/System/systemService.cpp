@@ -76,3 +76,35 @@ SystemServiceResult SystemService::GetDisplaySafeAreaInfo(CS_OUT float *ratio)
 
 	return (SystemServiceResult)result;
 }
+
+int32_t SystemService::GetNumRecieveEvents()
+{
+	SceSystemServiceStatus status;
+	sceSystemServiceGetStatus(&status);
+	return status.eventNum;
+}
+
+bool SystemService::GetIsSystemUIOverlaid()
+{
+	SceSystemServiceStatus status;
+	sceSystemServiceGetStatus(&status);
+	return status.isSystemUiOverlaid;
+}
+
+bool SystemService::GetIsInBackgroundExecution()
+{
+	SceSystemServiceStatus status;
+	sceSystemServiceGetStatus(&status);
+	return status.isInBackgroundExecution;
+}
+
+GpuLoadEmulationMode SystemService::GetGpuLoadEmulationMode()
+{
+	auto result = sceSystemServiceGetGpuLoadEmulationMode();
+	return (GpuLoadEmulationMode)result;
+}
+
+void SystemService::SetGpuLoadEmulationMode(GpuLoadEmulationMode mode)
+{
+	auto result = sceSystemServiceSetGpuLoadEmulationMode((SceSystemServiceGpuLoadEmulationMode)mode);
+}

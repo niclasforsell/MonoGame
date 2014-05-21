@@ -58,6 +58,13 @@ enum SystemTimeFormat
 	TwentyFourHour = SCE_SYSTEM_PARAM_TIME_FORMAT_24HOUR,
 };
 
+enum GpuLoadEmulationMode
+{
+	Off = SCE_SYSTEM_SERVICE_GPU_LOAD_EMULATION_MODE_OFF,
+	Normal = SCE_SYSTEM_SERVICE_GPU_LOAD_EMULATION_MODE_NORMAL,
+	High = SCE_SYSTEM_SERVICE_GPU_LOAD_EMULATION_MODE_HIGH,
+};
+
 
 class CS_API SystemService
 {
@@ -86,6 +93,16 @@ public:
 	static void ShowDisplaySafeAreaSettings();
 
 	static SystemServiceResult GetDisplaySafeAreaInfo(CS_OUT float *ratio);
+
+	static int32_t GetNumRecieveEvents();
+
+	static bool GetIsSystemUIOverlaid();
+
+	static bool GetIsInBackgroundExecution();
+
+	static GpuLoadEmulationMode GetGpuLoadEmulationMode();
+
+	static void SetGpuLoadEmulationMode(GpuLoadEmulationMode mode);
 };
 
 } // namespace System

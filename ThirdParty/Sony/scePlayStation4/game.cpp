@@ -1,15 +1,8 @@
 #include "game.h"
 
-#include <system_service.h>
+#include <cstdio>
 
 collect_function Game::_collect = NULL;
-
-bool Game::GetIsActive()
-{
-	SceSystemServiceStatus status;
-	sceSystemServiceGetStatus(&status);
-	return !status.isInBackgroundExecution;
-}
 
 void Game::SetManagedCollect(collect_function func)
 {

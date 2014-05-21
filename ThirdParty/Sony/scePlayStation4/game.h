@@ -12,8 +12,6 @@ private:
 
 public:
 
-	static bool GetIsActive();
-
 	static void SetManagedCollect(collect_function func);
 	static void DoManagedCollect();
 };
