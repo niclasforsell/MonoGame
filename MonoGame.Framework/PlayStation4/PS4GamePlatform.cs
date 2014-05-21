@@ -87,18 +87,11 @@ namespace Microsoft.Xna.Framework
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
             UserService.Update(dt);
 
-//            if (AudioEngine.Instance != null)
-//                AudioEngine.Instance.Update(dt);
-            
             return true;
         }
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-//            var device = Game.GraphicsDevice;
-//            if (device != null)
-//                device.ResetRenderTargets();
-
             return true;
         }
 
