@@ -7,13 +7,7 @@
 using namespace System;
 
 namespace {
-	// While prohibiting remote play, the block must be periodically renewed within
-	// a defined interval. We set the bar slightly lower to account for any delays.
-	const float RefreshInterval = SCE_REMOTEPLAY_PROHIBIT_INTERVAL * 0.001f * 0.001f * 0.8f;
-
 	void* heap = nullptr;
-	bool isEnabled = false;
-	float secondsSinceProhibit = 0.0f;
 }
 
 RemotePlayResult RemotePlay::Initialize()
@@ -35,14 +29,11 @@ RemotePlayResult RemotePlay::Initialize()
 		return (RemotePlayResult)ret;
 	}
 
-	isEnabled = true;
 	return RemotePlayResult::Ok;
 }
 
 RemotePlayResult RemotePlay::Terminate()
 {
-	isEnabled = false;
-
 	auto ret = sceRemoteplayTerminate();
 	if (ret != SCE_OK) {
 		return (RemotePlayResult)ret;
@@ -63,51 +54,24 @@ RemotePlayResult RemotePlay::Terminate()
 	return RemotePlayResult::Ok;
 }
 
-RemotePlayResult RemotePlay::Update(float elapsedSeconds)
+RemotePlayResult RemotePlay::Approve()
 {
-	assert(heap != nullptr);
-
-	if (isEnabled)
-		return RemotePlayResult::Ok;
-
-	// Renew remote play prohibition at regular intervals
-	secondsSinceProhibit += elapsedSeconds;
-	if (secondsSinceProhibit >= RefreshInterval) {
-		secondsSinceProhibit = 0;
-		auto ret = sceRemoteplayProhibit();
-		if (ret != SCE_OK) {
-			return (RemotePlayResult)ret;
-		}
-	}
-
-	return RemotePlayResult::Ok;
+	return (RemotePlayResult)sceRemoteplayApprove();
 }
 
-bool RemotePlay::GetIsEnabled()
+RemotePlayResult RemotePlay::Prohibit()
 {
-	return isEnabled;
+	return (RemotePlayResult)sceRemoteplayProhibit();
 }
 
-void RemotePlay::SetIsEnabled(bool value)
+#if SCE_ORBIS_SDK_VERSION >= 0x01700081u // SDK Version 1.7
+RemotePlayConnectionStatus RemotePlay::GetConnectionStatus(SceUserServiceUserId userId)
 {
-	if (isEnabled == value)
-		return;
+	int status;
+	auto ret = sceRemoteplayGetConnectionStatus(userId, &status);
+	if (ret != SCE_OK)
+		return (RemotePlayConnectionStatus)ret;
 
-	// If we were disabled and we're now enabling,
-	// let the system know immediately.
-	if (!isEnabled && value) {
-		auto ret = sceRemoteplayApprove();
-		assert(ret == SCE_OK);
-	}
-
-	// If we're disabling remote play, update
-	// immediately and schedule repeats.
-	if (!value)
-	{
-		auto ret = sceRemoteplayProhibit();
-		assert(ret == SCE_OK);
-		secondsSinceProhibit = 0;
-	}
-
-	isEnabled = value;
+	return (RemotePlayConnectionStatus)status;
 }
+#endif

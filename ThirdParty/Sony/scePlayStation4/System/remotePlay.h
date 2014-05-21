@@ -1,13 +1,14 @@
 #pragma once
 
 #include "predecls.h"
-#include <user_service.h>
-#include <sceerror.h>
+#include <scebase.h>
 #include <remoteplay.h>
 
 namespace System {
 
-enum class RemotePlayResult
+typedef int32_t SceUserServiceUserId;
+
+enum RemotePlayResult
 {
 	Ok = SCE_OK,
 
@@ -16,18 +17,34 @@ enum class RemotePlayResult
 	ErrorAlreadyInitialized = SCE_REMOTEPLAY_ERROR_NOT_INITIALIZED
 };
 
+#if SCE_ORBIS_SDK_VERSION >= 0x01700081u // SDK Version 1.7
+enum RemotePlayConnectionStatus
+{
+	Disconnect = SCE_REMOTEPLAY_CONNECTION_STATUS_DISCONNECT,
+	Connect = SCE_REMOTEPLAY_CONNECTION_STATUS_CONNECT,
+
+	// This doesn't quite match the docs, but we don't appear to be able
+	// to return enums with CS_OUT at this juncture.
+	ErrorNotInitialized = SCE_REMOTEPLAY_ERROR_NOT_INITIALIZED
+};
+#endif
+
 class CS_API RemotePlay
 {
 	RemotePlay() { }
 
 public:
 	static RemotePlayResult Initialize();
+
 	static RemotePlayResult Terminate();
 
-	static RemotePlayResult Update(float elapsedSeconds);
+	static RemotePlayResult Approve();
 
-	static bool GetIsEnabled();
-	static void SetIsEnabled(bool value);
+	static RemotePlayResult Prohibit();
+
+#if SCE_ORBIS_SDK_VERSION >= 0x01700081u // SDK Version 1.7
+	static RemotePlayConnectionStatus GetConnectionStatus(SceUserServiceUserId userId);
+#endif
 };
 
 } // namespace System
