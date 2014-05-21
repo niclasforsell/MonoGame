@@ -25,19 +25,14 @@ namespace Microsoft.Xna.Framework
         internal static string LaunchParameters;
 
         private PS4GameWindow _window;
-        private readonly List<Keys> _keyState;
+
+        private bool _isSplashHidden;
 
         public PS4GamePlatform(Game game)
             : base(game)
         {
-//            _keyState = new List<Keys>();
-//            Keyboard.SetKeys(_keyState);
-
             _window = new PS4GameWindow(this);
-            _window.KeyState = _keyState;
 
-            //Mouse.SetWindows(_window._form);
-            
             Window = _window;
         }
 
@@ -75,7 +70,6 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            SystemService.HideSplashScreen();
             _window.RunLoop();
         }
 
@@ -94,18 +88,11 @@ namespace Microsoft.Xna.Framework
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
             UserService.Update(dt);
 
-//            if (AudioEngine.Instance != null)
-//                AudioEngine.Instance.Update(dt);
-            
             return true;
         }
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-//            var device = Game.GraphicsDevice;
-//            if (device != null)
-//                device.ResetRenderTargets();
-
             return true;
         }
 
@@ -133,8 +120,19 @@ namespace Microsoft.Xna.Framework
         public override void Present()
         {
             var device = Game.GraphicsDevice;
-            if ( device != null )
-                device.Present();
+            if (device == null)
+                return;
+
+            device.Present();
+
+            // We wait until after the first frame is presented to
+            // hide the splash screen.  This reduces the time with
+            // nothing drawn to the screen to the very minimum.
+            if (!_isSplashHidden)
+            {
+                SystemService.HideSplashScreen();
+                _isSplashHidden = true;
+            }
         }
 
         protected override void Dispose(bool disposing)
