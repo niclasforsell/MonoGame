@@ -6,7 +6,7 @@
 namespace Graphics {
 
 	
-class __declspec(dllexport) FetchShader
+class CS_API FetchShader
 {
 	friend class GraphicsSystem;
 

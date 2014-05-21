@@ -5,7 +5,7 @@
 
 namespace Graphics {
 
-class __declspec(dllexport) Texture
+class CS_API Texture
 {
 	friend class GraphicsSystem;
 

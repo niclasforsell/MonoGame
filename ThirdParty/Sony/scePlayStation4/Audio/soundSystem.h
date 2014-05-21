@@ -5,7 +5,7 @@
 
 namespace Audio {
 
-class __declspec(dllexport) SoundSystem
+class CS_API SoundSystem
 {
 
 private:

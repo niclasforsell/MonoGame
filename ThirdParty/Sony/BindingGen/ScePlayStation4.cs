@@ -22,6 +22,7 @@ namespace BindingGen
 
             options.MicrosoftMode = false;
             options.NoBuiltinIncludes = true;
+            options.NoStandardIncludes = true;
             options.WriteOnlyWhenChanged = true;
             options.CompileCode = false;
 
@@ -39,6 +40,9 @@ namespace BindingGen
             options.OutputNamespace = "Sce.PlayStation4";
             options.SharedLibraryName = "scePlayStation4.prx";
 
+            options.Defines.Add("__ORBIS__");
+            options.Defines.Add("CS_BINDING_GEN");
+            
             // The paths to search for headers.
             options.IncludeDirs.Add(@".\");
 
@@ -66,7 +70,8 @@ namespace BindingGen
             options.Headers.Add(@"Input\MouseState.h");
             options.Headers.Add(@"Input\Mouse.h");
             options.Headers.Add(@"Media\Song.h");
-            options.Headers.Add(@"UserService.h");
+            options.Headers.Add(@"System\UserService.h");
+            options.Headers.Add(@"System\SaveData.h");
 
             // Make sure any system headers needed is available.
             var orbisSDK = System.Environment.GetEnvironmentVariable("SCE_ORBIS_SDK_DIR");

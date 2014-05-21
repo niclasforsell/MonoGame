@@ -4,7 +4,7 @@
 
 namespace Input {
 
-class __declspec(dllexport) GamePad
+class CS_API GamePad
 {
 	GamePad() {}
 

@@ -5,7 +5,7 @@
 
 namespace Graphics {
 
-class __declspec(dllexport) VertexBuffer
+class CS_API VertexBuffer
 {
 	friend class GraphicsSystem;
 

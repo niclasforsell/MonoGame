@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using Game = Microsoft.Xna.Framework.Game;
 using Microsoft.Xna.Framework.Audio;
 using SoundSystem = Sce.PlayStation4.Audio.SoundSystem;
-using UserService = Sce.PlayStation4.UserService;
+using Sce.PlayStation4.System;
 
 namespace Microsoft.Xna.Framework
 {
@@ -57,6 +57,7 @@ namespace Microsoft.Xna.Framework
 
             SoundSystem.Instance.Initialize();
             UserService.Initialize();
+
 //            SaveDataSystem.Initialize();
             Sce.PlayStation4.Game.ManagedCollect = CollectAndWait;
 
@@ -74,7 +75,7 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            Sce.PlayStation4.Game.HideSplashScreen();
+            SystemService.HideSplashScreen();
             _window.RunLoop();
         }
 

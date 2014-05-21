@@ -6,7 +6,7 @@
 namespace Graphics {
 
 
-class __declspec(dllexport) RenderTarget
+class CS_API RenderTarget
 {
 	friend class GraphicsSystem;
 

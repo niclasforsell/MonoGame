@@ -1,8 +1,5 @@
 #pragma once
-#include <stdint.h>
-
-#define CS_IGNORE
-#define CS_VALUE_TYPE
+#include "../common.h"
 
 // Include all pre-declarations used from header files.
 

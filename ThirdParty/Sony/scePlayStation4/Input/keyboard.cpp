@@ -1,6 +1,6 @@
 #include "keyboard.h"
 #include "keyboardState.h"
-#include "../userService.h"
+#include "../System/userService.h"
 #include "vkeys.h"
 
 #include <cstdio>
@@ -23,7 +23,7 @@ namespace {
 	void HandleKeyboard(void* arg, const SceImeEvent* e)
 	{
 		auto userId = e->param.keycode.userId;
-		auto playerIndex = UserService::GetPlayerIndexByUserId(userId);
+		auto playerIndex = System::UserService::GetPlayerIndexByUserId(userId);
 
 		auto usbKeyCode = (uint8_t)e->param.keycode.keycode;
 		auto virtKeyCode = toVKcode[usbKeyCode];

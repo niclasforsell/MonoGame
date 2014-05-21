@@ -117,7 +117,9 @@
     <ClCompile Include="Media\ring_buffer.cpp" />
     <ClCompile Include="Media\stream.cpp" />
     <ClCompile Include="prx.cpp" />
-    <ClCompile Include="userService.cpp" />
+    <ClCompile Include="System\saveData.cpp" />
+    <ClCompile Include="System\systemService.cpp" />
+    <ClCompile Include="System\userService.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allocator.h" />
@@ -160,7 +162,12 @@
     <ClInclude Include="Media\predecls.h" />
     <ClInclude Include="Media\ring_buffer.h" />
     <ClInclude Include="Media\stream.h" />
-    <ClInclude Include="userService.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="System\predecls.h" />
+    <ClInclude Include="System\saveData.h" />
+    <ClInclude Include="System\systemService.h" />
+    <ClInclude Include="System\threadPrio.h" />
+    <ClInclude Include="System\userService.h" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\SceGnm.targets" Condition="Exists('$(SolutionDir)\SceGnm.Development.props')" />
   <Import Project="$(SCE_ORBIS_SDK_DIR)\host_tools\msbuild\SceGnm.targets" Condition="!Exists('$(SolutionDir)\SceGnm.Development.props')" />

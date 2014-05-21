@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Sce.PlayStation4.System;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
@@ -257,7 +258,7 @@ namespace Microsoft.Xna.Framework
             while (true)
             {
                 // Update the active state.
-                _platform.IsActive = Sce.PlayStation4.Game.IsActive;
+                _platform.IsActive = !SystemService.IsInBackgroundExecution;
 
                 Game.Tick();
 
