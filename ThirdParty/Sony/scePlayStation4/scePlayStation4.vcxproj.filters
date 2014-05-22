@@ -97,6 +97,9 @@
     <ClCompile Include="System\remotePlay.cpp">
       <Filter>System</Filter>
     </ClCompile>
+    <ClCompile Include="System\playGo.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -258,6 +261,9 @@
       <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="System\remotePlay.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\playGo.h">
       <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
