@@ -7,6 +7,12 @@ namespace Sce.PlayStation4.System
 {
     partial class ChunkList
     {
+        public ChunkList(IEnumerable<ushort> items)
+        {
+            foreach (var item in items)
+                Add(item);
+        }
+
         public void Add(ushort value)
         {
             if (!TryAdd(value))
