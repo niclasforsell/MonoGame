@@ -1,4 +1,5 @@
 #include "userService.h"
+#include "../Audio/soundSystem.h"
 #include "../Input/gamePad.h"
 #include "../Input/keyboard.h"
 #include "../Input/mouse.h"
@@ -41,6 +42,7 @@ namespace {
 			Input::GamePad::Enable(userId, playerIndex);
 			Input::Keyboard::Enable(userId, playerIndex);
 			Input::Mouse::Enable(userId, playerIndex);
+			Audio::SoundSystem::GetInstance()->OpenControllerPort(playerIndex, userId);
 		}
 		else
 		{
@@ -61,6 +63,7 @@ namespace {
 			Input::GamePad::Disable(playerIndex);
 			Input::Keyboard::Disable(playerIndex);
 			Input::Mouse::Disable(playerIndex);
+			Audio::SoundSystem::GetInstance()->CloseControllerPort(playerIndex);
 
 			users[playerIndex] = -1;
 		}
