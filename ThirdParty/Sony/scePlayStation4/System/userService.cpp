@@ -82,6 +82,9 @@ void UserService::Initialize()
 	Input::GamePad::Initialize();
 	Input::Keyboard::Initialize();
 	Input::Mouse::Initialize();
+
+	// Perform an initial update for already logged in users
+	Update(0.0f);
 }
 
 void UserService::Terminate()

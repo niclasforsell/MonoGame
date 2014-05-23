@@ -70,6 +70,8 @@ namespace BindingGen
             options.Headers.Add(@"Input\MouseState.h");
             options.Headers.Add(@"Input\Mouse.h");
             options.Headers.Add(@"Media\Song.h");
+            options.Headers.Add(@"Network\Np.h");
+            options.Headers.Add(@"Network\TrophySet.h");
             options.Headers.Add(@"System\PlayGo.h");
             options.Headers.Add(@"System\RemotePlay.h");
             options.Headers.Add(@"System\SystemService.h");
