@@ -120,7 +120,6 @@ ProgressResult* PlayGo::GetProgress(const ChunkList* chunks)
 ToDoList* PlayGo::GetToDoList()
 {
 	auto result = new ToDoList();
-
 	auto ret = scePlayGoGetToDoList(_handle, result->_items, result->MaxItems, &result->_count);
 	assert(ret == SCE_OK);
 

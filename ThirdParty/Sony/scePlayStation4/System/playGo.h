@@ -1,6 +1,7 @@
 #pragma once
 
 #include "predecls.h"
+#include <memory>
 #include <scebase.h>
 #include <playgo.h>
 
@@ -35,7 +36,7 @@ enum PlayGoInstallSpeed : int32_t
 	Full = 2
 };
 
-/* Need 64-bit fix?
+/* TODO: Address this after 64-bit fix
 enum PlayGoLanguageMask : uint64_t
 {
 	All = SCE_PLAYGO_LANGUAGE_MASK_ALL
@@ -52,16 +53,17 @@ enum PlayGoLocus : int8_t
 class CS_API ChunkList
 {
 public:
-	CS_IGNORE static const int MaxItems = SCE_PLAYGO_CHUNK_INDEX_MAX - 1;
+	CS_IGNORE static const int MaxItems = SCE_PLAYGO_CHUNK_INDEX_MAX;
 	CS_IGNORE uint32_t _count;
 	CS_IGNORE ScePlayGoChunkId _items[MaxItems];
 
 	ChunkList()
 	{
 		_count = 0;
-		memset(&_items, 0, sizeof(ScePlayGoChunkId) * MaxItems);
+		memset(_items, 0, sizeof(ScePlayGoChunkId) * MaxItems);
 	}
 
+protected: // Hide from end users
 	bool TryAdd(ScePlayGoChunkId value)
 	{
 		if (_count >= MaxItems)
@@ -85,7 +87,7 @@ public:
 	LociResult()
 	{
 		_count = 0;
-		memset(&_items, 0, sizeof(ScePlayGoLocus) * MaxItems);
+		memset(_items, 0, sizeof(ScePlayGoLocus) * MaxItems);
 	}
 
 	uint32_t GetCount() const
@@ -98,6 +100,7 @@ public:
 		return _result;
 	}
 
+protected: // Hide from end users
 	bool TryGet(int index, CS_OUT ScePlayGoLocus* outLocus)
 	{
 		if (index >= MaxItems)
@@ -119,13 +122,15 @@ public:
 	ToDoList()
 	{
 		_count = 0;
-		memset(&_items, 0, sizeof(ScePlayGoToDo) * MaxItems);
+		memset(_items, 0, sizeof(ScePlayGoToDo) * MaxItems);
 	}
 
 	uint32_t GetCount() const
 	{
 		return _count;
 	}
+
+protected: // Hide from end users
 
 	bool TryAdd(ScePlayGoChunkId chunkId, ScePlayGoLocus locus)
 	{
@@ -162,7 +167,7 @@ public:
 	ProgressResult()
 	{
 		_count = 0;
-		memset(&_items, 0, sizeof(ScePlayGoProgress) * MaxItems);
+		memset(_items, 0, sizeof(ScePlayGoProgress) * MaxItems);
 	}
 
 	uint32_t GetCount() const
@@ -175,6 +180,7 @@ public:
 		return _result;
 	}
 
+protected: // Hide from end users
 	bool TryGet(int index, CS_OUT uint64_t* progressSize, CS_OUT uint64_t* totalSize)
 	{
 		if (index >= _count)
