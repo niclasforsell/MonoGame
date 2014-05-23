@@ -100,6 +100,12 @@
     <ClCompile Include="System\playGo.cpp">
       <Filter>System</Filter>
     </ClCompile>
+    <ClCompile Include="Network\np.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Network\trophySet.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -125,6 +131,9 @@
     </Filter>
     <Filter Include="System">
       <UniqueIdentifier>{c98e8bba-adbd-4dd4-a19e-51dd6879e084}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{faae6781-7fbd-4962-adf7-2391e5089d6b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +274,15 @@
     </ClInclude>
     <ClInclude Include="System\playGo.h">
       <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\predecls.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\np.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\trophySet.h">
+      <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
