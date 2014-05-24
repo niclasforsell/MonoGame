@@ -48,47 +48,68 @@ class CS_API SaveData
 {
 	SaveData() { }
 
+	static bool _initialized;
+
+	uint32_t _userId;
+
+	SceSaveDataTitleId _titleId;
+	SceSaveDataDirName _dirName;
+	SceSaveDataFingerprint _fingerprint;
+
+	char _title[SCE_SAVE_DATA_TITLE_MAXSIZE];
+	char _subTitle[SCE_SAVE_DATA_PARAM_TYPE_SUB_TITLE];
+	char _detail[SCE_SAVE_DATA_DETAIL_MAXSIZE];
+
+	//char _titleId[SCE_SAVE_DATA_TITLE_ID_DATA_SIZE];
+	//char _dirName[SCE_SAVE_DATA_DIRNAME_DATA_MAXSIZE];
+	//char _fingerprint[SCE_SAVE_DATA_FINGERPRINT_DATA_SIZE];
+
+	SceSaveDataMountPoint _mountPoint;
+
 public:
 
 	static SaveDataResult Initialize(ThreadPrio priority);
 
 	static SaveDataResult Terminate();
 
-	static SaveDataResult Mount(	uint32_t userId, 
-									const char *titleId, 
-									const char *dirName, 
-									const char *fingerprint,
-									uint64_t blocks,
-									SaveDataMountMode mountMode,
-									CS_OUT char *mountPoint,
-									CS_OUT uint64_t &requiredBlocks,
-									CS_OUT uint32_t &progress);
-
-	static SaveDataResult GetMountInfo(	const char *mountPoint,
-										CS_OUT uint64_t *blocks,
-										CS_OUT uint64_t *freeBlocks);
-
-	static SaveDataResult GetParamTitle(const char *mountPoint, CS_OUT char *title);
-	static SaveDataResult GetParamSubTitle(const char *mountPoint, CS_OUT char *subTitle);
-	static SaveDataResult GetParamDetail(const char *mountPoint, CS_OUT char *detail);
-	static SaveDataResult GetParamUserParam(const char *mountPoint, CS_OUT uint32_t *userParam);
-	static SaveDataResult GetParamMTime(const char *mountPoint, CS_OUT time_t *mtime);
-
-	static SaveDataResult SetParamTitle(const char *mountPoint, const char *title);
-	static SaveDataResult SetParamSubTitle(const char *mountPoint, const char *subTitle);
-	static SaveDataResult SetParamDetail(const char *mountPoint, const char *detail);
-	static SaveDataResult SetParamUserParam(const char *mountPoint, uint32_t userParam);
-	static SaveDataResult SetParamMTime(const char *mountPoint, time_t mtime);
-
-	static SaveDataResult LoadIcon(const char *mountPoint, void *buffer, size_t bufferSize, CS_OUT size_t *dataSize);
-	static SaveDataResult SaveIcon(const char *mountPoint, void *buffer, size_t bufferSize, size_t dataSize);
-
 	static SaveDataResult Delete(	uint32_t userId, 
 									const char *titleId, 
 									const char *dirName, 
 									CS_OUT uint32_t *progress);
 
-	static SaveDataResult Unmount(const char *mountPoint);
+	SaveData(uint32_t userId, const char *titleId, const char *dirName, const char *fingerprint);
+
+	~SaveData();
+
+	SaveDataResult Mount(	uint64_t blocks,
+							SaveDataMountMode mountMode,
+							CS_OUT uint64_t &requiredBlocks,
+							CS_OUT uint32_t &progress);
+
+	SaveDataResult Unmount();
+
+	const char* GetMountPoint() const;
+
+	const char* GetTitle();
+	void		SetTitle(const char *title);
+
+	const char* GetSubTitle();
+	void		SetSubTitle(const char *subTitle);
+
+	const char* GetDetail();
+	void		SetDetail(const char *detail);
+
+	uint32_t	GetUserParam();
+	void		SetUserParam(uint32_t userParam);
+
+	time_t	GetMTime();
+	void	SetMTime(time_t userParam);
+
+	SaveDataResult GetMountInfo(	CS_OUT uint64_t *blocks,
+									CS_OUT uint64_t *freeBlocks);
+
+	SaveDataResult LoadIcon(void *buffer, size_t bufferSize, CS_OUT size_t *dataSize);
+	SaveDataResult SaveIcon(void *buffer, size_t bufferSize, size_t dataSize);
 
 };
 
