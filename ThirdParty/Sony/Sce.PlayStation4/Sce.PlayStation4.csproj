@@ -78,6 +78,8 @@
     <Compile Include="SystemService.cs" />
     <Compile Include="Texture.cs" />
     <Compile Include="threadPrio.cs" />
+    <Compile Include="TitleStorage.cs" />
+    <Compile Include="TitleStorage.Public.cs" />
     <Compile Include="TrophySet.cs" />
     <Compile Include="TrophySet.Public.cs" />
     <Compile Include="UserService.cs" />
