@@ -272,6 +272,7 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 	public:
 		String^ Name;
 		ElementType Type;
+		String^ TypeName;
 		array<Byte>^ DefaultValue;
 		int ArraySize;
 		int OffsetInBytes;
