@@ -11,3 +11,5 @@
 #else
 #define CS_API
 #endif
+
+typedef int32_t UserServiceUserId;

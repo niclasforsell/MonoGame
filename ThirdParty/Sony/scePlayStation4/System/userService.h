@@ -3,8 +3,7 @@
 
 namespace System {
 
-typedef int32_t SceUserServiceUserId;
-typedef void (*user_event_callback)(SceUserServiceUserId userId, int playerIndex);
+typedef void (*user_event_callback)(UserServiceUserId userId, int playerIndex);
 
 class CS_API UserService
 {
@@ -18,8 +17,8 @@ public:
 	static void SetLoginCallback(user_event_callback callback);
 	static void SetLogoutCallback(user_event_callback callback);
 
-	static int GetPlayerIndexByUserId(SceUserServiceUserId userId);
-	static SceUserServiceUserId GetUserByPlayerIndex(int playerIndex);
+	static int GetPlayerIndexByUserId(UserServiceUserId userId);
+	static UserServiceUserId GetUserByPlayerIndex(int playerIndex);
 };
 
 } // namespace System

@@ -50,7 +50,7 @@ class CS_API SaveData
 
 	static bool _initialized;
 
-	uint32_t _userId;
+	UserServiceUserId _userId;
 
 	SceSaveDataTitleId _titleId;
 	SceSaveDataDirName _dirName;
@@ -72,12 +72,12 @@ public:
 
 	static SaveDataResult Terminate();
 
-	static SaveDataResult Delete(	uint32_t userId, 
+	static SaveDataResult Delete(	UserServiceUserId userId, 
 									const char *titleId, 
 									const char *dirName, 
 									CS_OUT uint32_t *progress);
 
-	SaveData(uint32_t userId, const char *titleId, const char *dirName, const char *fingerprint);
+	SaveData(UserServiceUserId userId, const char *titleId, const char *dirName, const char *fingerprint);
 
 	~SaveData();
 

@@ -13,7 +13,7 @@ using namespace System;
 
 namespace {
 	const int PLAYER_MAX = 4;
-	SceUserServiceUserId users[PLAYER_MAX];
+	UserServiceUserId users[PLAYER_MAX];
 
 	user_event_callback loginCallback = NULL;
 	user_event_callback logoutCallback = NULL;
@@ -29,7 +29,7 @@ namespace {
 		return -1;
 	}
 
-	void OnLogin(SceUserServiceUserId userId)
+	void OnLogin(UserServiceUserId userId)
 	{
 		auto playerIndex = findOpenSlot();
 		if (playerIndex >= 0)
@@ -50,7 +50,7 @@ namespace {
 		}
 	}
 
-	void OnLogout(SceUserServiceUserId userId)
+	void OnLogout(UserServiceUserId userId)
 	{
 		for (auto playerIndex = 0; playerIndex < PLAYER_MAX; playerIndex++)
 		{
@@ -72,7 +72,7 @@ namespace {
 
 void UserService::Initialize()
 {
-	memset(users, -1, sizeof(SceUserServiceUserId) * PLAYER_MAX);
+	memset(users, -1, sizeof(UserServiceUserId) * PLAYER_MAX);
 
 	auto ret = sceUserServiceInitialize(NULL);
 	assert(ret == SCE_OK);
@@ -158,7 +158,7 @@ int UserService::GetPlayerIndexByUserId(SceUserServiceUserId userId)
 	return -1;
 }
 
-SceUserServiceUserId UserService::GetUserByPlayerIndex(int playerIndex)
+UserServiceUserId UserService::GetUserByPlayerIndex(int playerIndex)
 {
 	assert(playerIndex >= 0);
 	assert(playerIndex < PLAYER_MAX);

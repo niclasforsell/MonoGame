@@ -34,7 +34,7 @@ SaveDataResult SaveData::Terminate()
 	return (SaveDataResult)result;
 }
 
-SaveData::SaveData(uint32_t userId, const char *titleId, const char *dirName, const char *fingerprint)
+SaveData::SaveData(UserServiceUserId userId, const char *titleId, const char *dirName, const char *fingerprint)
 {
 	if (!_initialized)
 		Initialize(ThreadPrio::Default);
@@ -217,7 +217,7 @@ SaveDataResult SaveData::SaveIcon(void *buffer, size_t bufferSize, size_t dataSi
 	return (SaveDataResult)result;
 }
 
-SaveDataResult SaveData::Delete(	uint32_t userId, 
+SaveDataResult SaveData::Delete(	UserServiceUserId userId, 
 									const char *titleId, 
 									const char *dirName, 
 									CS_OUT uint32_t *progress)
