@@ -164,6 +164,15 @@ namespace TwoMGFX
                     param.columns = 4;
                     break;
 
+                case ElementType.Int1:
+                case ElementType.Uint1:
+                case ElementType.Int1x1:
+                case ElementType.Uint1x1:
+                    param.class_ = EffectObject.D3DXPARAMETER_CLASS.SCALAR;
+                    param.type = EffectObject.D3DXPARAMETER_TYPE.INT;
+                    param.rows = 1;
+                    param.columns = 1;
+                    break;
 
                     /*
 		                Int1,
