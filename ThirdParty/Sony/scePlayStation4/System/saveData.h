@@ -44,6 +44,15 @@ CS_FLAGS enum SaveDataMountMode
 	DestructOff = SCE_SAVE_DATA_MOUNT_MODE_DESTRUCT_OFF,
 };
 
+CS_FLAGS enum SaveDataConst : uint
+{
+	BlockSize = SCE_SAVE_DATA_BLOCK_SIZE,
+	BlocksMin = SCE_SAVE_DATA_BLOCKS_MIN,
+	IconWidth = SCE_SAVE_DATA_ICON_WIDTH,
+	IconHeight = SCE_SAVE_DATA_ICON_HEIGHT,
+};
+
+
 class CS_API SaveData
 {
 	SaveData() { }
@@ -63,7 +72,7 @@ class CS_API SaveData
 	SceSaveDataMountPoint _mountPoint;
 
 public:
-
+		
 	static SaveDataResult Initialize(ThreadPrio priority);
 
 	static SaveDataResult Terminate();
