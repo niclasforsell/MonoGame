@@ -42,11 +42,14 @@ SaveData::SaveData(UserServiceUserId userId, const char *titleId, const char *di
 	_userId = userId;
 
 	memset(&_titleId, 0, sizeof(_titleId));
-	strncpy(_titleId.data, titleId, SCE_SAVE_DATA_TITLE_ID_DATA_SIZE);
+	if (titleId != NULL)
+		strncpy(_titleId.data, titleId, SCE_SAVE_DATA_TITLE_ID_DATA_SIZE);
 	memset(&_dirName, 0, sizeof(_dirName));
-	strncpy(_dirName.data, dirName, SCE_SAVE_DATA_DIRNAME_DATA_MAXSIZE);
+	if (dirName != NULL)
+		strncpy(_dirName.data, dirName, SCE_SAVE_DATA_DIRNAME_DATA_MAXSIZE);
 	memset(&_fingerprint, 0, sizeof(_fingerprint));
-	strncpy(_fingerprint.data, fingerprint, SCE_SAVE_DATA_FINGERPRINT_DATA_SIZE);
+	if (fingerprint != NULL)
+		strncpy(_fingerprint.data, fingerprint, SCE_SAVE_DATA_FINGERPRINT_DATA_SIZE);
 
 	memset(&_mountPoint, 0, sizeof(_mountPoint));
 	memset(_title, 0, sizeof(_title));
@@ -68,9 +71,9 @@ SaveDataResult SaveData::Mount(	uint64_t blocks,
 	SceSaveDataMount mount;
 	memset(&mount, 0, sizeof(mount));
 	mount.userId = _userId;
-	mount.titleId = &_titleId; 
-	mount.dirName = &_dirName;
-	mount.fingerprint = &_fingerprint;
+	mount.titleId = _titleId.data[0] ? &_titleId : NULL;
+	mount.dirName = _dirName.data[0] ? &_dirName : NULL;
+	mount.fingerprint = _fingerprint.data[0] ? &_fingerprint : NULL;
 	mount.blocks = blocks;
 	mount.mountMode = mountMode;
 
