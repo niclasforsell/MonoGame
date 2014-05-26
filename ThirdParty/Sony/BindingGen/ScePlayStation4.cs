@@ -79,6 +79,7 @@ namespace BindingGen
             options.Headers.Add(@"System\UserService.h");
             options.Headers.Add(@"System\SaveData.h");
             options.Headers.Add(@"System\CommonDialog.h");
+            options.Headers.Add(@"System\NpProfileDialog.h");
 
             // Make sure any system headers needed is available.
             var orbisSDK = System.Environment.GetEnvironmentVariable("SCE_ORBIS_SDK_DIR");

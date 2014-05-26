@@ -112,6 +112,9 @@
     <ClCompile Include="System\commonDialog.cpp">
       <Filter>System</Filter>
     </ClCompile>
+    <ClCompile Include="System\npProfileDialog.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -294,6 +297,9 @@
       <Filter>Network</Filter>
     </ClInclude>
     <ClInclude Include="System\commonDialog.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\npProfileDialog.h">
       <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
