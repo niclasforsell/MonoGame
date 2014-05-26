@@ -60,10 +60,6 @@ class CS_API SaveData
 	char _subTitle[SCE_SAVE_DATA_PARAM_TYPE_SUB_TITLE];
 	char _detail[SCE_SAVE_DATA_DETAIL_MAXSIZE];
 
-	//char _titleId[SCE_SAVE_DATA_TITLE_ID_DATA_SIZE];
-	//char _dirName[SCE_SAVE_DATA_DIRNAME_DATA_MAXSIZE];
-	//char _fingerprint[SCE_SAVE_DATA_FINGERPRINT_DATA_SIZE];
-
 	SceSaveDataMountPoint _mountPoint;
 
 public:
