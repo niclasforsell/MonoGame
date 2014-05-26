@@ -120,6 +120,7 @@
     <ClCompile Include="Network\titleStorage.cpp" />
     <ClCompile Include="Network\trophySet.cpp" />
     <ClCompile Include="prx.cpp" />
+    <ClCompile Include="System\commonDialog.cpp" />
     <ClCompile Include="System\playGo.cpp" />
     <ClCompile Include="System\remotePlay.cpp" />
     <ClCompile Include="System\saveData.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="Network\predecls.h" />
     <ClInclude Include="Network\titleStorage.h" />
     <ClInclude Include="Network\trophySet.h" />
+    <ClInclude Include="System\commonDialog.h" />
     <ClInclude Include="System\playGo.h" />
     <ClInclude Include="System\predecls.h" />
     <ClInclude Include="System\remotePlay.h" />

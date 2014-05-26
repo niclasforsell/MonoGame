@@ -109,6 +109,9 @@
     <ClCompile Include="Network\titleStorage.cpp">
       <Filter>Network</Filter>
     </ClCompile>
+    <ClCompile Include="System\commonDialog.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -289,6 +292,9 @@
     </ClInclude>
     <ClInclude Include="Network\titleStorage.h">
       <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="System\commonDialog.h">
+      <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
