@@ -53,6 +53,7 @@
     <Compile Include="CppSharp\Runtime\StdString.cs" />
     <Compile Include="CppSharp\Runtime\StdVector.cs" />
     <Compile Include="CppSharp\Runtime\SymbolResolver.cs" />
+    <Compile Include="ErrorDialog.cs" />
     <Compile Include="FetchShader.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePad.cs" />

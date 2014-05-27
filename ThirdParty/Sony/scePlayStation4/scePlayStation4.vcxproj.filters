@@ -121,6 +121,9 @@
     <ClCompile Include="System\screenShot.cpp">
       <Filter>System</Filter>
     </ClCompile>
+    <ClCompile Include="System\errorDialog.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -312,6 +315,9 @@
       <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="System\screenShot.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\errorDialog.h">
       <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
