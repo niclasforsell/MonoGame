@@ -65,6 +65,7 @@
     <Compile Include="KeyboardState.cs" />
     <Compile Include="Mouse.cs" />
     <Compile Include="MouseState.cs" />
+    <Compile Include="MsgDialog.cs" />
     <Compile Include="Np.cs" />
     <Compile Include="Np.Public.cs" />
     <Compile Include="NpProfileDialog.cs" />

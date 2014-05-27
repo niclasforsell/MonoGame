@@ -124,6 +124,9 @@
     <ClCompile Include="System\errorDialog.cpp">
       <Filter>System</Filter>
     </ClCompile>
+    <ClCompile Include="System\msgDialog.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -318,6 +321,9 @@
       <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="System\errorDialog.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\msgDialog.h">
       <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
