@@ -115,6 +115,9 @@
     <ClCompile Include="System\npProfileDialog.cpp">
       <Filter>System</Filter>
     </ClCompile>
+    <ClCompile Include="System\webBrowserDialog.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -300,6 +303,9 @@
       <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="System\npProfileDialog.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\webBrowserDialog.h">
       <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
