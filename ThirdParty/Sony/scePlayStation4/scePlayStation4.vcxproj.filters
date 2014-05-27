@@ -118,6 +118,9 @@
     <ClCompile Include="System\webBrowserDialog.cpp">
       <Filter>System</Filter>
     </ClCompile>
+    <ClCompile Include="System\screenShot.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -306,6 +309,9 @@
       <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="System\webBrowserDialog.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\screenShot.h">
       <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>

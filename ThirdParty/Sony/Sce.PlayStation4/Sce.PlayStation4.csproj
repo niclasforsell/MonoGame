@@ -74,6 +74,7 @@
     <Compile Include="RemotePlay.cs" />
     <Compile Include="SamplerVoice.cs" />
     <Compile Include="SaveData.cs" />
+    <Compile Include="ScreenShot.cs" />
     <Compile Include="Song.cs" />
     <Compile Include="SoundSystem.cs" />
     <Compile Include="RenderTarget.cs" />
