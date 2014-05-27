@@ -4,7 +4,6 @@
 
 using namespace System;
 
-
 CommonDialogError MsgDialog::Initialize()
 {
 	if (sceSysmoduleIsLoaded(SCE_SYSMODULE_MESSAGE_DIALOG) != SCE_SYSMODULE_LOADED)
@@ -23,7 +22,7 @@ CommonDialogError MsgDialog::Terminate()
 	return (CommonDialogError)error;
 }
 
-CommonDialogError OpenUserMsg(const char *message, MsgDialogButtonType buttonType, UserServiceUserId userId)
+CommonDialogError MsgDialog::OpenUserMsg(const char *message, MsgDialogButtonType buttonType, UserServiceUserId userId)
 {
 	SceMsgDialogParam param;
 	sceMsgDialogParamInitialize(&param);
@@ -39,7 +38,7 @@ CommonDialogError OpenUserMsg(const char *message, MsgDialogButtonType buttonTyp
 	return (CommonDialogError)error;
 }
 
-CommonDialogError OpenProgressBar(const char *message, UserServiceUserId userId)
+CommonDialogError MsgDialog::OpenProgressBar(const char *message, UserServiceUserId userId)
 {
 	SceMsgDialogParam param;
 	sceMsgDialogParamInitialize(&param);
@@ -55,7 +54,7 @@ CommonDialogError OpenProgressBar(const char *message, UserServiceUserId userId)
 	return (CommonDialogError)error;
 }
 
-CommonDialogError OpenSystemMsg(MsgDialogSysMsgType sysMsgType, UserServiceUserId userId)
+CommonDialogError MsgDialog::OpenSystemMsg(MsgDialogSysMsgType sysMsgType, UserServiceUserId userId)
 {
 	SceMsgDialogParam param;
 	sceMsgDialogParamInitialize(&param);

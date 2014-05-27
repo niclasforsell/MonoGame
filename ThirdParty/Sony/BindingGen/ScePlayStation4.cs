@@ -78,7 +78,7 @@ namespace BindingGen
             options.Headers.Add(@"System\SystemService.h");
             options.Headers.Add(@"System\UserService.h");
             options.Headers.Add(@"System\SaveData.h");
-            options.Headers.Add(@"System\CommonDialog.h");
+            //options.Headers.Add(@"System\CommonDialog.h");
             options.Headers.Add(@"System\NpProfileDialog.h");
             options.Headers.Add(@"System\WebBrowserDialog.h");
             options.Headers.Add(@"System\ErrorDialog.h");
