@@ -16,7 +16,7 @@ SaveDataResult SaveData::Initialize(ThreadPrio priority)
 {
 	SceSaveDataInitParams params;
 	memset(&params, 0, sizeof(params));
-	params.priority = priority;
+	params.priority = (int32_t)priority;
 
 	auto result = sceSaveDataInitialize(&params);
 	if (result == SCE_OK)
@@ -75,7 +75,7 @@ SaveDataResult SaveData::Mount(	uint64_t blocks,
 	mount.dirName = _dirName.data[0] ? &_dirName : NULL;
 	mount.fingerprint = _fingerprint.data[0] ? &_fingerprint : NULL;
 	mount.blocks = blocks;
-	mount.mountMode = mountMode;
+	mount.mountMode = (SceSaveDataMountMode)mountMode;
 
 	SceSaveDataMountResult mountResult;
 	memset(&mountResult, 0, sizeof(mountResult));

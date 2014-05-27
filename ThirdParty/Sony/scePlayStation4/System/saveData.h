@@ -11,7 +11,7 @@
 
 namespace System {
 
-enum SaveDataResult
+enum class SaveDataResult
 {
 	Ok = SCE_OK,
 
@@ -36,7 +36,7 @@ enum SaveDataResult
 	
 };
 
-CS_FLAGS enum SaveDataMountMode
+CS_FLAGS enum class SaveDataMountMode
 {
 	ReadOnly = SCE_SAVE_DATA_MOUNT_MODE_RDONLY,
 	WriteOnly = SCE_SAVE_DATA_MOUNT_MODE_WRONLY,
@@ -44,7 +44,7 @@ CS_FLAGS enum SaveDataMountMode
 	DestructOff = SCE_SAVE_DATA_MOUNT_MODE_DESTRUCT_OFF,
 };
 
-CS_FLAGS enum SaveDataConst : uint
+CS_FLAGS enum class SaveDataConst : uint
 {
 	BlockSize = SCE_SAVE_DATA_BLOCK_SIZE,
 	BlocksMin = SCE_SAVE_DATA_BLOCKS_MIN,

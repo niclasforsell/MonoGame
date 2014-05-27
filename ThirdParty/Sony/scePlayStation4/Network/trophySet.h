@@ -6,7 +6,7 @@
 
 namespace Network {
 
-enum TrophyResult
+enum class TrophyResult
 {
 	Ok = SCE_OK,
 

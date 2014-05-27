@@ -8,7 +8,7 @@ namespace System {
 
 typedef int32_t SceUserServiceUserId;
 
-enum RemotePlayResult
+enum class RemotePlayResult
 {
 	Ok = SCE_OK,
 
@@ -18,7 +18,7 @@ enum RemotePlayResult
 };
 
 #if SCE_ORBIS_SDK_VERSION >= 0x01700081u // SDK Version 1.7
-enum RemotePlayConnectionStatus
+enum class RemotePlayConnectionStatus
 {
 	Disconnect = SCE_REMOTEPLAY_CONNECTION_STATUS_DISCONNECT,
 	Connect = SCE_REMOTEPLAY_CONNECTION_STATUS_CONNECT,
