@@ -11,7 +11,7 @@
 
 namespace System {
 
-enum SaveDataResult
+enum class SaveDataResult
 {
 	Ok = SCE_OK,
 
@@ -36,13 +36,22 @@ enum SaveDataResult
 	
 };
 
-CS_FLAGS enum SaveDataMountMode
+CS_FLAGS enum class SaveDataMountMode
 {
 	ReadOnly = SCE_SAVE_DATA_MOUNT_MODE_RDONLY,
 	WriteOnly = SCE_SAVE_DATA_MOUNT_MODE_WRONLY,
 	Create = SCE_SAVE_DATA_MOUNT_MODE_CREATE,
 	DestructOff = SCE_SAVE_DATA_MOUNT_MODE_DESTRUCT_OFF,
 };
+
+CS_FLAGS enum class SaveDataConst : uint
+{
+	BlockSize = SCE_SAVE_DATA_BLOCK_SIZE,
+	BlocksMin = SCE_SAVE_DATA_BLOCKS_MIN,
+	IconWidth = SCE_SAVE_DATA_ICON_WIDTH,
+	IconHeight = SCE_SAVE_DATA_ICON_HEIGHT,
+};
+
 
 class CS_API SaveData
 {
@@ -60,14 +69,10 @@ class CS_API SaveData
 	char _subTitle[SCE_SAVE_DATA_PARAM_TYPE_SUB_TITLE];
 	char _detail[SCE_SAVE_DATA_DETAIL_MAXSIZE];
 
-	//char _titleId[SCE_SAVE_DATA_TITLE_ID_DATA_SIZE];
-	//char _dirName[SCE_SAVE_DATA_DIRNAME_DATA_MAXSIZE];
-	//char _fingerprint[SCE_SAVE_DATA_FINGERPRINT_DATA_SIZE];
-
 	SceSaveDataMountPoint _mountPoint;
 
 public:
-
+		
 	static SaveDataResult Initialize(ThreadPrio priority);
 
 	static SaveDataResult Terminate();

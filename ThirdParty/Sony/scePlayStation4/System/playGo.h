@@ -7,7 +7,7 @@
 
 namespace System {
 
-enum PlayGoResult
+enum class PlayGoResult
 {
 	Ok = SCE_OK,
 
@@ -29,7 +29,7 @@ enum PlayGoResult
 	ErrorBadLocus = SCE_PLAYGO_ERROR_BAD_LOCUS
 };
 
-enum PlayGoInstallSpeed : int32_t
+enum class PlayGoInstallSpeed : int32_t
 {
 	Suspended = 0,
 	Trickle = 1,
@@ -43,7 +43,7 @@ enum PlayGoLanguageMask : uint64_t
 };
 */
 
-enum PlayGoLocus : int8_t
+enum class PlayGoLocus : int8_t
 {
 	NotDownloaded = SCE_PLAYGO_LOCUS_NOT_DOWNLOADED,
 	LocalSlow = SCE_PLAYGO_LOCUS_LOCAL_SLOW,

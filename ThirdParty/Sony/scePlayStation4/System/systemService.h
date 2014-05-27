@@ -7,7 +7,7 @@
 
 namespace System {
 
-enum SystemServiceResult
+enum class SystemServiceResult
 {
 	Ok = SCE_OK,
 
@@ -20,7 +20,7 @@ enum SystemServiceResult
 
 };
 
-enum SystemLang
+enum class SystemLang
 {
 	Japanese = SCE_SYSTEM_PARAM_LANG_JAPANESE,
 	English_UnitedStates = SCE_SYSTEM_PARAM_LANG_ENGLISH_US,
@@ -45,20 +45,20 @@ enum SystemLang
 	Spanish_LatinAmerica = SCE_SYSTEM_PARAM_LANG_SPANISH_LA,
 };
 
-enum SystemDateFormat
+enum class SystemDateFormat
 {
 	YearMonthDay = SCE_SYSTEM_PARAM_DATE_FORMAT_YYYYMMDD,
 	DayMonthYear = SCE_SYSTEM_PARAM_DATE_FORMAT_DDMMYYYY,
 	MonthDayYear = SCE_SYSTEM_PARAM_DATE_FORMAT_MMDDYYYY,
 };
 
-enum SystemTimeFormat
+enum class SystemTimeFormat
 {
 	TwelveHour = SCE_SYSTEM_PARAM_TIME_FORMAT_12HOUR,
 	TwentyFourHour = SCE_SYSTEM_PARAM_TIME_FORMAT_24HOUR,
 };
 
-enum GpuLoadEmulationMode
+enum class GpuLoadEmulationMode
 {
 	Off = SCE_SYSTEM_SERVICE_GPU_LOAD_EMULATION_MODE_OFF,
 	Normal = SCE_SYSTEM_SERVICE_GPU_LOAD_EMULATION_MODE_NORMAL,

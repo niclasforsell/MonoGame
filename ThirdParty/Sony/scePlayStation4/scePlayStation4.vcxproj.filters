@@ -109,6 +109,24 @@
     <ClCompile Include="Network\titleStorage.cpp">
       <Filter>Network</Filter>
     </ClCompile>
+    <ClCompile Include="System\commonDialog.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="System\npProfileDialog.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="System\webBrowserDialog.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="System\screenShot.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="System\errorDialog.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="System\msgDialog.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -289,6 +307,24 @@
     </ClInclude>
     <ClInclude Include="Network\titleStorage.h">
       <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="System\commonDialog.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\npProfileDialog.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\webBrowserDialog.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\screenShot.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\errorDialog.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\msgDialog.h">
+      <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -6,7 +6,7 @@
 
 namespace Network {
 
-enum NpResult
+enum class NpResult
 {
 	Ok = SCE_OK,
 

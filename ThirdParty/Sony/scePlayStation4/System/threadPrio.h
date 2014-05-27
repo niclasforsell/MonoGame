@@ -5,7 +5,7 @@
 
 namespace System {
 
-enum ThreadPrio
+enum class ThreadPrio
 {
 	Default = SCE_KERNEL_PRIO_FIFO_DEFAULT,
 	Highest = SCE_KERNEL_PRIO_FIFO_HIGHEST,
