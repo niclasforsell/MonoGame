@@ -84,6 +84,7 @@ namespace BindingGen
             options.Headers.Add(@"System\ErrorDialog.h");
             options.Headers.Add(@"System\MsgDialog.h");
             options.Headers.Add(@"System\ScreenShot.h");
+            options.Headers.Add(@"System\VideoRecording.h");
 
             // Make sure any system headers needed is available.
             var orbisSDK = System.Environment.GetEnvironmentVariable("SCE_ORBIS_SDK_DIR");
