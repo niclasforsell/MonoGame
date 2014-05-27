@@ -127,6 +127,9 @@
     <ClCompile Include="System\msgDialog.cpp">
       <Filter>System</Filter>
     </ClCompile>
+    <ClCompile Include="Network\npCommerce.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -325,6 +328,9 @@
     </ClInclude>
     <ClInclude Include="System\msgDialog.h">
       <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\npCommerce.h">
+      <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

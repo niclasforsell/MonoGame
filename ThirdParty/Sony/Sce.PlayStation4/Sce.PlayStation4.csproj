@@ -68,6 +68,7 @@
     <Compile Include="MsgDialog.cs" />
     <Compile Include="Np.cs" />
     <Compile Include="Np.Public.cs" />
+    <Compile Include="NpCommerce.cs" />
     <Compile Include="NpProfileDialog.cs" />
     <Compile Include="PixelShader.cs" />
     <Compile Include="PlayGo.cs" />
