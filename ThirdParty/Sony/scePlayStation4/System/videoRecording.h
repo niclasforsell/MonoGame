@@ -3,6 +3,7 @@
 #include "threadPrio.h"
 #include <scebase.h>
 #include <video_recording.h>
+#include <ces.h>
 
 namespace System {
 
@@ -26,6 +27,8 @@ enum class VideoRecordingResult
 #if SCE_ORBIS_SDK_VERSION >= 0x01700081u // SDK Version 1.7
 	ErrorFileNoData = SCE_VIDEO_RECORDING_ERROR_FILE_NO_DATA
 #endif
+
+	ErrorStringConversionFailed
 };
 
 class CS_API VideoRecording
@@ -43,6 +46,17 @@ public:
 	static VideoRecordingResult Close(bool discardRecording);
 
 	static VideoRecordingResult GetStatus();
+
+	static VideoRecordingResult MarkChapterChange();
+	static VideoRecordingResult ProhibitRecording();
+
+	// Metadata
+	static VideoRecordingResult SetSubtitle(const char* value);
+	static VideoRecordingResult SetDescription(const char* value);
+	static VideoRecordingResult SetComments(const char* value);
+	static VideoRecordingResult SetKeywords(const char* value);
+	static VideoRecordingResult SetCopyright(const char* value);
+	static VideoRecordingResult SetPermissionLevel(int32_t permissionLevel);
 };
 
 } // namespace System
