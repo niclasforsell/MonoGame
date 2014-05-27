@@ -26,6 +26,7 @@ CommonDialogError MsgDialog::OpenUserMsg(const char *message, MsgDialogButtonTyp
 {
 	SceMsgDialogParam param;
 	sceMsgDialogParamInitialize(&param);
+	param.mode = SCE_MSG_DIALOG_MODE_USER_MSG;
 	param.userId = userId;
 
 	SceMsgDialogUserMessageParam userMsgParam;
@@ -42,6 +43,7 @@ CommonDialogError MsgDialog::OpenProgressBar(const char *message, UserServiceUse
 {
 	SceMsgDialogParam param;
 	sceMsgDialogParamInitialize(&param);
+	param.mode = SCE_MSG_DIALOG_MODE_PROGRESS_BAR;
 	param.userId = userId;
 
 	SceMsgDialogProgressBarParam progBarParam;
@@ -58,6 +60,7 @@ CommonDialogError MsgDialog::OpenSystemMsg(MsgDialogSysMsgType sysMsgType, UserS
 {
 	SceMsgDialogParam param;
 	sceMsgDialogParamInitialize(&param);
+	param.mode = SCE_MSG_DIALOG_MODE_SYSTEM_MSG;
 	param.userId = userId;
 
 	SceMsgDialogSystemMessageParam sysMsgParam;
