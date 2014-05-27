@@ -1,11 +1,18 @@
 #include "msgDialog.h"
-
+#include <libsysmodule.h>
+#include <assert.h>
 
 using namespace System;
 
 
 CommonDialogError MsgDialog::Initialize()
 {
+	if (sceSysmoduleIsLoaded(SCE_SYSMODULE_MESSAGE_DIALOG) != SCE_SYSMODULE_LOADED)
+	{
+		auto error = sceSysmoduleLoadModule(SCE_SYSMODULE_MESSAGE_DIALOG);
+		assert(error == SCE_OK);
+	}
+
 	auto error = sceMsgDialogInitialize();
 	return (CommonDialogError)error;
 }
