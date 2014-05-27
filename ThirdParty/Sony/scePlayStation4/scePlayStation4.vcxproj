@@ -130,6 +130,7 @@
     <ClCompile Include="System\screenShot.cpp" />
     <ClCompile Include="System\systemService.cpp" />
     <ClCompile Include="System\userService.cpp" />
+    <ClCompile Include="System\videoRecording.cpp" />
     <ClCompile Include="System\webBrowserDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +191,7 @@
     <ClInclude Include="System\systemService.h" />
     <ClInclude Include="System\threadPrio.h" />
     <ClInclude Include="System\userService.h" />
+    <ClInclude Include="System\videoRecording.h" />
     <ClInclude Include="System\webBrowserDialog.h" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\SceGnm.targets" Condition="Exists('$(SolutionDir)\SceGnm.Development.props')" />
