@@ -1,7 +1,10 @@
 #include "npScore.h"
 
+#include "../allocator.h"
+
 #include <libsysmodule.h>
 #include <memory.h>
+#include <assert.h>
 
 
 using namespace Network;
@@ -18,6 +21,135 @@ void NpScore::_tryInitialize()
 		return;
 	}
 }
+
+NpScoreRankings::NpScoreRankings(size_t arrayNum, bool needRanks, bool needComments, bool needGameInfo)
+{
+	assert(arrayNum <= SCE_NP_SCORE_MAX_RANGE_NUM_PER_REQUEST);
+	_arrayNum = arrayNum;
+
+	_rank = needRanks ? (SceNpScoreRankData*)Allocator::Get()->allocate(arrayNum * sizeof(SceNpScoreRankData), 8) : NULL;
+	_comment = needComments ? (SceNpScoreComment*)Allocator::Get()->allocate(arrayNum * sizeof(SceNpScoreComment), 8) : NULL;
+	_gameInfo = needGameInfo ? (SceNpScoreGameInfo*)Allocator::Get()->allocate(arrayNum * sizeof(SceNpScoreGameInfo), 8) : NULL;
+
+	_lastSortDate.tick = 0;
+	_totalPlayers = 0;
+	_first = 0;
+	_last = 0;
+	_index = 0;
+}
+
+NpScoreRankings::~NpScoreRankings()
+{
+	Allocator::Get()->release(_rank);
+	Allocator::Get()->release(_comment);
+	Allocator::Get()->release(_gameInfo);
+}
+
+int32_t NpScoreRankings::GetIndex()
+{
+	return _index;
+}
+
+void NpScoreRankings::SetIndex(int32_t index)
+{
+	assert(index >= 0);
+	assert(index < _arrayNum);
+	_index = index;
+}
+
+
+size_t NpScoreRankings::GetArrayNum()
+{
+	return _arrayNum;
+}
+
+
+SceNpScoreRankNumber NpScoreRankings::GetFirstInRange()
+{
+	return _first;
+}
+
+SceNpScoreRankNumber NpScoreRankings::GetLastInRange()
+{
+	return _last;
+}
+
+SceNpScoreRankNumber NpScoreRankings::GetTotalPlayers()
+{
+	return _totalPlayers;
+}
+
+const char* NpScoreRankings::GetUserOnlineIdAtIndex()
+{
+	if (_rank)
+		return _rank[_index].npId.handle.data;
+	return NULL;
+}
+
+SceNpScorePcId NpScoreRankings::GetPcIdAtIndex()
+{
+	if (_rank)
+		return _rank[_index].pcId;
+	return 0;
+}
+
+SceNpScoreRankNumber NpScoreRankings::GetSerialRankAtIndex()
+{
+	if (_rank)
+		return _rank[_index].serialRank;
+	return 0;
+}
+
+SceNpScoreRankNumber NpScoreRankings::GetRankAtIndex()
+{
+	if (_rank)
+		return _rank[_index].rank;
+	return 0;
+}
+
+SceNpScoreRankNumber NpScoreRankings::GetHighestRankAtIndex()
+{
+	if (_rank)
+		return _rank[_index].highestRank;
+	return 0;
+}
+
+SceNpScoreValue NpScoreRankings::GetScoreValueAtIndex()
+{
+	if (_rank)
+		return _rank[_index].scoreValue;
+	return 0;
+}
+
+bool NpScoreRankings::GetHasGameDataAtIndex()
+{
+	if (_rank)
+		return _rank[_index].hasGameData != 0;
+	return false;
+}
+
+uint64_t NpScoreRankings::GetRecordDateAtIndex()
+{
+	if (_rank)
+		return _rank[_index].recordDate.tick;
+	return 0;
+}
+
+const char* NpScoreRankings::GetCommentAtIndex()
+{
+	if (_comment)
+		return _comment[_index].utf8Comment;
+	return NULL;
+}
+
+const char* NpScoreRankings::GetGameInfoIndex()
+{
+	if (_gameInfo)
+		return (const char*)_gameInfo[_index].data;
+	return NULL;
+}
+
+
 
 
 NpScoreRequest::NpScoreRequest()
@@ -50,9 +182,39 @@ NpScoreRequest* NpScoreRequest::Create(NpScoreTitleContext *context,  CS_OUT int
 	return request;
 }
 
+NpCommunityError NpScoreRequest::GetRankingsByRange(	SceNpScoreBoardId boardId, 
+														SceNpScoreRankNumber startSerialRank,
+														NpScoreRankings *results)
+{
+	assert(results != NULL);
+
+	auto error = sceNpScoreGetRankingByRange(	_requestId, 
+												boardId, 
+												startSerialRank,
+												results->_rank,
+												results->_arrayNum * sizeof(SceNpScoreRankData),
+												results->_comment,
+												results->_arrayNum * sizeof(SceNpScoreComment),
+												results->_gameInfo,
+												results->_arrayNum * sizeof(SceNpScoreGameInfo),
+												results->_arrayNum,
+												&results->_lastSortDate,
+												&results->_totalPlayers,												
+												NULL);
+	if (error < 0)
+		return (NpCommunityError)error;
+
+	results->_index = 0;
+	results->_first = startSerialRank;
+	results->_last = startSerialRank + error;
+
+	return NpCommunityError::Ok;
+}
+
 NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId, 
 												SceNpScoreValue score, 
 												const char *scoreComment, 
+												const char *gameInfo,
 												uint64_t compareDate,
 												CS_OUT SceNpScoreRankNumber *tmpRank)
 {
@@ -63,7 +225,16 @@ NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId,
 	memset(&comment, 0, sizeof(comment));
 	strncpy(comment.utf8Comment, scoreComment, SCE_NP_SCORE_COMMENT_MAXLEN);
 
-	auto error = sceNpScoreRecordScore(_requestId, boardId, score, &comment, NULL, tmpRank, &tick, NULL);
+	SceNpScoreGameInfo info;
+	memset(&info, 0, sizeof(info));
+	if (gameInfo != NULL)
+	{
+		info.infoSize =  MIN(strlen(gameInfo), SCE_NP_SCORE_GAMEINFO_MAXSIZE);
+		memcpy(&info.data, gameInfo, info.infoSize);
+	}
+	
+
+	auto error = sceNpScoreRecordScore(_requestId, boardId, score, &comment, &info, tmpRank, &tick, NULL);
 	if (error < 0)
 		return (NpCommunityError)error;
 }

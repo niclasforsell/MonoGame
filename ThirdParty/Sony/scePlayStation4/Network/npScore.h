@@ -60,6 +60,7 @@ enum class NpCommunityError
 
 class NpScore;
 class NpScoreRequest;
+class NpScoreRankings;
 class NpScoreTitleContext;
 
 
@@ -77,6 +78,50 @@ public:
 };
 
 
+class CS_API NpScoreRankings
+{
+	friend class NpScoreRequest;
+
+	SceNpScoreRankData *_rank;
+	SceNpScoreComment *_comment;
+	SceNpScoreGameInfo *_gameInfo;
+
+	size_t _arrayNum;
+
+	SceRtcTick _lastSortDate;
+	SceNpScoreRankNumber _totalPlayers;
+
+	SceNpScoreRankNumber _first;
+	SceNpScoreRankNumber _last;
+
+	int32_t _index;
+
+public:
+
+	NpScoreRankings(size_t arrayNum, bool needRanks, bool needComments, bool needGameInfo);
+	~NpScoreRankings();
+
+	int32_t GetIndex();
+	void SetIndex(int32_t index);
+	
+	size_t GetArrayNum();
+
+	SceNpScoreRankNumber GetFirstInRange();
+	SceNpScoreRankNumber GetLastInRange();
+	SceNpScoreRankNumber GetTotalPlayers();
+
+	const char* GetUserOnlineIdAtIndex();
+	SceNpScorePcId GetPcIdAtIndex();
+	SceNpScoreRankNumber GetSerialRankAtIndex();
+	SceNpScoreRankNumber GetRankAtIndex();
+	SceNpScoreRankNumber GetHighestRankAtIndex();
+	SceNpScoreValue GetScoreValueAtIndex();
+	bool GetHasGameDataAtIndex();
+	uint64_t GetRecordDateAtIndex();
+	const char* GetCommentAtIndex();
+	const char* GetGameInfoIndex();
+};
+
 class CS_API NpScoreRequest
 {
 	int32_t _requestId;
@@ -90,9 +135,14 @@ public:
 
 	static NpScoreRequest* Create(NpScoreTitleContext *context, CS_OUT int32_t *error);
 
+	NpCommunityError GetRankingsByRange(	SceNpScoreBoardId boardId, 
+											SceNpScoreRankNumber startSerialRank, 
+											NpScoreRankings *results);
+
 	NpCommunityError RecordScore(	SceNpScoreBoardId boardId, 
 									SceNpScoreValue score, 
-									const char *scoreComment, 
+									const char *scoreComment,
+									const char *gameInfo,
 									uint64_t compareDate,
 									CS_OUT SceNpScoreRankNumber *tmpRank);
 
