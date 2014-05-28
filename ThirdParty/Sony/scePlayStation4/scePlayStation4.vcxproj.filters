@@ -127,6 +127,12 @@
     <ClCompile Include="System\msgDialog.cpp">
       <Filter>System</Filter>
     </ClCompile>
+    <ClCompile Include="Network\npCommerce.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Network\npScore.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
     <ClCompile Include="System\videoRecording.cpp">
       <Filter>System</Filter>
     </ClCompile>
@@ -328,6 +334,12 @@
     </ClInclude>
     <ClInclude Include="System\msgDialog.h">
       <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\npCommerce.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\npScore.h">
+      <Filter>Network</Filter>
     </ClInclude>
     <ClInclude Include="System\videoRecording.h">
       <Filter>System</Filter>
