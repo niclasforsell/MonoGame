@@ -133,6 +133,9 @@
     <ClCompile Include="Network\npScore.cpp">
       <Filter>Network</Filter>
     </ClCompile>
+    <ClCompile Include="System\videoRecording.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -337,6 +340,9 @@
     </ClInclude>
     <ClInclude Include="Network\npScore.h">
       <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="System\videoRecording.h">
+      <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,11 +1,18 @@
 #include "npProfileDialog.h"
-
+#include <libsysmodule.h>
+#include <assert.h>
 
 using namespace System;
 
 
 CommonDialogError NpProfileDialog::Initialize()
 {
+	if (sceSysmoduleIsLoaded(SCE_SYSMODULE_NP_PROFILE_DIALOG) != SCE_SYSMODULE_LOADED)
+	{
+		auto error = sceSysmoduleLoadModule(SCE_SYSMODULE_NP_PROFILE_DIALOG);
+		assert(error == SCE_OK);
+	}
+
 	auto error = sceNpProfileDialogInitialize();
 	return (CommonDialogError)error;
 }

@@ -1,11 +1,18 @@
 #include "webBrowserDialog.h"
-
+#include <libsysmodule.h>
+#include <assert.h>
 
 using namespace System;
 
 
 CommonDialogError WebBrowserDialog::Initialize()
 {
+	if (sceSysmoduleIsLoaded(SCE_SYSMODULE_WEB_BROWSER_DIALOG) != SCE_SYSMODULE_LOADED)
+	{
+		auto error = sceSysmoduleLoadModule(SCE_SYSMODULE_WEB_BROWSER_DIALOG);
+		assert(error == SCE_OK);
+	}
+
 	auto error = sceWebBrowserDialogInitialize();
 	return (CommonDialogError)error;
 }

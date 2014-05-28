@@ -1,11 +1,17 @@
 #include "msgDialog.h"
-
+#include <libsysmodule.h>
+#include <assert.h>
 
 using namespace System;
 
-
 CommonDialogError MsgDialog::Initialize()
 {
+	if (sceSysmoduleIsLoaded(SCE_SYSMODULE_MESSAGE_DIALOG) != SCE_SYSMODULE_LOADED)
+	{
+		auto error = sceSysmoduleLoadModule(SCE_SYSMODULE_MESSAGE_DIALOG);
+		assert(error == SCE_OK);
+	}
+
 	auto error = sceMsgDialogInitialize();
 	return (CommonDialogError)error;
 }
@@ -16,10 +22,11 @@ CommonDialogError MsgDialog::Terminate()
 	return (CommonDialogError)error;
 }
 
-CommonDialogError OpenUserMsg(const char *message, MsgDialogButtonType buttonType, UserServiceUserId userId)
+CommonDialogError MsgDialog::OpenUserMsg(const char *message, MsgDialogButtonType buttonType, UserServiceUserId userId)
 {
 	SceMsgDialogParam param;
 	sceMsgDialogParamInitialize(&param);
+	param.mode = SCE_MSG_DIALOG_MODE_USER_MSG;
 	param.userId = userId;
 
 	SceMsgDialogUserMessageParam userMsgParam;
@@ -32,10 +39,11 @@ CommonDialogError OpenUserMsg(const char *message, MsgDialogButtonType buttonTyp
 	return (CommonDialogError)error;
 }
 
-CommonDialogError OpenProgressBar(const char *message, UserServiceUserId userId)
+CommonDialogError MsgDialog::OpenProgressBar(const char *message, UserServiceUserId userId)
 {
 	SceMsgDialogParam param;
 	sceMsgDialogParamInitialize(&param);
+	param.mode = SCE_MSG_DIALOG_MODE_PROGRESS_BAR;
 	param.userId = userId;
 
 	SceMsgDialogProgressBarParam progBarParam;
@@ -48,10 +56,11 @@ CommonDialogError OpenProgressBar(const char *message, UserServiceUserId userId)
 	return (CommonDialogError)error;
 }
 
-CommonDialogError OpenSystemMsg(MsgDialogSysMsgType sysMsgType, UserServiceUserId userId)
+CommonDialogError MsgDialog::OpenSystemMsg(MsgDialogSysMsgType sysMsgType, UserServiceUserId userId)
 {
 	SceMsgDialogParam param;
 	sceMsgDialogParamInitialize(&param);
+	param.mode = SCE_MSG_DIALOG_MODE_SYSTEM_MSG;
 	param.userId = userId;
 
 	SceMsgDialogSystemMessageParam sysMsgParam;

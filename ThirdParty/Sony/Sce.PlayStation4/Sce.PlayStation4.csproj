@@ -92,6 +92,7 @@
     <Compile Include="UserService.cs" />
     <Compile Include="VertexBuffer.cs" />
     <Compile Include="VertexShader.cs" />
+    <Compile Include="VideoRecording.cs" />
     <Compile Include="WebBrowserDialog.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
