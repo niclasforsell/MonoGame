@@ -133,7 +133,7 @@ public:
 
 	~NpScoreRequest();
 
-	static NpScoreRequest* Create(NpScoreTitleContext *context, CS_OUT int32_t *error);
+	static NpScoreRequest* Create(NpScoreTitleContext *context, CS_OUT NpCommunityError *error);
 
 	NpCommunityError GetRankingsByRange(	SceNpScoreBoardId boardId, 
 											SceNpScoreRankNumber startSerialRank, 
@@ -148,7 +148,7 @@ public:
 
 	NpCommunityError CensorComment(const char *comment);
 
-	const char* SanitizeComment(const char *comment, CS_OUT int32_t *error);
+	const char* SanitizeComment(const char *comment, CS_OUT NpCommunityError *error);
 
 };
 
@@ -167,7 +167,7 @@ public:
 
 	~NpScoreTitleContext();
 
-	static NpScoreTitleContext* Create(UserServiceUserId userId, CS_OUT int32_t *error);
+	static NpScoreTitleContext* Create(UserServiceUserId userId, CS_OUT NpResult *error);
 
 	NpCommunityError Initialize(SceNpServiceLabel npServiceLabel);
 

@@ -166,19 +166,19 @@ NpScoreRequest::~NpScoreRequest()
 	}
 }
 
-NpScoreRequest* NpScoreRequest::Create(NpScoreTitleContext *context,  CS_OUT int32_t *error)
+NpScoreRequest* NpScoreRequest::Create(NpScoreTitleContext *context,  CS_OUT NpCommunityError *error)
 {
 	auto result = sceNpScoreCreateRequest(context->_titleCtxId);
 	if (result < 0)
 	{
-		*error = (int32_t)(NpCommunityError)result;
+		*error = (NpCommunityError)result;
 		return NULL;
 	}
 
 	auto request = new NpScoreRequest();
 	request->_requestId = result;
 	
-	*error = (int32_t)NpCommunityError::Ok;
+	*error = NpCommunityError::Ok;
 	return request;
 }
 
@@ -245,10 +245,10 @@ NpCommunityError NpScoreRequest::CensorComment(const char *comment)
 	return (NpCommunityError)error;
 }
 
-const char* NpScoreRequest::SanitizeComment(const char *comment, CS_OUT int32_t *error)
+const char* NpScoreRequest::SanitizeComment(const char *comment, CS_OUT NpCommunityError *error)
 {
-	*error = sceNpScoreSanitizeComment(_requestId, comment, _sanitizedComment, NULL);
-	if (error < 0)
+	*error = (NpCommunityError)sceNpScoreSanitizeComment(_requestId, comment, _sanitizedComment, NULL);
+	if ((int)(*error) < 0)
 		return NULL;
 
 	return _sanitizedComment;
@@ -270,13 +270,13 @@ NpScoreTitleContext::~NpScoreTitleContext()
 	}
 }
 
-NpScoreTitleContext* NpScoreTitleContext::Create(UserServiceUserId userId, CS_OUT int32_t *error)
+NpScoreTitleContext* NpScoreTitleContext::Create(UserServiceUserId userId, CS_OUT NpResult *error)
 {
 	SceNpId npId;
 	auto result = sceNpGetNpId(userId, &npId);
 	if (result < 0)
 	{
-		*error = (int32_t)(NpResult)result;
+		*error = (NpResult)result;
 		return NULL;
 	}
 
@@ -285,7 +285,7 @@ NpScoreTitleContext* NpScoreTitleContext::Create(UserServiceUserId userId, CS_OU
 	auto context = new NpScoreTitleContext();
 	memcpy(&context->_npId, &npId, sizeof(SceNpId));
 
-	*error = (int32_t)NpResult::Ok;
+	*error = NpResult::Ok;
 	return context;
 }
 
