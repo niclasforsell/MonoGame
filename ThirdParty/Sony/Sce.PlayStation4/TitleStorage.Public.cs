@@ -16,12 +16,12 @@ namespace Sce.PlayStation4.Network
                 throw new Exception(result.ToString());
         }
 
-        public uint GetData(int slotId, byte[] buffer)
+        public ulong GetData(int slotId, byte[] buffer)
         {
             var bufferHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
             var bufferPtr = (IntPtr)(bufferHandle.AddrOfPinnedObject().ToInt64());
             TitleStorageResult result;
-            uint recvdSize = 0;
+            ulong recvdSize = 0;
             unsafe
             {
                 result = GetData(slotId, (void*)bufferPtr, (uint)buffer.Length, out recvdSize);

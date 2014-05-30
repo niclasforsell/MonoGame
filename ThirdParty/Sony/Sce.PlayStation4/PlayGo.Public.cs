@@ -110,8 +110,8 @@ namespace Sce.PlayStation4.System
             get
             {
                 // TODO: Switch these to ulong after 64-bit fix
-                uint progressSize;
-                uint totalSize;
+                ulong progressSize;
+                ulong totalSize;
                 if (!TryGet(index, out progressSize, out totalSize))
                     throw new IndexOutOfRangeException();
 
