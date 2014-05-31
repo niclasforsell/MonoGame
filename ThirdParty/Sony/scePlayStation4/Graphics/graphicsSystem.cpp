@@ -830,7 +830,9 @@ void GraphicsSystem::CreateSamplerState(	TextureFilter filter,
 			break;
     }
 
-	sampler.setLodRange(0, maxMipLevel);
+	auto fixedMaxMip = Gnmx::convertF32ToU4_8((float)maxMipLevel);
+	sampler.setLodRange(fixedMaxMip, 0xFFF);
+
 	sampler.setLodBias(mipMapLevelOfDetailBias, 0.0f);
 
 	if (maxAnisotropy >= 16)
