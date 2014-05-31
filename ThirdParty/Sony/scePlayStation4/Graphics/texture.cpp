@@ -124,27 +124,18 @@ Texture::~Texture()
 
 void Texture::SetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t length)
 {
-	auto width = _texture->getWidth();
-	auto height = _texture->getHeight();
-	auto depth = _texture->getDepth();
+	auto width = MAX(1, _texture->getWidth() >> level);
+	auto height = MAX(1, _texture->getHeight() >> level);
+	auto depth = MAX(1, _texture->getDepth() >> level);
 	auto pixelBytes = _texture->getDataFormat().getBytesPerElement();
+
+	uint64_t levelOffset, levelSize;
+	GpuAddress::computeTextureSurfaceOffsetAndSize(&levelOffset, &levelSize, _texture, level, 0);
+
 	auto baseAddr = (unsigned char*)_texture->getBaseAddress();
-	auto pitch = _texture->getPitch();
-	auto levelZeroSize = pitch * height * depth * pixelBytes;
+	baseAddr += levelOffset;
 
-	baseAddr += offset;
-
-	while (level > 0)
-	{
-		baseAddr += levelZeroSize;
-		levelZeroSize /= 4;
-		--level;
-
-		width = MAX(1, width >> 1);
-		height = MAX(1, height >> 1);
-		pitch = MAX(1, pitch >> 1);
-	}
-
+	auto pitch = (levelSize / pixelBytes) / height;
 	if (pitch == width)
 		memcpy(baseAddr, data, length);
 	else
@@ -160,22 +151,18 @@ void Texture::SetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t l
 
 void Texture::GetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t length)
 {
-	auto width = _texture->getWidth();
-	auto height = _texture->getHeight();
-    auto depth = _texture->getDepth();
+	auto width = MAX(1, _texture->getWidth() >> level);
+	auto height = MAX(1, _texture->getHeight() >> level);
+	auto depth = MAX(1, _texture->getDepth() >> level);
 	auto pixelBytes = _texture->getDataFormat().getBytesPerElement();
+
+	uint64_t levelOffset, levelSize;
+	GpuAddress::computeTextureSurfaceOffsetAndSize(&levelOffset, &levelSize, _texture, level, 0);
+
 	auto baseAddr = (unsigned char*)_texture->getBaseAddress();
-	auto pitch = _texture->getPitch();
-	auto levelZeroSize = pitch * height * depth * pixelBytes;
+	baseAddr += levelOffset;
 
-	baseAddr += offset;
-
-	while (level > 0)
-	{
-		baseAddr += levelZeroSize;
-		levelZeroSize /= 4;
-		--level;
-	}
+	auto pitch = (levelSize / pixelBytes) / height;
 
 	if (pitch == width)
 		memcpy(data, baseAddr, length);
