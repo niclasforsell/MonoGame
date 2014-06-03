@@ -25,7 +25,7 @@ enum class VideoRecordingResult
 	ErrorNoSpace = SCE_VIDEO_RECORDING_ERROR_NO_SPACE,
 
 #if SCE_ORBIS_SDK_VERSION >= 0x01700081u // SDK Version 1.7
-	ErrorFileNoData = SCE_VIDEO_RECORDING_ERROR_FILE_NO_DATA
+	ErrorFileNoData = SCE_VIDEO_RECORDING_ERROR_FILE_NO_DATA,
 #endif
 
 	ErrorStringConversionFailed
