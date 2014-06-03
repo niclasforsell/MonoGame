@@ -136,6 +136,9 @@
     <ClCompile Include="System\videoRecording.cpp">
       <Filter>System</Filter>
     </ClCompile>
+    <ClCompile Include="Input\camera.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -343,6 +346,9 @@
     </ClInclude>
     <ClInclude Include="System\videoRecording.h">
       <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\camera.h">
+      <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

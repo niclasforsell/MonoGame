@@ -63,6 +63,7 @@ namespace BindingGen
             options.Headers.Add(@"Graphics\PixelShader.h");
             options.Headers.Add(@"Graphics\VertexBuffer.h");
             options.Headers.Add(@"Graphics\IndexBuffer.h");
+            options.Headers.Add(@"Input\Camera.h");
             options.Headers.Add(@"Input\GamePadState.h");
             options.Headers.Add(@"Input\GamePad.h");
             options.Headers.Add(@"Input\KeyboardState.h");
