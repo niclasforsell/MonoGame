@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioBuffer.cs" />
+    <Compile Include="Camera.cs" />
     <Compile Include="CommonDialog.cs" />
     <Compile Include="CppSharp\Runtime\Helpers.cs" />
     <Compile Include="CppSharp\Runtime\Interfaces.cs" />
