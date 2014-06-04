@@ -12,6 +12,11 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D
     {
+        internal Texture2D(PS4Texture texture)
+        {
+            _texture = texture;
+        }
+
         protected void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
             if (type != SurfaceType.Texture)

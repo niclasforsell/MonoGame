@@ -4,49 +4,54 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using PS4VideoPlayer = Sce.PlayStation4.Media.VideoPlayer;
 
 namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class VideoPlayer
     {
+        PS4VideoPlayer _player;
+        Texture2D _texture;
+
         private void PlatformInitialize()
         {
-            throw new NotImplementedException();
+            _player = new PS4VideoPlayer();
+            _texture = new Texture2D(_player.Texture);
         }
 
         private Texture2D PlatformGetTexture()
         {
-            throw new NotImplementedException();
+            return _texture;
         }
 
         private void PlatformPause()
         {
-            throw new NotImplementedException();
+            _player.Pause();
         }
 
         private void PlatformResume()
         {
-            throw new NotImplementedException();
+            _player.Resume();
         }
 
         private void PlatformPlay()
         {
-            throw new NotImplementedException();
+            _player.Play(_currentVideo.FileName);
         }
 
         private void PlatformStop()
         {
-            throw new NotImplementedException();
+            _player.Stop();
         }
 
         private void PlatformSetVolume()
         {
-            throw new NotImplementedException();
+            _player.Volume = _volume;
         }
 
         private TimeSpan PlatformGetPlayPosition()
         {
-            throw new NotImplementedException();
+            return TimeSpan.FromSeconds(_player.PlayPosition);
         }
     }
 }
