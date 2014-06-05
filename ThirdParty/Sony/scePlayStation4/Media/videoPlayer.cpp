@@ -54,7 +54,7 @@ namespace {
 
 		player->_frameAvailable = false;
 
-		for(;;)
+		while (sceAvPlayerIsActive(player->_handle))
 		{
 			player->_decodeReady.wait(lock, [player] { return !player->_frameAvailable; });
 			if (sceAvPlayerGetVideoDataEx(player->_handle, &player->_videoFrame))
@@ -64,8 +64,7 @@ namespace {
 			}
 		}
 
-		scePthreadExit(NULL);
-		return NULL;
+		return nullptr;
 	}
 
 	void* audioOutputThread(void* arg)
@@ -75,7 +74,7 @@ namespace {
 
 		SceAvPlayerFrameInfo audioFrame;
 
-		for(;;)
+		while (sceAvPlayerIsActive(player->_handle))
 		{
 			if (sceAvPlayerGetAudioData(player->_handle, &audioFrame))
 			{
@@ -86,6 +85,8 @@ namespace {
 				// Do silence here to prevent the thread from blocking
 			}
 		}
+
+		return nullptr;
 	}
 }
 
@@ -110,12 +111,11 @@ VideoPlayer::VideoPlayer(GraphicsSystem* graphics)
 
 	param.debugLevel = SCE_AVPLAYER_DBG_INFO;
 	param.basePriority = 160;
-	param.numOutputVideoFrameBuffers = 2;
+	param.numOutputVideoFrameBuffers = 3;
 	param.autoStart = true;
 	param.defaultLanguage = "eng";
 
 	_handle = sceAvPlayerInit(&param);
-
 	_graphics = graphics;
 }
 
@@ -124,6 +124,8 @@ VideoPlayer::~VideoPlayer()
 	Stop();
 	delete _videoThread;
 	delete _audioThread;
+
+	sceAvPlayerClose(_handle);
 }
 
 void VideoPlayer::GrabFrame()
