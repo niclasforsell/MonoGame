@@ -58,3 +58,4 @@ Documentation/Output/
 MonoGame.Framework.Content.Pipeline/*.csproj
 MonoGame.Framework/*.csproj
 /*.sln
+*.speccache
