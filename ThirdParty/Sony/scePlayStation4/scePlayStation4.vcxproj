@@ -158,6 +158,7 @@
     <ClInclude Include="Graphics\texture.h" />
     <ClInclude Include="Graphics\vertexBuffer.h" />
     <ClInclude Include="Graphics\vertexShader.h" />
+    <ClInclude Include="Graphics\videoShaders.h" />
     <ClInclude Include="Input\camera.h" />
     <ClInclude Include="Input\gamePad.h" />
     <ClInclude Include="Input\gamePadState.h" />

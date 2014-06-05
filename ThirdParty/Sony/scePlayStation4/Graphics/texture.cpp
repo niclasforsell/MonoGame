@@ -245,3 +245,14 @@ Texture* GraphicsSystem::CreateTextureFromPng(unsigned char *data, uint32_t byte
 	return texture;
 }
 */
+
+Texture* Texture::CreateEmpty()
+{
+	auto result = new Texture();
+	return result;
+}
+
+void Texture::SetTexture(Gnm::Texture* texture)
+{
+	_texture = texture;
+}

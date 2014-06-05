@@ -32,3 +32,8 @@ VertexShader::~VertexShader()
 	Allocator::Get()->release(_binary);
 	Allocator::Get()->release(_shader);
 }
+
+Gnmx::VsShader* VertexShader::GetShader() const
+{
+	return _shader;
+}

@@ -22,6 +22,7 @@ public:
 
 	virtual ~VertexShader();
 
+	CS_IGNORE sce::Gnmx::VsShader* GetShader() const;
 };
 
 

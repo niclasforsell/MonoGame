@@ -12,6 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D
     {
+        internal Texture2D() { }
         internal Texture2D(PS4Texture texture)
         {
             _texture = texture;

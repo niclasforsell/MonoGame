@@ -5,23 +5,38 @@
 using System;
 using Microsoft.Xna.Framework.Graphics;
 using PS4VideoPlayer = Sce.PlayStation4.Media.VideoPlayer;
+using PS4VertexShader = Sce.PlayStation4.Graphics.VertexShader;
+using PS4PixelShader = Sce.PlayStation4.Graphics.PixelShader;
 
 namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class VideoPlayer
     {
-        PS4VideoPlayer _player;
-        Texture2D _texture;
+        private GraphicsDevice _graphicsDevice;
+        private PS4VideoPlayer _player;
+        private RenderTarget2D _renderTarget;
+
+        public VideoPlayer(GraphicsDevice graphicsDevice)
+        {
+            _graphicsDevice = graphicsDevice;
+            PlatformInitialize();
+        }
 
         private void PlatformInitialize()
         {
-            _player = new PS4VideoPlayer();
-            _texture = new Texture2D(_player.Texture);
+            if (_graphicsDevice == null)
+                throw new Exception("PS4 requires VideoPlayer to have access the graphics device.");
+
+            _renderTarget = new RenderTarget2D(_graphicsDevice, _graphicsDevice.DisplayMode.Width, _graphicsDevice.DisplayMode.Height);
+            _player = new PS4VideoPlayer(_graphicsDevice._system, _renderTarget._target);
         }
 
         private Texture2D PlatformGetTexture()
         {
-            return _texture;
+            _player.GrabFrame();
+            //_graphicsDevice.PlatformSetDirty();
+
+            return _renderTarget;
         }
 
         private void PlatformPause()

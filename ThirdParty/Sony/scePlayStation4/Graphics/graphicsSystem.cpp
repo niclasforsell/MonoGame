@@ -14,6 +14,7 @@
 #include "../allocator.h"
 
 #include "defaultShaders.h"
+#include "videoShaders.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,6 +43,9 @@ GraphicsSystem::GraphicsSystem()
 	_clearPS = new PixelShader(clear_p);
 	_clearVS = new VertexShader(clear_vv);
 	_clearFS = new FetchShader(_clearVS, NULL, 0);
+
+	_videoPS = new PixelShader(video_p_pssl_sb);
+	_videoVS = new VertexShader(video_vv_pssl_sb);
 }
 
 GraphicsSystem::~GraphicsSystem()
@@ -588,6 +592,8 @@ void GraphicsSystem::_applyBuffers(DisplayBuffer *backBuffer, int baseVertex)
 	}
 }
 
+
+
 void GraphicsSystem::DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
@@ -1098,4 +1104,61 @@ void GraphicsSystem::SetShaderConstants(ShaderStage stage, void *data, uint32_t 
 	constBuffer.initAsConstantBuffer(constants, sizeInBytes);
 	constBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
 	gfxc.setConstantBuffers(stage == ShaderStage_Pixel ? Gnm::kShaderStagePs : Gnm::kShaderStageVs, 0, 1, &constBuffer);
+}
+
+void GraphicsSystem::ConvertYCbCrToRGB(Gnm::Texture* luma,
+										Gnm::Texture* chroma,
+										float left,
+										float right,
+										float top,
+										float bottom,
+										RenderTarget *outputTarget)
+{
+	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
+	Gnmx::GfxContext &gfxc = backBuffer->context;
+
+	Gnm::Sampler sampler;
+	sampler.init();
+	sampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+	sampler.setXyFilterMode(Gnm::kFilterModeBilinear, Gnm::kFilterModeBilinear);
+
+	_applyRenderTargets(outputTarget->_renderTarget, NULL, NULL, NULL, NULL);
+	Clear(ClearOptions_Target, 0, 0, 0, 1, 0, 0);
+
+	auto renderWidth = outputTarget->_renderTarget->getWidth();
+	auto renderHeight = outputTarget->_renderTarget->getHeight();
+
+	gfxc.setRenderTargetMask(0x0000000F);
+	gfxc.setupScreenViewport(0, 0, renderWidth, renderHeight, 1.0f, 0.0f);
+	gfxc.setClipRectangle(0, 0, 0, renderWidth, renderHeight);
+
+	void *fetchShaderAddr = NULL;
+	gfxc.setVsShader(_videoVS->_shader, 0, fetchShaderAddr);
+	gfxc.setPsShader(_videoPS->_shader);
+
+	gfxc.setTextures(Gnm::kShaderStagePs, 0, 1, luma);
+	gfxc.setTextures(Gnm::kShaderStagePs, 1, 1, chroma);
+	gfxc.setSamplers(Gnm::kShaderStagePs, 0, 1, &sampler);
+	gfxc.setSamplers(Gnm::kShaderStagePs, 1, 1, &sampler);
+
+	auto cb = static_cast<VideoShaderConstants*>(gfxc.allocateFromCommandBuffer(sizeof(VideoShaderConstants), Gnm::kEmbeddedDataAlignment4));
+	if (cb)
+	{
+		cb->pos_left = -1.0f;
+		cb->pos_right = 1.0f;
+		cb->pos_top = 1.0f;
+		cb->pos_bottom = -1.0f;
+
+		cb->tex_left = left;
+		cb->tex_right = right;
+		cb->tex_top = top;
+		cb->tex_bottom = bottom;
+
+		Gnm::Buffer constBuffer;
+		constBuffer.initAsConstantBuffer(cb, sizeof(VideoShaderConstants));
+		gfxc.setConstantBuffers(Gnm::kShaderStageVs, 0, 1, &constBuffer);
+	}
+
+	gfxc.setPrimitiveType(Gnm::kPrimitiveTypeTriStrip);
+	gfxc.drawIndexAuto(4);
 }

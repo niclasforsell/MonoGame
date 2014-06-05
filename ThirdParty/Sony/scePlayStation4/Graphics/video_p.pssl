@@ -1,0 +1,47 @@
+/*
+* SCE CONFIDENTIAL 
+* PlayStation(R)4 Programmer Tool Runtime Library Release 01.700.081 
+* Copyright (C) 2014 Sony Computer Entertainment Inc. 
+* All Rights Reserved.
+*/
+
+struct VpOut
+{
+	float4 pos       : S_POSITION;
+	float2 uv        : TEXCOORD0;
+};
+
+struct FpOut
+{
+	float4 color     : S_TARGET_OUTPUT;
+};
+
+Texture2D yTexture       : register(t0);
+
+SamplerState ySampler    : register(s0);
+
+Texture2D cbcrTexture    : register(t1);
+
+SamplerState cbcrSampler : register(s1);
+
+FpOut main( VpOut fragment )
+{
+	FpOut result;
+
+	if (fragment.uv.x < 0.0f || fragment.uv.y < 0.0f || fragment.uv.x > 1.0f || fragment.uv.y > 1.0f) {
+		result.color = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	} else {
+		float3 ycbcr =
+			float3( yTexture.Sample(ySampler, fragment.uv).x - 0.0625,
+				cbcrTexture.Sample(cbcrSampler, fragment.uv).x - 0.5,
+				cbcrTexture.Sample(cbcrSampler, fragment.uv).y - 0.5 );
+
+		result.color = 
+			float4( dot(float3(1.1644f, 0.0f, 1.7927f), ycbcr), // R
+				dot(float3(1.1644f, -0.2133f, -0.5329f), ycbcr), // G
+				dot(float3(1.1644f, 2.1124f, 0.0f), ycbcr), // B
+				1.0f );
+	}
+
+	return result;
+}

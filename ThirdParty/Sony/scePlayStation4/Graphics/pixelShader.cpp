@@ -32,3 +32,8 @@ PixelShader::~PixelShader()
 	Allocator::Get()->release(_binary);
 	Allocator::Get()->release(_shader);
 }
+
+Gnmx::PsShader* PixelShader::GetShader() const
+{
+	return _shader;
+}

@@ -31,6 +31,7 @@ AudioCodecSystem::AudioCodecSystem(void)
 		return;
 	}
 
+    return;
 	// register all the codecs on libaudiodec
 	for (uint32_t i = 0; i < sizeof(s_supportedCodecType) / sizeof(s_supportedCodecType[0]); i++) {
 		ret = sceAudiodecInitLibrary(s_supportedCodecType[i]);
