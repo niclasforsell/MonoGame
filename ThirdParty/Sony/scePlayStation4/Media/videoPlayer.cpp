@@ -50,14 +50,22 @@ namespace {
 		auto player = (VideoPlayer*)arg;
 		assert(player != nullptr);
 
-		while (sceAvPlayerIsActive(player->_handle))
+		std::unique_lock<std::mutex> lock(player->_frameLock);
+
+		player->_frameAvailable = false;
+
+		for(;;)
 		{
-			player->_frameMutex->lock();
-			player->_frameAvailable = sceAvPlayerGetVideoDataEx(player->_handle, &player->_videoFrame);
-			player->_frameMutex->unlock();
+			player->_decodeReady.wait(lock, [player] { return !player->_frameAvailable; });
+			if (sceAvPlayerGetVideoDataEx(player->_handle, &player->_videoFrame))
+			{
+				player->_frameAvailable = true;
+				player->_displayReady.notify_one();
+			}
 		}
 
-		return arg;
+		scePthreadExit(NULL);
+		return NULL;
 	}
 
 	void* audioOutputThread(void* arg)
@@ -81,7 +89,7 @@ namespace {
 	}
 }
 
-VideoPlayer::VideoPlayer(GraphicsSystem* graphics, RenderTarget* renderTarget)
+VideoPlayer::VideoPlayer(GraphicsSystem* graphics)
 {
 	if (sceSysmoduleIsLoaded(SCE_SYSMODULE_AV_PLAYER) != SCE_SYSMODULE_LOADED)
 	{
@@ -109,22 +117,19 @@ VideoPlayer::VideoPlayer(GraphicsSystem* graphics, RenderTarget* renderTarget)
 	_handle = sceAvPlayerInit(&param);
 
 	_graphics = graphics;
-	_renderTarget = renderTarget;
 }
 
 VideoPlayer::~VideoPlayer()
 {
 	Stop();
-	_videoThread->detach();
-	_audioThread->detach();
+	delete _videoThread;
+	delete _audioThread;
 }
 
 void VideoPlayer::GrabFrame()
 {
-	if (!_frameAvailable)
-		return;
-
-	_frameMutex->lock();
+	std::unique_lock<std::mutex> lock(_frameLock);
+	_displayReady.wait(lock, [this]() { return _frameAvailable; });
 
 	void* lumaAddress;
 	void* chromaAddress;
@@ -155,9 +160,10 @@ void VideoPlayer::GrabFrame()
 	auto right = (framePitch > 0) ? 1.0f - ((float)_videoFrame.details.video.cropRightOffset / framePitch) : 1.0f;
 	auto top = (frameHeight > 0) ? ((float)_videoFrame.details.video.cropTopOffset / frameHeight) : 0.0f;
 	auto bottom = (frameHeight > 0) ? 1.0f - ((float)_videoFrame.details.video.cropBottomOffset / frameHeight) : 1.0f;
-	_graphics->ConvertYCbCrToRGB(&lumaTexture, &chromaTexture, left, right, top, bottom, _renderTarget);
+	_graphics->DrawYCbCr(&lumaTexture, &chromaTexture, left, right, top, bottom);
 
-	_frameMutex->unlock();
+	_frameAvailable = false;
+	_decodeReady.notify_one();
 }
 
 void VideoPlayer::Pause()
@@ -179,7 +185,6 @@ void VideoPlayer::Play(const char* filename)
 	// Temporary
 	sceAvPlayerSetLooping(_handle, true);
 
-	_frameMutex = new std::mutex();
 	_videoThread = new std::thread(videoOutputThread, this);
 	_audioThread = new std::thread(audioOutputThread, this);
 }

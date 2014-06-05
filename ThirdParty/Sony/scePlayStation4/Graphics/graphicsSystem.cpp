@@ -46,6 +46,7 @@ GraphicsSystem::GraphicsSystem()
 
 	_videoPS = new PixelShader(video_p_pssl_sb);
 	_videoVS = new VertexShader(video_vv_pssl_sb);
+	_videoFS = new FetchShader(_videoVS, NULL, 0);
 }
 
 GraphicsSystem::~GraphicsSystem()
@@ -1106,13 +1107,12 @@ void GraphicsSystem::SetShaderConstants(ShaderStage stage, void *data, uint32_t 
 	gfxc.setConstantBuffers(stage == ShaderStage_Pixel ? Gnm::kShaderStagePs : Gnm::kShaderStageVs, 0, 1, &constBuffer);
 }
 
-void GraphicsSystem::ConvertYCbCrToRGB(Gnm::Texture* luma,
+void GraphicsSystem::DrawYCbCr(Gnm::Texture* luma,
 										Gnm::Texture* chroma,
 										float left,
 										float right,
 										float top,
-										float bottom,
-										RenderTarget *outputTarget)
+										float bottom)
 {
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
@@ -1122,13 +1122,9 @@ void GraphicsSystem::ConvertYCbCrToRGB(Gnm::Texture* luma,
 	sampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
 	sampler.setXyFilterMode(Gnm::kFilterModeBilinear, Gnm::kFilterModeBilinear);
 
-	_applyRenderTargets(outputTarget->_renderTarget, NULL, NULL, NULL, NULL);
-	Clear(ClearOptions_Target, 0, 0, 0, 1, 0, 0);
+	auto renderWidth = _currentRenderTarget->getWidth();
+	auto renderHeight = _currentRenderTarget->getHeight();
 
-	auto renderWidth = outputTarget->_renderTarget->getWidth();
-	auto renderHeight = outputTarget->_renderTarget->getHeight();
-
-	gfxc.setRenderTargetMask(0x0000000F);
 	gfxc.setupScreenViewport(0, 0, renderWidth, renderHeight, 1.0f, 0.0f);
 	gfxc.setClipRectangle(0, 0, 0, renderWidth, renderHeight);
 

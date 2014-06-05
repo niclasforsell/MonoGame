@@ -2,21 +2,16 @@
 
 #include "predecls.h"
 
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 #include <ctime>
 #include <scebase.h>
 #include <sceavplayer.h>
 #include <sceavplayer_ex.h>
-#include <pthread.h>
-
-namespace std {
-	class mutex;
-	class thread;
-	class condition_variable;
-}
 
 namespace Graphics {
 	class GraphicsSystem;
-	class RenderTarget;
 }
 
 namespace Media {
@@ -37,19 +32,22 @@ public:
 	CS_IGNORE SceAvPlayerHandle _handle;
 	CS_IGNORE int32_t _sourceID;
 	CS_IGNORE int32_t _videoOutHandle;
+
 	CS_IGNORE std::thread* _videoThread;
 	CS_IGNORE std::thread* _audioThread;
 
-	CS_IGNORE std::mutex* _frameMutex;
 	CS_IGNORE bool _frameAvailable;
+	CS_IGNORE std::mutex _frameLock;
+	CS_IGNORE std::condition_variable _decodeReady;
+	CS_IGNORE std::condition_variable _displayReady;
+
 	CS_IGNORE SceAvPlayerFrameInfoEx _videoFrame;
 	CS_IGNORE SceAvPlayerFrameInfoEx _audioFrame;
 
 	CS_IGNORE Graphics::GraphicsSystem* _graphics;
-	CS_IGNORE Graphics::RenderTarget* _renderTarget;
 
 public:
-	VideoPlayer(Graphics::GraphicsSystem* graphics, Graphics::RenderTarget* renderTarget);
+	VideoPlayer(Graphics::GraphicsSystem* graphics);
 	~VideoPlayer();
 
 	void GrabFrame();

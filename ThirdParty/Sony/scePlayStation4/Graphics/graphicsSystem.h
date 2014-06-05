@@ -38,6 +38,7 @@ private:
 
 	PixelShader *_videoPS;
 	VertexShader *_videoVS;
+	FetchShader *_videoFS;
 
 	void prepareBackBuffer();
 
@@ -139,13 +140,12 @@ public:
 
 	void SetBlendState(uint32_t blend0, uint32_t blend1, uint32_t blend2, uint32_t blend3, uint32_t colorWrites);
 
-	CS_IGNORE void ConvertYCbCrToRGB(sce::Gnm::Texture* luma,
-									sce::Gnm::Texture* chroma,
-									float left,
-									float right,
-									float top,
-									float bottom,
-									RenderTarget *outputTarget);
+	CS_IGNORE void DrawYCbCr(	sce::Gnm::Texture* luma,
+								sce::Gnm::Texture* chroma,
+								float left,
+								float right,
+								float top,
+								float bottom);
 };
 
 } // namespace Graphics

@@ -27,15 +27,22 @@ namespace Microsoft.Xna.Framework.Media
             if (_graphicsDevice == null)
                 throw new Exception("PS4 requires VideoPlayer to have access the graphics device.");
 
-            _renderTarget = new RenderTarget2D(_graphicsDevice, _graphicsDevice.DisplayMode.Width, _graphicsDevice.DisplayMode.Height);
-            _player = new PS4VideoPlayer(_graphicsDevice._system, _renderTarget._target);
+            _renderTarget = new RenderTarget2D(_graphicsDevice,
+                                               _graphicsDevice.PresentationParameters.BackBufferWidth,
+                                               _graphicsDevice.PresentationParameters.BackBufferHeight);
+
+            _player = new PS4VideoPlayer(_graphicsDevice._system);
         }
 
         private Texture2D PlatformGetTexture()
         {
-            _player.GrabFrame();
-            //_graphicsDevice.PlatformSetDirty();
+            _graphicsDevice.SetRenderTarget(_renderTarget);
+            _graphicsDevice.Clear(Color.Black);
 
+            _player.GrabFrame();
+            _graphicsDevice.PlatformSetDirty();
+
+            _graphicsDevice.SetRenderTarget(null);
             return _renderTarget;
         }
 
