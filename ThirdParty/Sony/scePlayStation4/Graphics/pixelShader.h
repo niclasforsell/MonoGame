@@ -20,8 +20,6 @@ public:
 	PixelShader(const void *data);
 
 	virtual ~PixelShader();
-
-	CS_IGNORE sce::Gnmx::PsShader* GetShader() const;
 };
 
 

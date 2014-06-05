@@ -298,7 +298,7 @@ void Song::Play()
 	scePthreadAttrInit(&attr);
 	scePthreadAttrSetstacksize(&attr, stackSize);
 	scePthreadAttrSetinheritsched(&attr, SCE_PTHREAD_EXPLICIT_SCHED);
-	schedParam.sched_priority = SCE_KERNEL_PRIO_FIFO_DEFAULT;
+	schedParam.sched_priority = SCE_KERNEL_PRIO_FIFO_HIGHEST;
 	scePthreadAttrSetschedparam(&attr, &schedParam);
 
 	ret = scePthreadCreate(&_state->threadDecode, &attr, decodeMain, _state, "AudioDecBgm");

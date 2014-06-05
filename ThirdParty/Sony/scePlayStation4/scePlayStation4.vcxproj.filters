@@ -7,13 +7,13 @@
     </ClCompile>
     <ClCompile Include="allocator.cpp" />
     <ClCompile Include="Audio\soundSystem.cpp">
-      <Filter>Graphics\Audio</Filter>
+      <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="Audio\audioBuffer.cpp">
-      <Filter>Graphics\Audio</Filter>
+      <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="Audio\samplerVoice.cpp">
-      <Filter>Graphics\Audio</Filter>
+      <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\graphicsSystem.cpp">
       <Filter>Graphics</Filter>
@@ -168,7 +168,7 @@
     <Filter Include="Network">
       <UniqueIdentifier>{faae6781-7fbd-4962-adf7-2391e5089d6b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Graphics\Audio">
+    <Filter Include="Audio">
       <UniqueIdentifier>{bb92b6eb-3b5b-42ce-b62a-9c766bc2cc7a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -181,19 +181,19 @@
     </ClInclude>
     <ClInclude Include="allocator.h" />
     <ClInclude Include="Audio\audioOut.h">
-      <Filter>Graphics\Audio</Filter>
+      <Filter>Audio</Filter>
     </ClInclude>
     <ClInclude Include="Audio\predecls.h">
-      <Filter>Graphics\Audio</Filter>
+      <Filter>Audio</Filter>
     </ClInclude>
     <ClInclude Include="Audio\soundSystem.h">
-      <Filter>Graphics\Audio</Filter>
+      <Filter>Audio</Filter>
     </ClInclude>
     <ClInclude Include="Audio\audioBuffer.h">
-      <Filter>Graphics\Audio</Filter>
+      <Filter>Audio</Filter>
     </ClInclude>
     <ClInclude Include="Audio\samplerVoice.h">
-      <Filter>Graphics\Audio</Filter>
+      <Filter>Audio</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\graphicsSystem.h">
       <Filter>Graphics</Filter>
