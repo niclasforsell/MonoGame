@@ -4,7 +4,6 @@
 
 #include <thread>
 #include <mutex>
-#include <condition_variable>
 #include <ctime>
 #include <scebase.h>
 #include <sceavplayer.h>
@@ -37,9 +36,7 @@ public:
 	CS_IGNORE std::thread* _audioThread;
 
 	CS_IGNORE bool _frameAvailable;
-	CS_IGNORE std::mutex _frameLock;
-	CS_IGNORE std::condition_variable _decodeReady;
-	CS_IGNORE std::condition_variable _displayReady;
+	CS_IGNORE std::mutex _frameMutex;
 
 	CS_IGNORE SceAvPlayerFrameInfoEx _videoFrame;
 	CS_IGNORE SceAvPlayerFrameInfoEx _audioFrame;
@@ -50,7 +47,7 @@ public:
 	VideoPlayer(Graphics::GraphicsSystem* graphics);
 	~VideoPlayer();
 
-	void GrabFrame();
+	bool GrabFrame();
 
 	void Pause();
 	void Resume();

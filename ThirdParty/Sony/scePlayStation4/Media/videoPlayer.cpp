@@ -50,18 +50,12 @@ namespace {
 		auto player = (VideoPlayer*)arg;
 		assert(player != nullptr);
 
-		std::unique_lock<std::mutex> lock(player->_frameLock);
-
-		player->_frameAvailable = false;
-
 		while (sceAvPlayerIsActive(player->_handle))
 		{
-			player->_decodeReady.wait(lock, [player] { return !player->_frameAvailable; });
+			player->_frameMutex.lock();
 			if (sceAvPlayerGetVideoDataEx(player->_handle, &player->_videoFrame))
-			{
 				player->_frameAvailable = true;
-				player->_displayReady.notify_one();
-			}
+			player->_frameMutex.unlock();
 		}
 
 		return nullptr;
@@ -128,10 +122,12 @@ VideoPlayer::~VideoPlayer()
 	sceAvPlayerClose(_handle);
 }
 
-void VideoPlayer::GrabFrame()
+bool VideoPlayer::GrabFrame()
 {
-	std::unique_lock<std::mutex> lock(_frameLock);
-	_displayReady.wait(lock, [this]() { return _frameAvailable; });
+    std::lock_guard<std::mutex> lock(_frameMutex);
+
+	if (!_frameAvailable)
+		return false;
 
 	void* lumaAddress;
 	void* chromaAddress;
@@ -165,7 +161,7 @@ void VideoPlayer::GrabFrame()
 	_graphics->DrawYCbCr(&lumaTexture, &chromaTexture, left, right, top, bottom);
 
 	_frameAvailable = false;
-	_decodeReady.notify_one();
+	return true;
 }
 
 void VideoPlayer::Pause()
@@ -187,6 +183,8 @@ void VideoPlayer::Play(const char* filename)
 	// Temporary
 	sceAvPlayerSetLooping(_handle, true);
 
+	_frameAvailable = false;
+	_frameMutex.unlock();
 	_videoThread = new std::thread(videoOutputThread, this);
 	_audioThread = new std::thread(audioOutputThread, this);
 }

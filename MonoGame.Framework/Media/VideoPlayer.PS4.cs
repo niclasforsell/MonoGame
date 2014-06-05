@@ -29,7 +29,12 @@ namespace Microsoft.Xna.Framework.Media
 
             _renderTarget = new RenderTarget2D(_graphicsDevice,
                                                _graphicsDevice.PresentationParameters.BackBufferWidth,
-                                               _graphicsDevice.PresentationParameters.BackBufferHeight);
+                                               _graphicsDevice.PresentationParameters.BackBufferHeight,
+                                               false,
+                                               SurfaceFormat.Color,
+                                               DepthFormat.None,
+                                               1,
+                                               RenderTargetUsage.PreserveContents);
 
             _player = new PS4VideoPlayer(_graphicsDevice._system);
         }
@@ -37,10 +42,9 @@ namespace Microsoft.Xna.Framework.Media
         private Texture2D PlatformGetTexture()
         {
             _graphicsDevice.SetRenderTarget(_renderTarget);
-            _graphicsDevice.Clear(Color.Black);
 
-            _player.GrabFrame();
-            _graphicsDevice.PlatformSetDirty();
+            if(_player.GrabFrame())
+                _graphicsDevice.PlatformSetDirty();
 
             _graphicsDevice.SetRenderTarget(null);
             return _renderTarget;
