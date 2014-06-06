@@ -1,22 +1,11 @@
 #include "videoPlayer.h"
 #include "../allocator.h"
-#include "../Graphics/vertexShader.h"
-#include "../Graphics/pixelShader.h"
-#include "../Graphics/graphicsEnums.h"
 #include "../Graphics/graphicsSystem.h"
-#include "../Graphics/renderTarget.h"
-#include "../Graphics/texture.h"
-
 #include <assert.h>
 #include <memory>
-#include <mutex>
-#include <thread>
-#include <condition_variable>
 #include <libsysmodule.h>
 #include <sceerror.h>
 #include <gnm.h>
-#include <gnmx.h>
-#include <gnmx/shader_parser.h>
 #include <sceavplayer_ex.h>
 #include <video_out.h>
 
@@ -52,10 +41,11 @@ namespace {
 
 		while (sceAvPlayerIsActive(player->_handle))
 		{
-			player->_frameMutex.lock();
-			if (sceAvPlayerGetVideoDataEx(player->_handle, &player->_videoFrame))
+			scePthreadMutexLock(&player->_frameMutex);
+			if(sceAvPlayerGetVideoDataEx(player->_handle, &player->_videoFrame))
 				player->_frameAvailable = true;
-			player->_frameMutex.unlock();
+			scePthreadMutexUnlock(&player->_frameMutex);
+			sceKernelUsleep(16670);
 		}
 
 		return nullptr;
@@ -67,7 +57,6 @@ namespace {
 		assert(player != nullptr);
 
 		SceAvPlayerFrameInfo audioFrame;
-
 		while (sceAvPlayerIsActive(player->_handle))
 		{
 			if (sceAvPlayerGetAudioData(player->_handle, &audioFrame))
@@ -78,6 +67,7 @@ namespace {
 			{
 				// Do silence here to prevent the thread from blocking
 			}
+			sceKernelUsleep(16670);
 		}
 
 		return nullptr;
@@ -93,7 +83,6 @@ VideoPlayer::VideoPlayer(GraphicsSystem* graphics)
 	}
 
 	memset(&_videoFrame, 0, sizeof(SceAvPlayerFrameInfoEx));
-	memset(&_audioFrame, 0, sizeof(SceAvPlayerFrameInfoEx));
 
 	SceAvPlayerInitData param;
 	memset(&param, 0, sizeof(SceAvPlayerInitData));
@@ -116,18 +105,23 @@ VideoPlayer::VideoPlayer(GraphicsSystem* graphics)
 VideoPlayer::~VideoPlayer()
 {
 	Stop();
-	delete _videoThread;
-	delete _audioThread;
+
+	scePthreadJoin(_videoThread, NULL);
+	scePthreadJoin(_audioThread, NULL);
 
 	sceAvPlayerClose(_handle);
 }
 
 bool VideoPlayer::GrabFrame()
 {
-    std::lock_guard<std::mutex> lock(_frameMutex);
+	if (scePthreadMutexTrylock(&_frameMutex) != SCE_OK)
+		return false;
 
 	if (!_frameAvailable)
+	{
+		scePthreadMutexUnlock(&_frameMutex);
 		return false;
+	}
 
 	void* lumaAddress;
 	void* chromaAddress;
@@ -161,6 +155,8 @@ bool VideoPlayer::GrabFrame()
 	_graphics->DrawYCbCr(&lumaTexture, &chromaTexture, left, right, top, bottom);
 
 	_frameAvailable = false;
+	scePthreadMutexUnlock(&_frameMutex);
+
 	return true;
 }
 
@@ -184,9 +180,25 @@ void VideoPlayer::Play(const char* filename)
 	sceAvPlayerSetLooping(_handle, true);
 
 	_frameAvailable = false;
-	_frameMutex.unlock();
-	_videoThread = new std::thread(videoOutputThread, this);
-	_audioThread = new std::thread(audioOutputThread, this);
+
+	scePthreadMutexInit(&_frameMutex, NULL, "video_frame_lock");
+
+	ScePthreadAttr threadAttr;
+	SceKernelSchedParam schedParam;
+
+	scePthreadAttrInit(&threadAttr);
+	scePthreadAttrSetstacksize(&threadAttr, 1024 * 1024);
+	auto ret = scePthreadCreate(&_videoThread, &threadAttr, videoOutputThread, this, "av_video_output_thread");
+	scePthreadAttrDestroy(&threadAttr);
+	if (ret < 0)
+		return;
+
+	scePthreadAttrInit(&threadAttr);
+	scePthreadAttrSetstacksize(&threadAttr, 1024 * 1024);
+	ret = scePthreadCreate(&_audioThread, &threadAttr, audioOutputThread, this, "av_audio_output_thread");
+	scePthreadAttrDestroy(&threadAttr);
+	if (ret < 0)
+		return;
 }
 
 void VideoPlayer::Stop()

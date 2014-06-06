@@ -2,10 +2,9 @@
 
 #include "predecls.h"
 
-#include <thread>
-#include <mutex>
 #include <ctime>
 #include <scebase.h>
+#include <kernel.h>
 #include <sceavplayer.h>
 #include <sceavplayer_ex.h>
 
@@ -32,14 +31,12 @@ public:
 	CS_IGNORE int32_t _sourceID;
 	CS_IGNORE int32_t _videoOutHandle;
 
-	CS_IGNORE std::thread* _videoThread;
-	CS_IGNORE std::thread* _audioThread;
+	CS_IGNORE ScePthread _videoThread;
+	CS_IGNORE ScePthread _audioThread;
 
 	CS_IGNORE bool _frameAvailable;
-	CS_IGNORE std::mutex _frameMutex;
-
+	CS_IGNORE ScePthreadMutex _frameMutex;
 	CS_IGNORE SceAvPlayerFrameInfoEx _videoFrame;
-	CS_IGNORE SceAvPlayerFrameInfoEx _audioFrame;
 
 	CS_IGNORE Graphics::GraphicsSystem* _graphics;
 
