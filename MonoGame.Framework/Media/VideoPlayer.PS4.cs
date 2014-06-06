@@ -15,6 +15,7 @@ namespace Microsoft.Xna.Framework.Media
         private GraphicsDevice _graphicsDevice;
         private PS4VideoPlayer _player;
         private RenderTarget2D _renderTarget;
+        private RenderTargetBinding[] _prevRenderTargets;
 
         public VideoPlayer(GraphicsDevice graphicsDevice)
         {
@@ -27,6 +28,8 @@ namespace Microsoft.Xna.Framework.Media
             if (_graphicsDevice == null)
                 throw new Exception("PS4 requires VideoPlayer to have access the graphics device.");
 
+            // Use a render target that will preserve contents, to allow frame doubling
+            // instead of flickering in the case of dropped frames.
             _renderTarget = new RenderTarget2D(_graphicsDevice,
                                                _graphicsDevice.PresentationParameters.BackBufferWidth,
                                                _graphicsDevice.PresentationParameters.BackBufferHeight,
@@ -41,12 +44,21 @@ namespace Microsoft.Xna.Framework.Media
 
         private Texture2D PlatformGetTexture()
         {
+            // GrabFrame will take whatever render target is set and draw the video
+            // into it. Here we store the render target state, swap our own in for
+            // the video render, and then restore it at the end.
+
+            if (_prevRenderTargets == null || _prevRenderTargets.Length != _graphicsDevice.RenderTargetCount)
+                _prevRenderTargets = new RenderTargetBinding[_graphicsDevice.RenderTargetCount];
+
+            _graphicsDevice.GetRenderTargets(_prevRenderTargets);
             _graphicsDevice.SetRenderTarget(_renderTarget);
 
             if(_player.GrabFrame())
                 _graphicsDevice.PlatformSetDirty();
 
-            _graphicsDevice.SetRenderTarget(null);
+            _graphicsDevice.SetRenderTargets(_prevRenderTargets);
+
             return _renderTarget;
         }
 
@@ -77,7 +89,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private TimeSpan PlatformGetPlayPosition()
         {
-            return TimeSpan.FromSeconds(_player.PlayPosition);
+            return TimeSpan.FromMilliseconds(_player.PlayPosition);
         }
     }
 }

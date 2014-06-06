@@ -38,7 +38,6 @@ private:
 
 	PixelShader *_videoPS;
 	VertexShader *_videoVS;
-	FetchShader *_videoFS;
 
 	void prepareBackBuffer();
 

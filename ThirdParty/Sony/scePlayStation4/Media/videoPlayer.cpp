@@ -105,7 +105,7 @@ VideoPlayer::VideoPlayer(GraphicsSystem* graphics)
 
 	param.debugLevel = SCE_AVPLAYER_DBG_INFO;
 	param.basePriority = 160;
-	param.numOutputVideoFrameBuffers = 3;
+	param.numOutputVideoFrameBuffers = 2;
 	param.autoStart = true;
 	param.defaultLanguage = "eng";
 
@@ -201,5 +201,5 @@ void VideoPlayer::SetVolume(float volume)
 
 time_t VideoPlayer::GetPlayPosition()
 {
-	return sceAvPlayerCurrentTime(_handle) * 1000;
+	return sceAvPlayerCurrentTime(_handle);
 }

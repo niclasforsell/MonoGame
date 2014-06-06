@@ -46,7 +46,6 @@ GraphicsSystem::GraphicsSystem()
 
 	_videoPS = new PixelShader(video_p_pssl_sb);
 	_videoVS = new VertexShader(video_vv_pssl_sb);
-	_videoFS = new FetchShader(_videoVS, NULL, 0);
 }
 
 GraphicsSystem::~GraphicsSystem()
