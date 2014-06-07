@@ -1,6 +1,8 @@
 #include "videoPlayer.h"
+#include "audio_output.h"
 #include "../allocator.h"
 #include "../Graphics/graphicsSystem.h"
+
 #include <assert.h>
 #include <memory>
 #include <libsysmodule.h>
@@ -8,6 +10,7 @@
 #include <gnm.h>
 #include <sceavplayer_ex.h>
 #include <video_out.h>
+#include <audioout.h>
 
 using namespace sce;
 using namespace Graphics;
@@ -26,7 +29,7 @@ namespace {
 
 	void* videoAllocTexture(void* argP, uint32_t argAlignment, uint32_t argSize)
 	{
-		return Allocator::Get()->allocate(argSize, argAlignment, SCE_KERNEL_WC_GARLIC);
+		return Allocator::Get()->allocate(argSize, argAlignment, SCE_KERNEL_WB_ONION);
 	}
 
 	void videoFreeTexture(void* argP, void* argMemory)
@@ -41,13 +44,18 @@ namespace {
 
 		while (sceAvPlayerIsActive(player->_handle))
 		{
+			//auto startTime = sceKernelGetProcessTime();
+
 			scePthreadMutexLock(&player->_frameMutex);
 			if(sceAvPlayerGetVideoDataEx(player->_handle, &player->_videoFrame))
 				player->_frameAvailable = true;
 			scePthreadMutexUnlock(&player->_frameMutex);
-			sceKernelUsleep(16670);
+
+			//auto elapsed = sceKernelGetProcessTime() - startTime;
+			//sceKernelUsleep(16670UL - elapsed);
 		}
 
+		scePthreadExit(nullptr);
 		return nullptr;
 	}
 
@@ -56,20 +64,41 @@ namespace {
 		auto player = (VideoPlayer*)arg;
 		assert(player != nullptr);
 
+		const uint32_t outputStreamSize = 128 * 1024;
+		const uint32_t outputStreamGrain = 256;
+		AudioOutput output;
+		output.open(outputStreamGrain, 48000, SCE_AUDIO_OUT_PARAM_FORMAT_S16_STEREO);
+
+		void* silence = Allocator::Get()->allocate(4096 * 4, 0x20);
+		memset(silence, 0, 4096 * 4);
+
 		SceAvPlayerFrameInfo audioFrame;
+		memset(&audioFrame, 0, sizeof(SceAvPlayerFrameInfo));
+
+		// TODO: Hack to avoid apparent deadlock, find root cause or set barrier
+		sceKernelSleep(1);
+
 		while (sceAvPlayerIsActive(player->_handle))
 		{
+			auto startTime = sceKernelGetProcessTime();
+
 			if (sceAvPlayerGetAudioData(player->_handle, &audioFrame))
 			{
-				// Do audio here
+				output.output(audioFrame.pData);
 			}
 			else
 			{
-				// Do silence here to prevent the thread from blocking
+				output.output(silence);
 			}
-			sceKernelUsleep(16670);
+
+			//auto elapsed = sceKernelGetProcessTime() - startTime;
+			//sceKernelUsleep(8192UL - elapsed);
 		}
 
+		output.close();
+		Allocator::Get()->release(silence);
+
+		scePthreadExit(nullptr);
 		return nullptr;
 	}
 }
@@ -184,7 +213,6 @@ void VideoPlayer::Play(const char* filename)
 	scePthreadMutexInit(&_frameMutex, NULL, "video_frame_lock");
 
 	ScePthreadAttr threadAttr;
-	SceKernelSchedParam schedParam;
 
 	scePthreadAttrInit(&threadAttr);
 	scePthreadAttrSetstacksize(&threadAttr, 1024 * 1024);
