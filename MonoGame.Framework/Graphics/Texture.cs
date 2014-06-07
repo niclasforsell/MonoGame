@@ -50,7 +50,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Dxt3:
                 case SurfaceFormat.Dxt5:
                 case SurfaceFormat.RgbPvrtc4Bpp:
-                case SurfaceFormat.RgbaPvrtc4Bpp:                    
+                case SurfaceFormat.RgbaPvrtc4Bpp:
+                case SurfaceFormat.PlayStation4_BC1Unorm:
+                case SurfaceFormat.PlayStation4_BC2Unorm:
+                case SurfaceFormat.PlayStation4_BC3Unorm:              
                     pitch = ((width + 3) / 4) * _format.GetSize();
                     break;
 

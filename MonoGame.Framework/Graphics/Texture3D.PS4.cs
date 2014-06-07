@@ -22,17 +22,16 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
             var startBytes = elementSizeInBytes * startIndex;
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
             var pitchRow = GetPitch(_width);
             var pitchSlice = pitchRow * _height;
-            startBytes += pitchSlice * front + pitchRow * top + left;
-
-            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
+            var sliceOffset = pitchSlice * front + pitchRow * top + left;
 
             unsafe
             {
-                _texture.SetData((uint)level, (byte*)dataPtr, (uint)startBytes, (uint)(elementSizeInBytes * elementCount));
+                _texture.SetData((uint)level, (byte*)dataPtr, (uint)sliceOffset, (uint)(elementSizeInBytes * elementCount));
             }
 
             dataHandle.Free();
@@ -43,17 +42,16 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
             var startBytes = elementSizeInBytes * startIndex;
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
             var pitchRow = GetPitch(_width);
             var pitchSlice = pitchRow * _height;
-            startBytes += pitchSlice * front + pitchRow * top + left;
-
-            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
+            var sliceOffset = pitchSlice * front + pitchRow * top + left;
 
             unsafe
             {
-                _texture.GetData((uint)level, (byte*)dataPtr, (uint)startBytes, (uint)(elementSizeInBytes * elementCount));
+                _texture.GetData((uint)level, (byte*)dataPtr, (uint)sliceOffset, (uint)(elementSizeInBytes * elementCount));
             }
 
             dataHandle.Free();

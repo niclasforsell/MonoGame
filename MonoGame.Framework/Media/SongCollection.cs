@@ -26,9 +26,8 @@ namespace Microsoft.Xna.Framework.Media
         }
 #endif
 
-        internal SongCollection()
+        public SongCollection()
         {
-
         }
 
         internal SongCollection(List<Song> songs)
