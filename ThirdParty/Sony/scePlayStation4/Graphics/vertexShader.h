@@ -21,7 +21,6 @@ public:
 	VertexShader(const void *data);
 
 	virtual ~VertexShader();
-
 };
 
 

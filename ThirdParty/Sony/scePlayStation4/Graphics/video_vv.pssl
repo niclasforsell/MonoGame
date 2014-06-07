@@ -1,0 +1,60 @@
+/*
+* SCE CONFIDENTIAL 
+* PlayStation(R)4 Programmer Tool Runtime Library Release 01.700.081 
+* Copyright (C) 2014 Sony Computer Entertainment Inc. 
+* All Rights Reserved.
+*/
+
+ConstantBuffer ShaderConstants
+{
+	float pos_top;
+	float pos_left;
+	float pos_right;
+	float pos_bottom;
+
+	float tex_top;
+	float tex_left;
+	float tex_right;
+	float tex_bottom;
+};
+
+struct VpIn
+{
+	uint vid	: S_VERTEX_ID;
+};
+
+struct VpOut
+{
+	float4 pos	: S_POSITION;
+	float2 uv	: TEXCOORD0;
+};
+
+float2 GetPosition4(uint vid){
+	const float2 position[4] = {
+		{pos_left,  pos_top},
+		{pos_left,  pos_bottom},
+		{pos_right, pos_top},
+		{pos_right, pos_bottom},
+	};
+	return position[vid];
+}
+
+float2 GetTexturePosition4(uint vid){
+	const float2 texturePosition[4] = {
+		{tex_left,  tex_top},
+		{tex_left,  tex_bottom},
+		{tex_right, tex_top},
+		{tex_right, tex_bottom},
+	};
+	return texturePosition[vid];
+}
+
+VpOut main( VpIn vertex )
+{
+	VpOut result;
+
+	result.pos = float4( GetPosition4(vertex.vid), 0, 1 );
+	result.uv  = GetTexturePosition4( vertex.vid );
+
+	return result;
+}

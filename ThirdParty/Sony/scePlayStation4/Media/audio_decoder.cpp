@@ -17,7 +17,12 @@ using namespace Media;
 const uint32_t AudioCodecSystem::s_supportedCodecType[] = {
 	SCE_AUDIODEC_TYPE_AT9,
 	SCE_AUDIODEC_TYPE_MP3,
+
+	// If you load this codec here in SDK 1.6, video playback will fail.
+	// The issue is resolved in v1.7
+#if SCE_ORBIS_SDK_VERSION >= 0x01700081u // SDK Version 1.7
 	SCE_AUDIODEC_TYPE_M4AAC,
+#endif
 };
 
 AudioCodecSystem::AudioCodecSystem(void)
