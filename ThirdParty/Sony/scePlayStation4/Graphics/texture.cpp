@@ -122,126 +122,84 @@ Texture::~Texture()
 	delete _texture;
 }
 
-void Texture::SetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t length)
+void Texture::SetData(uint32_t mipLevel, uint8_t* data, uint32_t offset, uint32_t length)
 {
-	auto width = MAX(1, _texture->getWidth() >> level);
-	auto height = MAX(1, _texture->getHeight() >> level);
-	auto depth = MAX(1, _texture->getDepth() >> level);
-	auto pixelBytes = _texture->getDataFormat().getBytesPerElement();
+	auto width = MAX(1, _texture->getWidth() >> mipLevel);
+	auto height = MAX(1, _texture->getHeight() >> mipLevel);
+	auto depth = MAX(1, _texture->getDepth() >> mipLevel);
+	auto pixelBits = _texture->getDataFormat().getBitsPerElement();
 
 	uint64_t levelOffset, levelSize;
-	GpuAddress::computeTextureSurfaceOffsetAndSize(&levelOffset, &levelSize, _texture, level, 0);
+	GpuAddress::computeTextureSurfaceOffsetAndSize(&levelOffset, &levelSize, _texture, mipLevel, 0);
 
 	auto baseAddr = (unsigned char*)_texture->getBaseAddress();
 	baseAddr += levelOffset;
 
-	auto pitch = (levelSize / pixelBytes) / height;
-	if (pitch == width)
+	if (offset == 0 && length == levelSize)
 		memcpy(baseAddr, data, length);
 	else
 	{
+		GpuAddress::TilingParameters tile;
+		tile.initFromTexture(_texture, mipLevel, 0);
+		GpuAddress::SurfaceInfo info;
+		GpuAddress::computeSurfaceInfo(&info, &tile);
+
+		auto pitch = info.m_pitch;
+		auto dataPitchBytes = (width * pixelBits) / 8;
+		auto texPitchBytes = (pitch * pixelBits) / 8;
+
 		for (auto h=0; h < height; h++)
 		{
-			memcpy(baseAddr, data, width * pixelBytes);
-			data += width * pixelBytes;
-			baseAddr += pitch * pixelBytes;
+			memcpy(baseAddr, data, MIN(dataPitchBytes, length));
+
+			// Have we copied all the data we got?
+			length -= dataPitchBytes;
+			if (length <= 0)
+				break;
+
+			data += dataPitchBytes;
+			baseAddr += texPitchBytes;
 		}
 	}
 }
 
-void Texture::GetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t length)
+void Texture::GetData(uint32_t mipLevel, uint8_t* data, uint32_t offset, uint32_t length)
 {
-	auto width = MAX(1, _texture->getWidth() >> level);
-	auto height = MAX(1, _texture->getHeight() >> level);
-	auto depth = MAX(1, _texture->getDepth() >> level);
-	auto pixelBytes = _texture->getDataFormat().getBytesPerElement();
+	auto width = MAX(1, _texture->getWidth() >> mipLevel);
+	auto height = MAX(1, _texture->getHeight() >> mipLevel);
+	auto depth = MAX(1, _texture->getDepth() >> mipLevel);
+	auto pixelBits = _texture->getDataFormat().getBitsPerElement();
 
 	uint64_t levelOffset, levelSize;
-	GpuAddress::computeTextureSurfaceOffsetAndSize(&levelOffset, &levelSize, _texture, level, 0);
+	GpuAddress::computeTextureSurfaceOffsetAndSize(&levelOffset, &levelSize, _texture, mipLevel, 0);
 
 	auto baseAddr = (unsigned char*)_texture->getBaseAddress();
 	baseAddr += levelOffset;
 
-	auto pitch = (levelSize / pixelBytes) / height;
-
-	if (pitch == width)
-		memcpy(data, baseAddr, length);
+	if (offset == 0 && length == levelSize)
+		memcpy(baseAddr, data, length);
 	else
 	{
+		GpuAddress::TilingParameters tile;
+		tile.initFromTexture(_texture, mipLevel, 0);
+		GpuAddress::SurfaceInfo info;
+		GpuAddress::computeSurfaceInfo(&info, &tile);
+
+		auto pitch = info.m_pitch;
+		auto texPitchBytes = (pitch * pixelBits) / 8;
+		auto dataPitchBytes = (width * pixelBits) / 8;
+
 		for (auto h=0; h < height; h++)
 		{
-			memcpy(data, baseAddr, width * pixelBytes);
-			data += width * pixelBytes;
-			baseAddr += pitch * pixelBytes;
+			memcpy(data, baseAddr, MIN(dataPitchBytes, length));
+
+			// Have we filled the data buffer?
+			length -= dataPitchBytes;
+			if (length <= 0)
+				break;
+
+			data += dataPitchBytes;
+			baseAddr += texPitchBytes;
 		}
 	}
 }
-
-/*
-Texture* GraphicsSystem::CreateTextureFromPng(unsigned char *data, uint32_t bytes)
-{
-	ScePngDecParseParam parseParam;
-	parseParam.pngMemAddr = data;
-	parseParam.pngMemSize = bytes;
-	parseParam.reserved0 = 0;
-
-	ScePngDecImageInfo imageInfo;
-	int ret = scePngDecParseHeader(&parseParam, &imageInfo);
-	if (ret < 0) 
-	{
-		printf("Error: scePngDecParseHeader(), ret 0x%08x\n", ret);
-		return NULL;
-	}
-
-	Texture* texture = CreateTexture(imageInfo.imageWidth, imageInfo.imageHeight, 1);
-	if (texture == NULL)
-		return NULL;
-
-	ScePngDecCreateParam createParam;
-	createParam.thisSize = sizeof(createParam);
-	createParam.attribute = imageInfo.bitDepth >> 4;
-	createParam.maxImageWidth = imageInfo.imageWidth;
-	int memorySize = scePngDecQueryMemorySize(&createParam);
-	if (memorySize < 0) 
-	{
-		printf("Error: scePngDecQueryMemorySize(), ret 0x%08x\n", memorySize);
-		return NULL;
-	}
-
-	// allocate memory for PNG decoder
-	// create PNG decoder
-	void *decoderBuffer = new char[memorySize];	
-	ScePngDecHandle	handle;
-	ret = scePngDecCreate(&createParam, decoderBuffer, memorySize, &handle);
-	if (ret < 0) 
-	{
-		printf("Error: scePngDecCreate(), ret 0x%08x\n", ret);
-		return NULL;
-	}
-
-	//void *image = texture->_texture.
-	
-	// decode PNG image
-	ScePngDecDecodeParam decodeParam;
-	decodeParam.pngMemAddr	= data;
-	decodeParam.pngMemSize	= bytes;
-	decodeParam.imageMemAddr = texture->_texture->getBaseAddress();
-	decodeParam.imageMemSize = imageInfo.imageWidth * imageInfo.imageHeight * 4;
-	decodeParam.imagePitch	= 0;
-	decodeParam.pixelFormat	= SCE_PNG_DEC_PIXEL_FORMAT_R8G8B8A8;
-	decodeParam.alphaValue	= 255;
-	ret = scePngDecDecode(handle, &decodeParam, NULL);
-	if (ret < 0) 
-	{
-		printf("Error: scePngDecDecode(), ret 0x%08x\n", ret);
-		scePngDecDelete(handle);
-		return NULL;
-	}
-
-	// Cleanup
-	scePngDecDelete(handle);
-	delete [] decoderBuffer;
-
-	return texture;
-}
-*/

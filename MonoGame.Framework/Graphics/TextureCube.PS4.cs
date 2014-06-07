@@ -21,15 +21,16 @@ namespace Microsoft.Xna.Framework.Graphics
             where T : struct
         {
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
-            var pitchRow = GetPitch(this.size);
-            var length = elementSizeInBytes * pitchRow * pitchRow;
-            var faceOffset = elementSizeInBytes * (int)cubeMapFace * length;
             var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+
+            var pitchRow = GetPitch(this.size);
+            var faceSize = this.Size * pitchRow;
+            var faceOffset = (int)cubeMapFace * faceSize;
 
             unsafe
             {
-                _texture.GetData(0, (byte*)dataPtr, (uint)faceOffset, (uint)length);
+                _texture.GetData(0, (byte*)dataPtr, (uint)faceOffset, (uint)(elementSizeInByte * data.Length));
             }
 
             dataHandle.Free();
@@ -37,14 +38,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetData<T>(CubeMapFace face, int level, IntPtr dataPtr, int xOffset, int yOffset, int width, int height)
         {
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
             var pitchRow = GetPitch(this.size);
-            var length = elementSizeInBytes * pitchRow * pitchRow;
-            var faceOffset = elementSizeInBytes * (int)face * length;
+            var faceSize = this.Size * pitchRow;
+            var faceOffset = (int)face * faceSize;
 
             unsafe
             {
-                _texture.SetData(0, (byte*)dataPtr, (uint)faceOffset, (uint)length);
+                _texture.SetData((uint)level, (byte*)dataPtr, (uint)faceOffset, (uint)faceSize);
             }
         }
     }
