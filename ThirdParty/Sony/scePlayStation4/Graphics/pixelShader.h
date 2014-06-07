@@ -20,7 +20,6 @@ public:
 	PixelShader(const void *data);
 
 	virtual ~PixelShader();
-
 };
 
 

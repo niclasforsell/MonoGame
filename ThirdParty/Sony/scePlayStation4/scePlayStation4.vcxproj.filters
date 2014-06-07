@@ -139,13 +139,13 @@
     <ClCompile Include="Input\camera.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="Media\videoPlayer.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
       <UniqueIdentifier>{c9450fc7-a523-448b-8517-55f55288893f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Audio">
-      <UniqueIdentifier>{bb92b6eb-3b5b-42ce-b62a-9c766bc2cc7a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Input">
       <UniqueIdentifier>{cbc8235f-fea0-4c9e-b7c0-f92f9a7446c4}</UniqueIdentifier>
@@ -167,6 +167,9 @@
     </Filter>
     <Filter Include="Network">
       <UniqueIdentifier>{faae6781-7fbd-4962-adf7-2391e5089d6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Audio">
+      <UniqueIdentifier>{bb92b6eb-3b5b-42ce-b62a-9c766bc2cc7a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -349,6 +352,12 @@
     </ClInclude>
     <ClInclude Include="Input\camera.h">
       <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\videoPlayer.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\videoShaders.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

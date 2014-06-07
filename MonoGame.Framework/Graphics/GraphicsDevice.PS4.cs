@@ -48,6 +48,17 @@ namespace Microsoft.Xna.Framework.Graphics
             _scissorRectangleDirty = true;
         }
 
+        internal void PlatformSetDirty()
+        {
+            PlatformSetViewport(ref _viewport);
+            _depthStencilStateDirty = true;
+            _blendStateDirty = true;
+            _pixelShaderDirty = true;
+            _vertexShaderDirty = true;
+            _rasterizerStateDirty = true;
+            _scissorRectangleDirty = true;
+        }
+
         private void PlatformDispose()
         {
             foreach (var fetch in _fetchShaders)

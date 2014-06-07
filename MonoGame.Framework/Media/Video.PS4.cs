@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
 
@@ -10,9 +11,14 @@ namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class Video
     {
+        // Temporary hack to bypass content pipeline
+        public static Video FromFile(string filename)
+        {
+            return new Video(filename);
+        }
+
         private void PlatformInitialize()
         {
-            throw new NotImplementedException();
         }
 
         private void PlatformDispose(bool disposing)

@@ -27,7 +27,6 @@ public:
 
 	void SetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t length);
 	void GetData(uint32_t level, uint8_t* data, uint32_t offset, uint32_t length);
-
 };
 
 } // namespace Graphics
