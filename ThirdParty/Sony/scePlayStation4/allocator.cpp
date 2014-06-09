@@ -7,7 +7,6 @@
 #include <kernel.h>
 #include <assert.h>
 
-// RegionAllocator
 using namespace sce;
 
 #define DISABLE_MEMORY_CLEAR
@@ -30,14 +29,22 @@ using namespace sce;
     printf("scePthreadMutexUnlock failed: 0x%08X\n", ret);	\
 }
 
-void TFPS4::mapMemory(uint64_t* system, uint32_t* systemSize, uint64_t* gpuShared, uint32_t* gpuSharedSize)
+static const uint64_t kRegionTypeMask = 0xE000000000000000ULL;
+static const uint64_t kRegionStartMask = 0x1FFFFFFFFFFFFFFFULL;
+
+static const uint64_t kUnusedRegionType      = 0x0000000000000000ULL;
+static const uint64_t kSystemRegionType      = 0x2000000000000000ULL;
+static const uint64_t kSharedVideoRegionType = 0x4000000000000000ULL;
+static const uint64_t kPrivateVideoRegionType= 0x8000000000000000ULL;
+
+
+void Allocator::mapMemory(uint64_t* system, uint32_t* systemSize, uint64_t* gpuShared, uint32_t* gpuSharedSize)
 {
     assert(system && systemSize && gpuShared && gpuSharedSize);
 
-    // Setup the memory pools:
+    // Setup the onion and garlic memory pools.
     const uint32_t	systemPoolSize	   = 1024 * 1024 * 2048;
     const uint32_t	sharedGpuPoolSize  = 1024 * 1024 * 1024;
-
     const uint32_t  systemAlignment		= 2 * 1024 * 1024;
     const uint32_t  shaderGpuAlignment	= 2 * 1024 * 1024;
 
@@ -120,7 +127,7 @@ void TFPS4::mapMemory(uint64_t* system, uint32_t* systemSize, uint64_t* gpuShare
 }
 
 
-void TFPS4::RegionAllocator::init(uint64_t memStart, uint32_t memSize, Region* regions, uint32_t numRegions)
+void RegionAllocator::init(uint64_t memStart, uint32_t memSize, Region* regions, uint32_t numRegions)
 {
     m_memoryStart = memStart;
     m_memoryEnd = memStart + memSize;
@@ -128,6 +135,7 @@ void TFPS4::RegionAllocator::init(uint64_t memStart, uint32_t memSize, Region* r
     m_numRegions = numRegions;
     m_freeRegions = NULL;
     m_usedRegions = NULL;
+    m_totalMemoryInUse = 0;
 
     auto ret = scePthreadMutexInit(&m_lock, NULL, NULL);
     if (ret) 
@@ -146,7 +154,7 @@ void TFPS4::RegionAllocator::init(uint64_t memStart, uint32_t memSize, Region* r
     }
 }
 
-TFPS4::Region* TFPS4::RegionAllocator::findUnusedRegion() const
+Region* RegionAllocator::findUnusedRegion() const
 {
     for (uint32_t i = 0; i < m_numRegions; ++i)
     {
@@ -154,10 +162,15 @@ TFPS4::Region* TFPS4::RegionAllocator::findUnusedRegion() const
         if ((r->m_typeAndStart & kRegionTypeMask) == kUnusedRegionType)
             return r;
     }
+
+    // If you got here then we ran out of region handles for
+    // allocations see the header to increase the count of
+    // either the onion or garlic regions.
+    printf("OUT OF REGION HANDLES!");
     return 0;
 }
 
-void* TFPS4::RegionAllocator::allocate(uint32_t size, Gnm::AlignmentType alignment)
+void* RegionAllocator::allocate(uint32_t size, Gnm::AlignmentType alignment)
 {
     // Give it a few chances before giving up.
     auto retry = 10;
@@ -207,7 +220,7 @@ void* TFPS4::RegionAllocator::allocate(uint32_t size, Gnm::AlignmentType alignme
         return NULL;
 }
 
-void TFPS4::RegionAllocator::release(void* ptr)
+void RegionAllocator::release(void* ptr)
 {
     if(!ptr)
         return;
@@ -219,7 +232,7 @@ void TFPS4::RegionAllocator::release(void* ptr)
     MUTEX_UNLOCK
 }
 
-TFPS4::Region* TFPS4::RegionAllocator::allocateRegion(uint32_t size, uint64_t type, uint32_t alignment)
+Region* RegionAllocator::allocateRegion(uint32_t size, uint64_t type, uint32_t alignment)
 {
     // must be power of 2
     assert((alignment & (alignment-1)) == 0);
@@ -264,6 +277,9 @@ TFPS4::Region* TFPS4::RegionAllocator::allocateRegion(uint32_t size, uint64_t ty
             {
                 // Align the region start
                 Region *n = findUnusedRegion();
+                if (n == NULL)
+                    break;
+
                 n->m_size = miss;
                 n->m_typeAndStart = r->m_typeAndStart;
                 n->m_next = r;
@@ -300,6 +316,7 @@ TFPS4::Region* TFPS4::RegionAllocator::allocateRegion(uint32_t size, uint64_t ty
                 u->m_guard = guard;
                 m_usedRegions = u;
                 //printf("a %08x %08x %08x\n", u->m_typeAndStart, size, alignment);
+                m_totalMemoryInUse += size;
                 return u;
             }
             else
@@ -314,6 +331,7 @@ TFPS4::Region* TFPS4::RegionAllocator::allocateRegion(uint32_t size, uint64_t ty
                 u->m_guard = guard;
                 u->m_typeAndStart = off | type;
                 m_usedRegions = u;
+                m_totalMemoryInUse += size;
                 //printf("b %08x %08x %08x\n", u->m_typeAndStart, size, alignment);
                 return u;
             }
@@ -324,7 +342,7 @@ TFPS4::Region* TFPS4::RegionAllocator::allocateRegion(uint32_t size, uint64_t ty
     return NULL;
 }
 
-void TFPS4::RegionAllocator::releaseRegion(uint64_t start, uint64_t type)
+void RegionAllocator::releaseRegion(uint64_t start, uint64_t type)
 {
     SCE_GNM_UNUSED(type);
 
@@ -343,6 +361,7 @@ void TFPS4::RegionAllocator::releaseRegion(uint64_t start, uint64_t type)
             else
                 m_usedRegions = r->m_next;
 
+            m_totalMemoryInUse -= r->m_size;
             uint64_t re = (r->m_typeAndStart & kRegionStartMask) + r->m_size;
 
             // Add to free list, find insertion point
@@ -422,8 +441,8 @@ Allocator* Allocator::Get()
 
 Allocator::Allocator()
     :	m_onionMemAddr(0), m_garlicMemAddr(0),
-    m_onionMemSize(0), m_garlicMemSize(0),
-    m_onionAllocator(), m_garlicAllocator()
+        m_onionMemSize(0), m_garlicMemSize(0),
+        m_onionAllocator(), m_garlicAllocator()
 {
     memset(m_onionRegions, 0, sizeof(m_onionRegions));
     memset(m_garlicRegions, 0, sizeof(m_garlicRegions));
@@ -431,23 +450,23 @@ Allocator::Allocator()
 
 void Allocator::initialize()
 {
-    TFPS4::mapMemory(
+    mapMemory(
         &m_onionMemAddr, &m_onionMemSize,
         &m_garlicMemAddr, &m_garlicMemSize);
 
     m_onionAllocator.init(
         m_onionMemAddr, m_onionMemSize,
-        m_onionRegions, 1024);
+        m_onionRegions, sizeof(m_onionRegions) / sizeof(m_onionRegions[0]));
 
     m_garlicAllocator.init(
         m_garlicMemAddr, m_garlicMemSize,
-        m_garlicRegions, 2048);
+        m_garlicRegions, sizeof(m_garlicRegions) / sizeof(m_garlicRegions[0]));
 }
 
 void* Allocator::allocate(size_t size, size_t align, SceKernelMemoryType type)
 {
-	assert(size > 0);
-	assert(align > 0);
+    assert(size > 0);
+    assert(align > 0);
 
     switch( type )
     {
