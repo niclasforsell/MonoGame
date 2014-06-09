@@ -11,7 +11,7 @@ using SoundSystem = Sce.PlayStation4.Audio.SoundSystem;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed partial class SoundEffectInstance
+    public partial class SoundEffectInstance
     {
         internal SamplerVoice _voice;
         internal AudioBuffer _buffer;
