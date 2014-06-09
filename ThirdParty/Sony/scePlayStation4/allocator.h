@@ -1,88 +1,49 @@
-﻿/* SCE CONFIDENTIAL
-ORBIS Programmer Tool Runtime Library Release 01.020.041
-* Copyright (C) 2013 Sony Computer Entertainment Inc.
-* All Rights Reserved.
-*/
-
-#ifndef _ALLOCATOR_H_
+﻿#ifndef _ALLOCATOR_H_
 #define _ALLOCATOR_H_
 
 #include <gnm/common.h>
 #include <sys/dmem.h>
 #include <kernel.h>
 #include <gnm/gpumem.h>
-#include "memory.h"
+#include <memory.h>
 
-namespace TFPS4
+
+class Region
 {
-    static const uint64_t kRegionTypeMask = 0xE000000000000000ULL;
-    static const uint64_t kRegionStartMask = 0x1FFFFFFFFFFFFFFFULL;
-
-    static const uint64_t kUnusedRegionType      = 0x0000000000000000ULL;
-    static const uint64_t kSystemRegionType      = 0x2000000000000000ULL;
-    static const uint64_t kSharedVideoRegionType = 0x4000000000000000ULL;
-    static const uint64_t kPrivateVideoRegionType= 0x8000000000000000ULL;
-
-    class Region
-    {
-    public:
-        uint64_t m_typeAndStart;
-        uint32_t m_size;
-        uint32_t m_guard;
-        Region *m_next;
+public:
+    uint64_t m_typeAndStart;
+    uint32_t m_size;
+    uint32_t m_guard;
+    Region *m_next;
 
 #if GNM_MEMORY_STORE_ALLOC_FILE
-        const char *m_file;
-        uint32_t    m_line;
+    const char *m_file;
+    uint32_t    m_line;
 #endif // GNM_MEMORY_STORE_ALLOC_FILE
-    };
+};
 
-    class RegionAllocator 
-    {
-        ScePthreadMutex m_lock;
-        //SceKernelMemoryType m_type;
-        Region *m_freeRegions;
-        Region *m_usedRegions;
-        Region *m_allRegions;
-        uint32_t m_numRegions;
-        uint64_t m_memoryStart;
-        uint64_t m_memoryEnd;
+class RegionAllocator 
+{
+    ScePthreadMutex m_lock;
+    Region *m_freeRegions;
+    Region *m_usedRegions;
+    Region *m_allRegions;
+    uint32_t m_numRegions;
+    uint64_t m_memoryStart;
+    uint64_t m_memoryEnd;
+        
+    uint64_t m_totalMemoryInUse;
 
-        Region* findUnusedRegion() const;
-        Region* allocateRegion(uint32_t size, uint64_t type, uint32_t alignment);
-        void	releaseRegion(uint64_t start, uint64_t type);
-    public:
-        void	init(uint64_t memStart, uint32_t memSize, Region* regions, uint32_t numRegions);
+    Region* findUnusedRegion() const;
+    Region* allocateRegion(uint32_t size, uint64_t type, uint32_t alignment);
+    void	releaseRegion(uint64_t start, uint64_t type);
+public:
+    void	init(uint64_t memStart, uint32_t memSize, Region* regions, uint32_t numRegions);
 
-        void*	allocate(uint32_t size, sce::Gnm::AlignmentType alignment);
-        void*	allocate(sce::Gnm::SizeAlign sz) { return allocate(sz.m_size, sz.m_align); }
-        void	release(void*);
-    };
-
-    /** @brief Maps system and shared memory.
-    @param system         The base system memory address.
-    @param systemSize     The size of the system memory window.
-    @param gpuShared      The base shared video memory address.
-    @param gpuSharedSize  The size of the shared video memory window.
-    */
-    void mapMemory(	uint64_t	*system,		uint32_t* systemSize,
-        uint64_t	*gpuShared,		uint32_t* gpuSharedSize);
-
-    /*
-    #if GNM_MEMORY_STORE_ALLOC_FILE
-    #ifndef GNM_MEMORY_STORE_INHIB_MACRO
-    #define allocateSystemSharedMemory(...)  recordFileNameAndLineInRegion(Toolkit::allocateSystemSharedMemory(__VA_ARGS__), __FILE__, __LINE__)
-    #define allocateVideoSharedMemory(...)   recordFileNameAndLineInRegion(Toolkit::allocateVideoSharedMemory(__VA_ARGS__), __FILE__, __LINE__)
-    #endif // GNM_MEMORY_STORE_INHIB_MACRO
-
-    #endif // GNM_MEMORY_STORE_ALLOC_FILE
-
-
-    IAllocator GetInterface(RegionAllocator *regionAllocator);
-
-    typedef RegionAllocator Allocator; // THIS EXISTS TEMPORARILY, AND ONLY BECAUSE THE OLD "Allocator" IS NOW CALLED "RegionAllocator"
-    */
-}
+    void*	allocate(uint32_t size, sce::Gnm::AlignmentType alignment);
+    void*	allocate(sce::Gnm::SizeAlign sz) { return allocate(sz.m_size, sz.m_align); }
+    void	release(void*);
+};
 
 class Allocator
 {
@@ -100,6 +61,8 @@ private:
     Allocator();
     void initialize();
 
+    static void mapMemory(	uint64_t *onion, uint32_t* onionSize,
+                            uint64_t *garlic, uint32_t* garlicSize);
 
     static Allocator *_instance;
 
@@ -108,11 +71,15 @@ private:
     uint32_t m_onionMemSize;
     uint32_t m_garlicMemSize;
 
-    TFPS4::RegionAllocator m_onionAllocator;
-    TFPS4::RegionAllocator m_garlicAllocator;
+    RegionAllocator m_onionAllocator;
+    RegionAllocator m_garlicAllocator;
 
-    TFPS4::Region m_onionRegions[1024];
-    TFPS4::Region m_garlicRegions[2048];
+    // These are the number of "handles" for memory
+    // allocations, if you get an out or regions
+    // crash then this is what you need to increase.
+    Region m_onionRegions[8192];
+    Region m_garlicRegions[3072];
 };
 
-#endif
+
+#endif // _ALLOCATOR_H_
