@@ -67,13 +67,15 @@ namespace Microsoft.Xna.Framework.Audio
         {
         }
 
-        private void PlatformDispose()
+        private void PlatformDispose(bool disposing)
         {
-            if (_buffer != null)
+            if (disposing)
             {
-                _buffer.Dispose();
-                _buffer = null;
+                if (_buffer != null)
+                    _buffer.Dispose();
             }
+
+            _buffer = null;
         }
     }
 }
