@@ -123,7 +123,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            _voice.Volume = value;
+            _voice.Volume = value * SoundEffect.MasterVolume;
         }
 
         private void PlatformDispose(bool disposing)

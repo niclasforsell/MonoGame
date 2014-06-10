@@ -58,9 +58,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private static void PlatformSetMasterVolume()
         {
-            var activeSounds = SoundEffectInstancePool.GetAllPlayingSounds();
-            foreach (var sound in activeSounds)
-                sound.Volume = _masterVolume;
+            SoundEffectInstancePool.UpdateVolumes();
         }
 
         internal static void PlatformShutdown()
