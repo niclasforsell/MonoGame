@@ -5,9 +5,9 @@
 
 #include <string>
 
+#include <scebase.h>
 #include <save_data.h>
 #include <save_data/save_data_error.h>
-#include <sceerror.h>
 
 namespace System {
 
