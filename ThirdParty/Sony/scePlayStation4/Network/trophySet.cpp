@@ -34,7 +34,7 @@ TrophyResult TrophySet::CreateContext(const SceUserServiceUserId userId, const S
 		goto cleanup;
 
 	ret = sceNpTrophyCreateHandle(&handle);
-	if (handle != SCE_OK)
+	if (ret != SCE_OK)
 		goto cleanup;
 
 	ret = sceNpTrophyRegisterContext(_context, handle, 0);
@@ -48,9 +48,33 @@ cleanup:
 	return (TrophyResult)ret;
 }
 
+TrophyResult TrophySet::IsUnlocked(int32_t trophyId, CS_OUT bool* isUnlocked)
+{
+	assert(_context != SCE_NP_TROPHY_INVALID_CONTEXT);
+	assert(trophyId != SCE_NP_TROPHY_INVALID_TROPHY_ID);
+
+	SceNpTrophyHandle handle = SCE_NP_TROPHY_INVALID_HANDLE;
+	auto ret = sceNpTrophyCreateHandle(&handle);
+	if (ret != SCE_OK)
+		return (TrophyResult)ret;
+
+	SceNpTrophyFlagArray flags;
+	uint32_t count = 0;
+	SCE_NP_TROPHY_FLAG_ZERO(&flags);
+	ret = sceNpTrophyGetTrophyUnlockState(_context, handle, &flags, &count);
+	if (ret != SCE_OK)
+		return (TrophyResult)ret;
+
+	*isUnlocked = SCE_NP_TROPHY_FLAG_ISSET(trophyId, &flags);
+
+	return (TrophyResult)ret;
+}
+
 TrophyResult TrophySet::Unlock(int32_t trophyId, CS_OUT bool* platinumReceived)
 {
+	assert(_context != SCE_NP_TROPHY_INVALID_CONTEXT);
 	assert(trophyId != SCE_NP_TROPHY_INVALID_TROPHY_ID);
+
 	SceNpTrophyHandle handle = SCE_NP_TROPHY_INVALID_HANDLE;
 	auto ret = sceNpTrophyCreateHandle(&handle);
 	if (ret != SCE_OK)

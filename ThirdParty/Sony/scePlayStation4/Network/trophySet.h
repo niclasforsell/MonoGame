@@ -47,10 +47,9 @@ enum class TrophyResult
 	ErrorHandleExceedsMax = SCE_NP_TROPHY_ERROR_HANDLE_EXCEEDS_MAX,
 	ErrorInvalidUserId = SCE_NP_TROPHY_ERROR_INVALID_USER_ID,
 	ErrorTitleConfNotInstalled = SCE_NP_TROPHY_ERROR_TITLE_CONF_NOT_INSTALLED,
-	ErrorBrokenTitleCOnf = SCE_NP_TROPHY_ERROR_BROKEN_TITLE_CONF
+	ErrorBrokenTitleCOnf = SCE_NP_TROPHY_ERROR_BROKEN_TITLE_CONF,
 #if SCE_ORBIS_SDK_VERSION >= 0x01700081u // SDK Version 1.7
-	,
-	ErrorInconsistentTitleConf = SCE_NP_TROPHY_ERROR_INCONSISTENT_TITLE_CONF
+	ErrorInconsistentTitleConf = SCE_NP_TROPHY_ERROR_INCONSISTENT_TITLE_CONF,
 #endif
 };
 
@@ -66,6 +65,7 @@ public:
 	TrophySet(const TrophySet&) = delete;
 	~TrophySet();
 
+	TrophyResult IsUnlocked(int32_t trophyId, CS_OUT bool* isUnlocked);
 	TrophyResult Unlock(int32_t trophyId, CS_OUT bool* platinumReceived);
 };
 
