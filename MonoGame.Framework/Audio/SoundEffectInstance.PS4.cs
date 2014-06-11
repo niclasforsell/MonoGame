@@ -11,7 +11,7 @@ using SoundSystem = Sce.PlayStation4.Audio.SoundSystem;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed partial class SoundEffectInstance
+    public partial class SoundEffectInstance
     {
         internal SamplerVoice _voice;
         internal AudioBuffer _buffer;
@@ -134,12 +134,15 @@ namespace Microsoft.Xna.Framework.Audio
             return _voice.Volume * SoundEffect.MasterVolume;
         }
 
-        private void PlatformDispose()
+        private void PlatformDispose(bool disposing)
         {
-            if (_voice != null)
+            if (disposing)
             {
-                _voice.Dispose();
-                _voice = null;
+                if (_voice != null)
+                {
+                    _voice.Dispose();
+                    _voice = null;
+                }
             }
         }
     }
