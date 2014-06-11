@@ -42,17 +42,17 @@ namespace {
 		auto player = (VideoPlayer*)arg;
 		assert(player != nullptr);
 
+		SceAvPlayerFrameInfoEx videoFrame;
+		memset(&videoFrame, 0, sizeof(SceAvPlayerFrameInfoEx));
+
 		while (sceAvPlayerIsActive(player->_handle))
 		{
-			//auto startTime = sceKernelGetProcessTime();
-
-			scePthreadMutexLock(&player->_frameMutex);
-			if(sceAvPlayerGetVideoDataEx(player->_handle, &player->_videoFrame))
-				player->_frameAvailable = true;
-			scePthreadMutexUnlock(&player->_frameMutex);
-
-			//auto elapsed = sceKernelGetProcessTime() - startTime;
-			//sceKernelUsleep(16670UL - elapsed);
+			if(sceAvPlayerGetVideoDataEx(player->_handle, &videoFrame))
+			{
+				scePthreadMutexLock(&player->_frameMutex);
+				memcpy(&player->_videoFrame, &videoFrame, sizeof(SceAvPlayerFrameInfoEx));
+				scePthreadMutexUnlock(&player->_frameMutex);
+			}
 		}
 
 		scePthreadExit(nullptr);
@@ -65,34 +65,22 @@ namespace {
 		assert(player != nullptr);
 
 		const uint32_t outputStreamSize = 128 * 1024;
-		const uint32_t outputStreamGrain = 256;
+		const uint32_t outputStreamGrain = 1024;
 		AudioOutput output;
 		output.open(outputStreamGrain, 48000, SCE_AUDIO_OUT_PARAM_FORMAT_S16_STEREO);
 
-		void* silence = Allocator::Get()->allocate(4096 * 4, 0x20);
-		memset(silence, 0, 4096 * 4);
+		void* silence = Allocator::Get()->allocate(4096, 0x20);
+		memset(silence, 0, 4096);
 
 		SceAvPlayerFrameInfo audioFrame;
 		memset(&audioFrame, 0, sizeof(SceAvPlayerFrameInfo));
 
-		// TODO: Hack to avoid apparent deadlock, find root cause or set barrier
-		sceKernelSleep(1);
-
 		while (sceAvPlayerIsActive(player->_handle))
 		{
-			auto startTime = sceKernelGetProcessTime();
-
 			if (sceAvPlayerGetAudioData(player->_handle, &audioFrame))
-			{
 				output.output(audioFrame.pData);
-			}
 			else
-			{
 				output.output(silence);
-			}
-
-			//auto elapsed = sceKernelGetProcessTime() - startTime;
-			//sceKernelUsleep(8192UL - elapsed);
 		}
 
 		output.close();
@@ -123,7 +111,7 @@ VideoPlayer::VideoPlayer(GraphicsSystem* graphics)
 
 	param.debugLevel = SCE_AVPLAYER_DBG_INFO;
 	param.basePriority = 160;
-	param.numOutputVideoFrameBuffers = 2;
+	param.numOutputVideoFrameBuffers = 6;
 	param.autoStart = true;
 	param.defaultLanguage = "eng";
 
@@ -135,8 +123,8 @@ VideoPlayer::~VideoPlayer()
 {
 	Stop();
 
-	scePthreadJoin(_videoThread, NULL);
 	scePthreadJoin(_audioThread, NULL);
+	scePthreadJoin(_videoThread, NULL);
 
 	sceAvPlayerClose(_handle);
 }
@@ -146,7 +134,7 @@ bool VideoPlayer::GrabFrame()
 	if (scePthreadMutexTrylock(&_frameMutex) != SCE_OK)
 		return false;
 
-	if (!_frameAvailable)
+	if (_videoFrame.pData == nullptr)
 	{
 		scePthreadMutexUnlock(&_frameMutex);
 		return false;
@@ -162,19 +150,17 @@ bool VideoPlayer::GrabFrame()
 	auto framePitch = _videoFrame.details.video.pitch;
 
 	// Set texture
-	{
-		Gnm::SizeAlign sz;
+	Gnm::SizeAlign sz;
 
-		sz = lumaTexture.initAs2d(framePitch, frameHeight, 1, Gnm::kDataFormatR8Unorm, Gnm::kTileModeDisplay_LinearAligned, Gnm::kNumSamples1);
-		assert(sz.m_size == framePitch * frameHeight);
-		lumaAddress = _videoFrame.pData;
-		lumaTexture.setBaseAddress256ByteBlocks((uint32_t)(reinterpret_cast<uint64_t>(lumaAddress) >> 8));
+	sz = lumaTexture.initAs2d(framePitch, frameHeight, 1, Gnm::kDataFormatR8Unorm, Gnm::kTileModeDisplay_LinearAligned, Gnm::kNumSamples1);
+	assert(sz.m_size == framePitch * frameHeight);
+	lumaAddress = _videoFrame.pData;
+	lumaTexture.setBaseAddress256ByteBlocks((uint32_t)(reinterpret_cast<uint64_t>(lumaAddress) >> 8));
 
-		sz = chromaTexture.initAs2d(framePitch / 2, frameHeight / 2, 1, Gnm::kDataFormatR8G8Unorm, Gnm::kTileModeDisplay_LinearAligned, Gnm::kNumSamples1);
-		assert(sz.m_size == framePitch * (frameHeight / 2));
-		chromaAddress = (uint8_t*)(_videoFrame.pData) + (framePitch * frameHeight);
-		chromaTexture.setBaseAddress256ByteBlocks((uint32_t)(reinterpret_cast<uint64_t>(chromaAddress) >> 8));
-	}
+	sz = chromaTexture.initAs2d(framePitch / 2, frameHeight / 2, 1, Gnm::kDataFormatR8G8Unorm, Gnm::kTileModeDisplay_LinearAligned, Gnm::kNumSamples1);
+	assert(sz.m_size == framePitch * (frameHeight / 2));
+	chromaAddress = (uint8_t*)(_videoFrame.pData) + (framePitch * frameHeight);
+	chromaTexture.setBaseAddress256ByteBlocks((uint32_t)(reinterpret_cast<uint64_t>(chromaAddress) >> 8));
 
 	// Draw
 	auto left = (framePitch > 0) ? ((float)_videoFrame.details.video.cropLeftOffset / framePitch) : 0.0f;
@@ -183,9 +169,8 @@ bool VideoPlayer::GrabFrame()
 	auto bottom = (frameHeight > 0) ? 1.0f - ((float)_videoFrame.details.video.cropBottomOffset / frameHeight) : 1.0f;
 	_graphics->DrawYCbCr(&lumaTexture, &chromaTexture, left, right, top, bottom);
 
-	_frameAvailable = false;
+	memset(&_videoFrame, 0, sizeof(SceAvPlayerFrameInfoEx));
 	scePthreadMutexUnlock(&_frameMutex);
-
 	return true;
 }
 
@@ -208,9 +193,7 @@ void VideoPlayer::Play(const char* filename)
 	// Temporary
 	sceAvPlayerSetLooping(_handle, true);
 
-	_frameAvailable = false;
-
-	scePthreadMutexInit(&_frameMutex, NULL, "video_frame_lock");
+	scePthreadMutexInit(&_frameMutex, NULL, "av_frame_mutex");
 
 	ScePthreadAttr threadAttr;
 

@@ -34,7 +34,6 @@ public:
 	CS_IGNORE ScePthread _videoThread;
 	CS_IGNORE ScePthread _audioThread;
 
-	CS_IGNORE bool _frameAvailable;
 	CS_IGNORE ScePthreadMutex _frameMutex;
 	CS_IGNORE SceAvPlayerFrameInfoEx _videoFrame;
 
