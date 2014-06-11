@@ -15,11 +15,19 @@ namespace Sce.PlayStation4.Network
                 throw new Exception(result.ToString());
         }
 
+        public void IsUnlocked(int trophyId)
+        {
+            bool isUnlocked;
+            var result = IsUnlocked(trophyId, out isUnlocked);
+            if (result != TrophyResult.Ok)
+                throw new Exception(result.ToString());
+        }
+
         public void Unlock(int trophyId)
         {
             bool gotPlatinum;
             var result = Unlock(trophyId, out gotPlatinum);
-            if (result != TrophyResult.Ok)
+            if (result != TrophyResult.Ok && result != TrophyResult.ErrorTrophyAlreadyUnlocked)
                 throw new Exception(result.ToString());
         }
     }
