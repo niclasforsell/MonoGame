@@ -42,6 +42,9 @@ CS_FLAGS enum class SaveDataMountMode
 	WriteOnly = SCE_SAVE_DATA_MOUNT_MODE_WRONLY,
 	Create = SCE_SAVE_DATA_MOUNT_MODE_CREATE,
 	DestructOff = SCE_SAVE_DATA_MOUNT_MODE_DESTRUCT_OFF,
+#if SCE_ORBIS_SDK_VERSION >= 0x01700081u // SDK Version 1.7
+	CopyIcon = SCE_SAVE_DATA_MOUNT_MODE_COPY_ICON,
+#endif
 };
 
 CS_FLAGS enum class SaveDataConst : uint

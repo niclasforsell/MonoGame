@@ -120,6 +120,11 @@ SaveDataResult SaveData::GetMountInfo(	CS_OUT uint64_t *blocks,
 	return (SaveDataResult)result;
 }
 
+const char* SaveData::GetMountPoint() const
+{
+	return _mountPoint.data;
+}
+
 const char* SaveData::GetTitle()
 {
 	auto result = sceSaveDataGetParam(&_mountPoint, SCE_SAVE_DATA_PARAM_TYPE_TITLE, _title, SCE_SAVE_DATA_TITLE_MAXSIZE, NULL);
