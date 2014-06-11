@@ -15,12 +15,14 @@ namespace Sce.PlayStation4.Network
                 throw new Exception(result.ToString());
         }
 
-        public void IsUnlocked(int trophyId)
+        public bool IsUnlocked(int trophyId)
         {
             bool isUnlocked;
             var result = IsUnlocked(trophyId, out isUnlocked);
             if (result != TrophyResult.Ok)
                 throw new Exception(result.ToString());
+
+            return isUnlocked;
         }
 
         public void Unlock(int trophyId)
