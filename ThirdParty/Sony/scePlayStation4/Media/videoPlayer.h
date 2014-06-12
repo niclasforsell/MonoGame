@@ -24,12 +24,19 @@ enum class VideoPlayerResult
 	ErrorNotSupported = SCE_AVPLAYER_ERROR_NOT_SUPPORTED
 };
 
+enum class VideoPlayerState
+{
+	Not_Loaded,
+	Stopped,
+	Paused,
+	Playing,
+};
+
 class CS_API VideoPlayer
 {
 public:
 	CS_IGNORE SceAvPlayerHandle _handle;
 	CS_IGNORE int32_t _sourceID;
-	CS_IGNORE int32_t _videoOutHandle;
 
 	CS_IGNORE ScePthread _videoThread;
 	CS_IGNORE ScePthread _audioThread;
@@ -37,7 +44,12 @@ public:
 	CS_IGNORE ScePthreadMutex _frameMutex;
 	CS_IGNORE SceAvPlayerFrameInfoEx _videoFrame;
 
+	CS_IGNORE ScePthreadMutex _audioMutex;
+	CS_IGNORE float _volume;
+
 	CS_IGNORE Graphics::GraphicsSystem* _graphics;
+
+	CS_IGNORE VideoPlayerState _state;
 
 public:
 	VideoPlayer(Graphics::GraphicsSystem* graphics);

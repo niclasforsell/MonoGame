@@ -77,10 +77,19 @@ namespace {
 
 		while (sceAvPlayerIsActive(player->_handle))
 		{
-			if (sceAvPlayerGetAudioData(player->_handle, &audioFrame))
+			scePthreadMutexLock(&player->_audioMutex);
+			auto volume = player->_volume;
+			scePthreadMutexUnlock(&player->_audioMutex);
+
+			if (output.getVolume() != volume)
+				output.setVolume(volume);
+
+			if (sceAvPlayerGetAudioData(player->_handle, &audioFrame) && volume > 0.0f)
 				output.output(audioFrame.pData);
 			else
 				output.output(silence);
+
+
 		}
 
 		output.close();
@@ -100,6 +109,7 @@ VideoPlayer::VideoPlayer(GraphicsSystem* graphics)
 	}
 
 	memset(&_videoFrame, 0, sizeof(SceAvPlayerFrameInfoEx));
+	scePthreadMutexInit(&_frameMutex, NULL, "av_frame_mutex");
 
 	SceAvPlayerInitData param;
 	memset(&param, 0, sizeof(SceAvPlayerInitData));
@@ -115,18 +125,28 @@ VideoPlayer::VideoPlayer(GraphicsSystem* graphics)
 	param.autoStart = true;
 	param.defaultLanguage = "eng";
 
+	_state = VideoPlayerState::Not_Loaded;
 	_handle = sceAvPlayerInit(&param);
 	_graphics = graphics;
+	_sourceID = -1;
+	_volume = 1.0f;
 }
 
 VideoPlayer::~VideoPlayer()
 {
-	Stop();
+	sceAvPlayerStop(_handle);
+	_state == VideoPlayerState::Stopped;
+
+	scePthreadMutexLock(&_frameMutex);
+	memset(&_videoFrame, 0, sizeof(SceAvPlayerFrameInfoEx));
+	scePthreadMutexUnlock(&_frameMutex);
 
 	scePthreadJoin(_audioThread, NULL);
 	scePthreadJoin(_videoThread, NULL);
 
 	sceAvPlayerClose(_handle);
+	_handle = nullptr;
+	_sourceID = -1;
 }
 
 bool VideoPlayer::GrabFrame()
@@ -176,50 +196,90 @@ bool VideoPlayer::GrabFrame()
 
 void VideoPlayer::Pause()
 {
+	if (_state != VideoPlayerState::Playing)
+		return;
+
 	auto ret = sceAvPlayerPause(_handle);
 	assert(ret == SCE_OK);
+	if (ret == SCE_OK)
+		_state = VideoPlayerState::Paused;
 }
 
 void VideoPlayer::Resume()
 {
+	if (_state != VideoPlayerState::Paused)
+		return;
+
 	auto ret = sceAvPlayerResume(_handle);
 	assert(ret == SCE_OK);
+	if (ret == SCE_OK)
+		_state = VideoPlayerState::Playing;
 }
 
 void VideoPlayer::Play(const char* filename)
 {
-	_sourceID = sceAvPlayerAddSource(_handle, filename);
+    switch(_state)
+	{
+	case VideoPlayerState::Not_Loaded:
+		{
+			_sourceID = sceAvPlayerAddSource(_handle, filename);
 
-	// Temporary
-	sceAvPlayerSetLooping(_handle, true);
+			ScePthreadAttr threadAttr;
+			scePthreadAttrInit(&threadAttr);
+			scePthreadAttrSetstacksize(&threadAttr, 1024 * 1024);
+			auto ret = scePthreadCreate(&_videoThread, &threadAttr, videoOutputThread, this, "av_video_output_thread");
+			scePthreadAttrDestroy(&threadAttr);
+			if (ret < 0)
+			{
+				printf("Couldn't start video thread: 0x%08X\n", ret);
+				return;
+			}
 
-	scePthreadMutexInit(&_frameMutex, NULL, "av_frame_mutex");
+			scePthreadAttrInit(&threadAttr);
+			scePthreadAttrSetstacksize(&threadAttr, 1024 * 1024);
+			ret = scePthreadCreate(&_audioThread, &threadAttr, audioOutputThread, this, "av_audio_output_thread");
+			scePthreadAttrDestroy(&threadAttr);
+			if (ret < 0)
+			{
+				printf("Couldn't start audio thread: 0x%08X\n", ret);
+				return;
+			}
 
-	ScePthreadAttr threadAttr;
+			_state = VideoPlayerState::Playing;
+		}
+		break;
 
-	scePthreadAttrInit(&threadAttr);
-	scePthreadAttrSetstacksize(&threadAttr, 1024 * 1024);
-	auto ret = scePthreadCreate(&_videoThread, &threadAttr, videoOutputThread, this, "av_video_output_thread");
-	scePthreadAttrDestroy(&threadAttr);
-	if (ret < 0)
+	case VideoPlayerState::Playing:
+		sceAvPlayerJumpToTime(_handle, 0);
 		return;
 
-	scePthreadAttrInit(&threadAttr);
-	scePthreadAttrSetstacksize(&threadAttr, 1024 * 1024);
-	ret = scePthreadCreate(&_audioThread, &threadAttr, audioOutputThread, this, "av_audio_output_thread");
-	scePthreadAttrDestroy(&threadAttr);
-	if (ret < 0)
-		return;
+	case VideoPlayerState::Stopped:
+		sceAvPlayerResume(_handle);
+		sceAvPlayerJumpToTime(_handle, 0);
+		_state = VideoPlayerState::Playing;
+		break;
+	}
 }
 
 void VideoPlayer::Stop()
 {
-	auto ret = sceAvPlayerStop(_handle);
+	if (_state == VideoPlayerState::Stopped)
+		return;
+
+	if (_state != VideoPlayerState::Playing && _state != VideoPlayerState::Paused)
+		return;
+
+	auto ret = sceAvPlayerPause(_handle);
 	assert(ret == SCE_OK);
+	if (ret == SCE_OK)
+		_state = VideoPlayerState::Stopped;
 }
 
 void VideoPlayer::SetVolume(float volume)
 {
+	scePthreadMutexLock(&_audioMutex);
+	_volume = volume;
+	scePthreadMutexUnlock(&_audioMutex);
 }
 
 time_t VideoPlayer::GetPlayPosition()
