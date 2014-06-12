@@ -279,7 +279,6 @@ void Song::Play()
 
 	auto ret = 0;
 	ScePthreadAttr attr = 0;
-	SceKernelSchedParam schedParam;
 
 	ret = sceKernelCreateEventFlag(&_state->eventFlag, "AudioBgm", SCE_KERNEL_EVF_ATTR_MULTI, 0, 0);
 	if (ret < 0)
@@ -297,9 +296,7 @@ void Song::Play()
 
 	scePthreadAttrInit(&attr);
 	scePthreadAttrSetstacksize(&attr, stackSize);
-	scePthreadAttrSetinheritsched(&attr, SCE_PTHREAD_EXPLICIT_SCHED);
-	schedParam.sched_priority = SCE_KERNEL_PRIO_FIFO_HIGHEST;
-	scePthreadAttrSetschedparam(&attr, &schedParam);
+	scePthreadAttrSetaffinity(&attr, (1 << 4) | (1 << 5));
 
 	ret = scePthreadCreate(&_state->threadDecode, &attr, decodeMain, _state, "AudioDecBgm");
 	if (ret < 0)

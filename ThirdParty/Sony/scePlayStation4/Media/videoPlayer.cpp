@@ -230,6 +230,7 @@ void VideoPlayer::Play(const char* filename)
 			ScePthreadAttr threadAttr;
 			scePthreadAttrInit(&threadAttr);
 			scePthreadAttrSetstacksize(&threadAttr, 1024 * 1024);
+			scePthreadAttrSetaffinity(&threadAttr, (1 << 4) | (1 << 5));
 			auto ret = scePthreadCreate(&_videoThread, &threadAttr, videoOutputThread, this, "av_video_output_thread");
 			scePthreadAttrDestroy(&threadAttr);
 			if (ret < 0)
@@ -240,6 +241,7 @@ void VideoPlayer::Play(const char* filename)
 
 			scePthreadAttrInit(&threadAttr);
 			scePthreadAttrSetstacksize(&threadAttr, 1024 * 1024);
+			scePthreadAttrSetaffinity(&threadAttr, (1 << 4) | (1 << 5));
 			ret = scePthreadCreate(&_audioThread, &threadAttr, audioOutputThread, this, "av_audio_output_thread");
 			scePthreadAttrDestroy(&threadAttr);
 			if (ret < 0)

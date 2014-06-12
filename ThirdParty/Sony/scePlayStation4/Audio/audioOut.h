@@ -155,6 +155,7 @@ public:
 		//AudioOut Process Thread Create
 		scePthreadAttrInit(&attr);
 		scePthreadAttrSetstacksize(&attr, 512*1024);
+		scePthreadAttrSetaffinity(&attr, (1 << 4) | (1 << 5));
 
 		if ((result = scePthreadCreate( &m_thread, &attr, AudioOut::_process, this, "AudioOutThread")) < 0) {
 			scePthreadAttrDestroy(&attr);
