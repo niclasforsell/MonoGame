@@ -43,7 +43,7 @@ TrophyResult TrophySet::CreateContext(const SceUserServiceUserId userId, const S
 
 cleanup:
 	if (handle != SCE_NP_TROPHY_INVALID_HANDLE)
-		assert(sceNpTrophyDestroyHandle(handle) == SCE_OK);
+		sceNpTrophyDestroyHandle(handle);
 
 	return (TrophyResult)ret;
 }
@@ -85,7 +85,7 @@ TrophyResult TrophySet::Unlock(int32_t trophyId, CS_OUT bool* platinumReceived)
 
 	*platinumReceived = platinumId != SCE_NP_TROPHY_INVALID_TROPHY_ID;
 
-	assert(sceNpTrophyDestroyHandle(handle) == SCE_OK);
+	sceNpTrophyDestroyHandle(handle);
 	return (TrophyResult)ret;
 }
 
