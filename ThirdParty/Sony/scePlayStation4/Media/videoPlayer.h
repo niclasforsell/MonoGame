@@ -46,6 +46,8 @@ public:
 
 	CS_IGNORE ScePthreadMutex _audioMutex;
 	CS_IGNORE float _volume;
+	CS_IGNORE bool _isLooped;
+	CS_IGNORE bool _isMuted;
 
 	CS_IGNORE Graphics::GraphicsSystem* _graphics;
 
@@ -63,6 +65,9 @@ public:
 	void Stop();
 	void SetVolume(float volume);
 	time_t GetPlayPosition();
+
+	void SetIsLooped(bool value);
+	void SetIsMuted(bool value);
 };
 
 } // namespace Media

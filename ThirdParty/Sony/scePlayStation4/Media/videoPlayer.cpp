@@ -79,12 +79,13 @@ namespace {
 		{
 			scePthreadMutexLock(&player->_audioMutex);
 			auto volume = player->_volume;
+			auto isMuted = player->_isMuted || volume < 0.001f;
 			scePthreadMutexUnlock(&player->_audioMutex);
 
 			if (output.getVolume() != volume)
 				output.setVolume(volume);
 
-			if (sceAvPlayerGetAudioData(player->_handle, &audioFrame) && volume > 0.0f)
+			if (sceAvPlayerGetAudioData(player->_handle, &audioFrame) && !isMuted)
 				output.output(audioFrame.pData);
 			else
 				output.output(silence);
@@ -130,23 +131,24 @@ VideoPlayer::VideoPlayer(GraphicsSystem* graphics)
 	_graphics = graphics;
 	_sourceID = -1;
 	_volume = 1.0f;
+	_isMuted = false;
+	_isLooped = false;
 }
 
 VideoPlayer::~VideoPlayer()
 {
 	sceAvPlayerStop(_handle);
-	_state == VideoPlayerState::Stopped;
+	scePthreadJoin(_audioThread, NULL);
+	scePthreadJoin(_videoThread, NULL);
 
 	scePthreadMutexLock(&_frameMutex);
 	memset(&_videoFrame, 0, sizeof(SceAvPlayerFrameInfoEx));
 	scePthreadMutexUnlock(&_frameMutex);
 
-	scePthreadJoin(_audioThread, NULL);
-	scePthreadJoin(_videoThread, NULL);
-
 	sceAvPlayerClose(_handle);
 	_handle = nullptr;
 	_sourceID = -1;
+	_state == VideoPlayerState::Not_Loaded;
 }
 
 bool VideoPlayer::GrabFrame()
@@ -223,6 +225,7 @@ void VideoPlayer::Play(const char* filename)
 	case VideoPlayerState::Not_Loaded:
 		{
 			_sourceID = sceAvPlayerAddSource(_handle, filename);
+			sceAvPlayerSetLooping(_handle, _isLooped);
 
 			ScePthreadAttr threadAttr;
 			scePthreadAttrInit(&threadAttr);
@@ -285,4 +288,22 @@ void VideoPlayer::SetVolume(float volume)
 time_t VideoPlayer::GetPlayPosition()
 {
 	return sceAvPlayerCurrentTime(_handle);
+}
+
+void VideoPlayer::SetIsLooped(bool value)
+{
+	_isLooped = value;
+
+	if (_state != VideoPlayerState::Not_Loaded)
+	{
+		auto ret = sceAvPlayerSetLooping(_handle, value);
+		assert(ret == SCE_OK);
+	}
+}
+
+void VideoPlayer::SetIsMuted(bool value)
+{
+	scePthreadMutexLock(&_audioMutex);
+	_isMuted = value;
+	scePthreadMutexUnlock(&_audioMutex);
 }

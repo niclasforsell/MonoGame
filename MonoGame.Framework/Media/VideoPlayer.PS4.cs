@@ -39,6 +39,14 @@ namespace Microsoft.Xna.Framework.Media
                                                1,
                                                RenderTargetUsage.PreserveContents);
 
+            // Clear initial render target contents
+            _prevRenderTargets = new RenderTargetBinding[_graphicsDevice.RenderTargetCount];
+            _graphicsDevice.GetRenderTargets(_prevRenderTargets);
+            _graphicsDevice.SetRenderTarget(_renderTarget);
+            _graphicsDevice.Clear(Color.Black);
+            _graphicsDevice.SetRenderTargets(_prevRenderTargets);
+            _graphicsDevice.PlatformSetDirty();
+
             _player = new PS4VideoPlayer(_graphicsDevice._system);
         }
 
@@ -87,9 +95,25 @@ namespace Microsoft.Xna.Framework.Media
             _player.Volume = _volume;
         }
 
+        private void PlatformSetIsLooped()
+        {
+            _player.IsLooped = _isLooped;
+        }
+
+        private void PlatformSetIsMuted()
+        {
+            _player.IsMuted = _isMuted;
+        }
+
         private TimeSpan PlatformGetPlayPosition()
         {
             return TimeSpan.FromMilliseconds(_player.PlayPosition);
+        }
+
+        private void PlatformDispose(bool disposing)
+        {
+            _player.Dispose();
+            _renderTarget.Dispose();
         }
     }
 }
