@@ -400,7 +400,7 @@
       <Link>Assimp64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\libmojoshader_64.dll">
+    <None Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll">
       <Platforms>Windows</Platforms>
       <Link>libmojoshader_64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -415,7 +415,16 @@
       <Link>FreeImage.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffmpeg.exe">
+      <Platforms>Windows</Platforms>
+      <Link>ffmpeg.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffprobe.exe">
+      <Platforms>Windows</Platforms>
+      <Link>ffprobe.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <!-- Linux Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvcore.so">
@@ -453,7 +462,16 @@
       <Link>AssimpNet.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffmpeg">
+      <Platforms>Linux</Platforms>
+      <Link>ffmpeg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffprobe">
+      <Platforms>Linux</Platforms>
+      <Link>ffprobe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <!-- Mac Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib">
@@ -514,6 +532,16 @@
     <None Include="..\ThirdParty\Dependencies\assimp\libassimp.dylib">
       <Platforms>MacOS</Platforms>
       <Link>libassimp.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg">
+      <Platforms>MacOS</Platforms>
+      <Link>ffmpeg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe">
+      <Platforms>MacOS</Platforms>
+      <Link>ffprobe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
