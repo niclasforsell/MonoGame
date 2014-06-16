@@ -17,15 +17,12 @@ FetchShader::FetchShader(VertexShader *shader, const uint32_t* remap, int32_t co
 {
 	auto fetchSize = Gnmx::computeVsFetchShaderSize(shader->_shader);
 
-	_fsMem = Allocator::Get()->allocate(
-		fetchSize,
-		Gnm::kAlignmentOfFetchShaderInBytes,
-		SCE_KERNEL_WC_GARLIC);
+	_fsMem = mem::allocShared(fetchSize, Gnm::kAlignmentOfFetchShaderInBytes);
 
 	Gnmx::generateVsFetchShader(_fsMem, &_shaderModifier, shader->_shader, NULL, remap, count);
 }
 
 FetchShader::~FetchShader()
 {
-	Allocator::Get()->release(_fsMem);
+	mem::freeShared(_fsMem);
 }

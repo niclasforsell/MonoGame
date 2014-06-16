@@ -107,7 +107,7 @@ public:
 		scePthreadMutexattrDestroy( &mutexAttr);
 
 
-		m_aPortInfo = (AudioOutPortInfo*)Allocator::Get()->allocate(index * sizeof(AudioOutPortInfo));
+		m_aPortInfo = mem::alloc_array<AudioOutPortInfo>(index);
 		m_numPorts  = index;
 		index = 0;
 
@@ -134,7 +134,7 @@ public:
 					break;
 				}
 				m_aPortInfo[index].bufferSize  = m_aPortInfo[index].numChannels * numGrains * 2 * sizeof(float);
-				m_aPortInfo[index].buffer      = (float*)Allocator::Get()->allocate(m_aPortInfo[index].bufferSize);
+				m_aPortInfo[index].buffer      = mem::alloc<float>(m_aPortInfo[index].bufferSize);
 				index++;
 			}
 		}
@@ -189,10 +189,10 @@ public:
 
 		for( int i = 0; i < m_numPorts; i++){
 			close(i);
-			Allocator::Get()->release( m_aPortInfo[i].buffer);
+			mem::free( m_aPortInfo[i].buffer);
 		}
 
-		Allocator::Get()->release(m_aPortInfo);
+		mem::free(m_aPortInfo);
 
 		m_isCreated = false;
 

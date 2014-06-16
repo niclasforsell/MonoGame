@@ -40,7 +40,7 @@ Texture* Texture::Create2D(TextureFormat format, int32_t width, int32_t height, 
 		Gnm::kNumSamples1);
 
 	// Allocate the texture data using the alignment returned by initAs2d
-	void *textureData = Allocator::Get()->allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
+	void *textureData = mem::allocShared(textureSizeAlign);
 	texture->setBaseAddress(textureData);
 
 	return result;
@@ -75,7 +75,7 @@ Texture* Texture::Create3D(TextureFormat format, int32_t width, int32_t height, 
 		tileMode);
 
 	// Allocate the texture data using the alignment returned by initAs3d
-	void *textureData = Allocator::Get()->allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
+	void *textureData = mem::allocShared(textureSizeAlign);
 	texture->setBaseAddress(textureData);
 
 	return result;
@@ -110,7 +110,7 @@ Texture* Texture::CreateCube(TextureFormat format, int32_t width, int32_t height
 		tileMode);
 
 	// Allocate the texture data using the alignment returned by initAsCubemap
-	void *textureData = Allocator::Get()->allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
+	void *textureData = mem::allocShared(textureSizeAlign);
 	texture->setBaseAddress(textureData);
 
 	return result;
@@ -118,7 +118,7 @@ Texture* Texture::CreateCube(TextureFormat format, int32_t width, int32_t height
 
 Texture::~Texture()
 {
-	Allocator::Get()->release(_texture->getBaseAddress());
+	mem::freeShared(_texture->getBaseAddress());
 	delete _texture;
 }
 

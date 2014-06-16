@@ -27,9 +27,9 @@ NpScoreRankings::NpScoreRankings(size_t arrayNum, bool needRanks, bool needComme
 	assert(arrayNum <= SCE_NP_SCORE_MAX_RANGE_NUM_PER_REQUEST);
 	_arrayNum = arrayNum;
 
-	_rank = needRanks ? (SceNpScoreRankData*)Allocator::Get()->allocate(arrayNum * sizeof(SceNpScoreRankData), 8) : NULL;
-	_comment = needComments ? (SceNpScoreComment*)Allocator::Get()->allocate(arrayNum * sizeof(SceNpScoreComment), 8) : NULL;
-	_gameInfo = needGameInfo ? (SceNpScoreGameInfo*)Allocator::Get()->allocate(arrayNum * sizeof(SceNpScoreGameInfo), 8) : NULL;
+	_rank = needRanks ? mem::alloc_array<SceNpScoreRankData>(arrayNum, 8) : NULL;
+	_comment = needComments ? mem::alloc_array<SceNpScoreComment>(arrayNum, 8) : NULL;
+	_gameInfo = needGameInfo ? mem::alloc_array<SceNpScoreGameInfo>(arrayNum, 8) : NULL;
 
 	_lastSortDate.tick = 0;
 	_totalPlayers = 0;
@@ -40,9 +40,9 @@ NpScoreRankings::NpScoreRankings(size_t arrayNum, bool needRanks, bool needComme
 
 NpScoreRankings::~NpScoreRankings()
 {
-	Allocator::Get()->release(_rank);
-	Allocator::Get()->release(_comment);
-	Allocator::Get()->release(_gameInfo);
+	mem::free(_rank);
+	mem::free(_comment);
+	mem::free(_gameInfo);
 }
 
 int32_t NpScoreRankings::GetIndex()

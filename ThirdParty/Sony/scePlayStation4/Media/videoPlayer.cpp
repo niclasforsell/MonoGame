@@ -17,25 +17,10 @@ using namespace Graphics;
 using namespace Media;
 
 namespace {
-	void* videoAlloc(void* argP, uint32_t argAlignment, uint32_t argSize)
-	{
-		return Allocator::Get()->allocate(argSize, argAlignment, SCE_KERNEL_WB_ONION);
-	}
-
-	void videoFree(void* argP, void* argMemory)
-	{
-		Allocator::Get()->release(argP);
-	}
-
-	void* videoAllocTexture(void* argP, uint32_t argAlignment, uint32_t argSize)
-	{
-		return Allocator::Get()->allocate(argSize, argAlignment, SCE_KERNEL_WB_ONION);
-	}
-
-	void videoFreeTexture(void* argP, void* argMemory)
-	{
-		Allocator::Get()->release(argP);
-	}
+	void* videoAlloc(void* argP, uint32_t argAlignment, uint32_t argSize) { return mem::alloc(argSize, argAlignment); }
+	void videoFree(void* argP, void* argMemory) { mem::free(argP); }
+	void* videoAllocTexture(void* argP, uint32_t argAlignment, uint32_t argSize) { return mem::alloc(argSize, argAlignment); }
+	void videoFreeTexture(void* argP, void* argMemory) { mem::free(argP); }
 
 	void* videoOutputThread(void* arg)
 	{
@@ -69,7 +54,7 @@ namespace {
 		AudioOutput output;
 		output.open(outputStreamGrain, 48000, SCE_AUDIO_OUT_PARAM_FORMAT_S16_STEREO);
 
-		void* silence = Allocator::Get()->allocate(4096, 0x20);
+		void* silence = mem::alloc(4096, 0x20);
 		memset(silence, 0, 4096);
 
 		SceAvPlayerFrameInfo audioFrame;
@@ -94,7 +79,7 @@ namespace {
 		}
 
 		output.close();
-		Allocator::Get()->release(silence);
+		mem::free(silence);
 
 		scePthreadExit(nullptr);
 		return nullptr;

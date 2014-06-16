@@ -13,7 +13,7 @@ namespace {
 RemotePlayResult RemotePlay::Initialize()
 {
 	int ret = -1;
-	heap = Allocator::Get()->allocate(SCE_REMOTEPLAY_HEAP_SIZE);
+	heap = mem::alloc(SCE_REMOTEPLAY_HEAP_SIZE);
 	if (heap == nullptr)
 		return RemotePlayResult::ErrorOutOfMemory;
 
@@ -40,7 +40,7 @@ RemotePlayResult RemotePlay::Terminate()
 	}
 
 	if (heap != nullptr) {
-		Allocator::Get()->release(heap);
+		mem::free(heap);
 		heap = nullptr;
 	}
 

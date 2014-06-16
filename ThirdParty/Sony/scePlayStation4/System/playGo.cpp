@@ -18,7 +18,7 @@ PlayGo::PlayGo(uint32_t heapSize)
 	}
 
 	assert(heapSize > 0);
-	_heap = Allocator::Get()->allocate(heapSize, 512UL);
+	_heap = mem::alloc(heapSize, 512UL);
 
 	ScePlayGoInitParams params;
 	memset(&params, 0, sizeof(ScePlayGoInitParams));
@@ -45,7 +45,7 @@ PlayGo::~PlayGo()
 	auto termRet = scePlayGoTerminate();
 	assert(termRet == SCE_OK);
 
-	Allocator::Get()->release(_heap);
+	mem::free(_heap);
 
 	if (sceSysmoduleIsLoaded(SCE_SYSMODULE_PLAYGO) == SCE_SYSMODULE_LOADED)
 	{
