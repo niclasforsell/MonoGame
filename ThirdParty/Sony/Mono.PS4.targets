@@ -1,0 +1,75 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MonoPS4BclPath>$(Mono_PS4)\bcl\</MonoPS4BclPath>
+  </PropertyGroup>
+
+  <Target Name="MonoPS4_ResolveBclAssemblies" BeforeTargets="ResolveReferences">
+
+    <ItemGroup>
+    
+      <!-- Convert references and explicit references over to PS4 BCL references. -->
+      <_MonoBclReference Include="@(Reference->'$(MonoPS4BclPath)%(Identity).dll')" Condition="Exists('$(MonoPS4BclPath)%(Identity).dll')" />
+      <_MonoBclReference Include="@(_ExplicitReference->'$(MonoPS4BclPath)%(Filename)%(Extension)')" Condition="Exists('$(MonoPS4BclPath)%(Filename)%(Extension)')" />
+
+      <!-- Remove any references we converted over to Mono BCL. -->
+      <_ExplicitReference Remove="@(_ExplicitReference)" Condition="Exists('$(MonoPS4BclPath)%(Filename)%(Extension)')" />
+      <Reference Remove="@(Reference)" Condition="Exists('$(MonoPS4BclPath)%(Identity).dll')" />
+
+      <!-- Add the Mono BCL references to the explicit references. -->
+      <_ExplicitReference Include="@(_MonoBclReference)" />
+
+    </ItemGroup>
+
+    <!--
+    <Message Text="Reference: @(Reference)" Importance="high"/>
+    <Message Text="_ExplicitReference: @(_ExplicitReference)" Importance="high"/>
+    -->
+
+  </Target>
+
+  <Target Name="MonoPS4_AOTValidate" BeforeTargets="BeforeCompile" Condition=" '$(OutputType)' == 'Exe' ">
+
+    <Error Condition="'$(AotIntermediateOutputPath)' == ''"
+	Text="You must define %24(AotIntermediateOutputPath) to point to the output path where the AOT intermediate files are copied!" />
+    <Error Condition="'$(AotOutputPath)' == ''"
+	Text="You must define %24(AotOutputPath) to point to the output path where the AOT compiled managed assemblies are copied!" />
+
+    <PropertyGroup>
+
+       <!-- Add our AOT output to the additional includes, so that it will force a rebuild -->
+       <!--
+       <CustomAdditionalCompileOutputs>$CustomAdditionalCompileOutputs;$(AotOutputPath)\$(TargetFileName)</CustomAdditionalCompileOutputs>
+       -->
+
+       <MonoDebugFlag Condition="'$(Optimize)' == 'true'">--debug</MonoDebugFlag>
+
+    </PropertyGroup>
+
+  </Target>
+
+  <Target	Name="MonoPS4_AOTCompile" 
+		AfterTargets="CoreBuild"
+		Condition=" '$(OutputType)' == 'Exe' ">
+
+    <!--
+    <Message Text="(Inputs) = $(TargetPath)" Importance="high"/>
+    <Message Text="(Outputs) = $(AotOutputPath)\$(TargetFileName)" Importance="high"/>
+    -->
+
+    <Message Text="Executing Mono.PS4 AOT..." Importance="high"/>
+
+    <!-- Ensure the output paths exist as psbuild will crash otherwise! -->
+    <MakeDir Directories="$(AotOutputPath)" />
+    <MakeDir Directories="$(AotIntermediateOutputPath)" />
+
+    <Exec Command="$(MONO_PS4)\bin\psbuild.exe $(MonoDebugFlag) --incremental=$(ProjectGuid)_$(Configuration) $(MONO_PS4)\bcl $(TargetDir) $(AotIntermediateOutputPath) $(AotOutputPath) $(MONO_PS4_BUILDER)" />
+
+  </Target>
+
+  <!--
+  <Target Name="MonoPS4Clean" AfterTargets="Clean" Condition=" '$(OutputType)' == 'Exe' ">
+  </Target>
+  -->
+
+</Project>

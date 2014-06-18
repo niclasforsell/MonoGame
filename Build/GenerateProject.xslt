@@ -161,9 +161,6 @@
     <xsl:if test="/Input/Generation/Platform = 'Windows8'">
       <DefaultLanguage>en-US</DefaultLanguage>
     </xsl:if>
-    <xsl:if test="/Input/Generation/Platform = 'PlayStation4'">
-	    <NoStdLib>True</NoStdLib>
-    </xsl:if>
   </xsl:template>
 
   <xsl:template name="configuration"
@@ -1229,6 +1226,10 @@
         </xsl:when>
         <xsl:when test="/Input/Generation/Platform = 'PSMobile'">
           <Import Project="$(MSBuildExtensionsPath)\Sce\Sce.Psm.CSharp.targets" />
+        </xsl:when>
+        <xsl:when test="/Input/Generation/Platform = 'PlayStation4'">
+          <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+		  <Import Project="..\ThirdParty\Sony\Mono.PS4.targets" />
         </xsl:when>
         <xsl:otherwise>
           <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

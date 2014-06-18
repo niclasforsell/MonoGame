@@ -11,8 +11,6 @@
     <AssemblyName>Sce.PlayStation4</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NoCompilerStandardLib>true</NoCompilerStandardLib>
-    <NoStdLib>true</NoStdLib>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -37,14 +35,6 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <ItemGroup>
-    <_ExplicitReference Include="$(MONO_PS4)\bcl\mscorlib.dll">
-      <Link>bcl\mscorlib.dll</Link>
-    </_ExplicitReference>
-    <_ExplicitReference Include="$(MONO_PS4)\bcl\System.dll">
-      <Link>bcl\System.dll</Link>
-    </_ExplicitReference>
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioBuffer.cs" />
     <Compile Include="Camera.cs" />
@@ -97,7 +87,11 @@
     <Compile Include="VideoRecording.cs" />
     <Compile Include="WebBrowserDialog.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\Mono.PS4.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
