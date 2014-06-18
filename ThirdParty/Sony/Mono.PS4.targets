@@ -4,7 +4,7 @@
     <MonoPS4BclPath>$(Mono_PS4)\bcl\</MonoPS4BclPath>
   </PropertyGroup>
 
-  <Target Name="MonoPS4ResolveBclAssemblies" BeforeTargets="ResolveReferences">
+  <Target Name="MonoPS4_ResolveBclAssemblies" BeforeTargets="ResolveReferences">
 
     <ItemGroup>
     
@@ -27,5 +27,49 @@
     -->
 
   </Target>
+
+  <Target Name="MonoPS4_AOTValidate" BeforeTargets="BeforeCompile" Condition=" '$(OutputType)' == 'Exe' ">
+
+    <Error Condition="'$(AotIntermediateOutputPath)' == ''"
+	Text="You must define %24(AotIntermediateOutputPath) to point to the output path where the AOT intermediate files are copied!" />
+    <Error Condition="'$(AotOutputPath)' == ''"
+	Text="You must define %24(AotOutputPath) to point to the output path where the AOT compiled managed assemblies are copied!" />
+
+    <PropertyGroup>
+
+       <!-- Add our AOT output to the additional includes, so that it will force a rebuild -->
+       <!--
+       <CustomAdditionalCompileOutputs>$CustomAdditionalCompileOutputs;$(AotOutputPath)\$(TargetFileName)</CustomAdditionalCompileOutputs>
+       -->
+
+       <MonoDebugFlag Condition="'$(Optimize)' == 'true'">--debug</MonoDebugFlag>
+
+    </PropertyGroup>
+
+  </Target>
+
+  <Target	Name="MonoPS4_AOTCompile" 
+		AfterTargets="CoreBuild"
+		Condition=" '$(OutputType)' == 'Exe' ">
+
+    <!--
+    <Message Text="(Inputs) = $(TargetPath)" Importance="high"/>
+    <Message Text="(Outputs) = $(AotOutputPath)\$(TargetFileName)" Importance="high"/>
+    -->
+
+    <Message Text="Executing Mono.PS4 AOT..." Importance="high"/>
+
+    <!-- Ensure the output paths exist as psbuild will crash otherwise! -->
+    <MakeDir Directories="$(AotOutputPath)" />
+    <MakeDir Directories="$(AotIntermediateOutputPath)" />
+
+    <Exec Command="$(MONO_PS4)\bin\psbuild.exe $(MonoDebugFlag) --incremental=$(ProjectGuid)_$(Configuration) $(MONO_PS4)\bcl $(TargetDir) $(AotIntermediateOutputPath) $(AotOutputPath) $(MONO_PS4_BUILDER)" />
+
+  </Target>
+
+  <!--
+  <Target Name="MonoPS4Clean" AfterTargets="Clean" Condition=" '$(OutputType)' == 'Exe' ">
+  </Target>
+  -->
 
 </Project>
