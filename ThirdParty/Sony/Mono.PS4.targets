@@ -1,0 +1,31 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MonoPS4BclPath>$(Mono_PS4)\bcl\</MonoPS4BclPath>
+  </PropertyGroup>
+
+  <Target Name="MonoPS4ResolveBclAssemblies" BeforeTargets="ResolveReferences">
+
+    <ItemGroup>
+    
+      <!-- Convert references and explicit references over to PS4 BCL references. -->
+      <_MonoBclReference Include="@(Reference->'$(MonoPS4BclPath)%(Identity).dll')" Condition="Exists('$(MonoPS4BclPath)%(Identity).dll')" />
+      <_MonoBclReference Include="@(_ExplicitReference->'$(MonoPS4BclPath)%(Filename)%(Extension)')" Condition="Exists('$(MonoPS4BclPath)%(Filename)%(Extension)')" />
+
+      <!-- Remove any references we converted over to Mono BCL. -->
+      <_ExplicitReference Remove="@(_ExplicitReference)" Condition="Exists('$(MonoPS4BclPath)%(Filename)%(Extension)')" />
+      <Reference Remove="@(Reference)" Condition="Exists('$(MonoPS4BclPath)%(Identity).dll')" />
+
+      <!-- Add the Mono BCL references to the explicit references. -->
+      <_ExplicitReference Include="@(_MonoBclReference)" />
+
+    </ItemGroup>
+
+    <!--
+    <Message Text="Reference: @(Reference)" Importance="high"/>
+    <Message Text="_ExplicitReference: @(_ExplicitReference)" Importance="high"/>
+    -->
+
+  </Target>
+
+</Project>
