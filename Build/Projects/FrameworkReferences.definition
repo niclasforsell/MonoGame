@@ -61,13 +61,10 @@
   </Platform>
 
   <Platform Type="PlayStation4">
-    <ExplicitReference	Include="$(MONO_PS4)\bcl\mscorlib.dll"
-						Link="bcl\mscorlib.dll" />
-    <ExplicitReference	Include="$(MONO_PS4)\bcl\System.dll"
-						Link="bcl\System.dll" />
-    <ExplicitReference	Include="$(MONO_PS4)\bcl\System.Runtime.Serialization.dll"
-						Link="bcl\System.Runtime.Serialization.dll" />
-    <Project 
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+
+	<Project 
       Name="Sce.PlayStation4"
       Guid="27EC69DA-9B49-44E9-ACCB-AB3A3877400B"
       Path="ThirdParty\Sony\Sce.PlayStation4\Sce.PlayStation4.csproj">
