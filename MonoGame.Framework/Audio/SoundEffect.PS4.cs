@@ -28,6 +28,24 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        /// <summary>
+        /// PlayStation 4 specific version of Play to output a sound on the player's controller.
+        /// </summary>
+        public bool Play(PlayerIndex playerIndex, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f)
+        {
+            var inst = GetPooledInstance();
+            if (inst == null)
+                return false;
+
+            inst._controllerPort = (int)playerIndex;
+            inst.Volume = volume;
+            inst.Pitch = pitch;
+            inst.Pan = pan;
+            inst.Play();
+
+            return true;
+        }
+
         private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
         {
             PlatformInitialize(buffer, 0, buffer.Length, sampleRate, channels, 0, buffer.Length);
@@ -54,6 +72,7 @@ namespace Microsoft.Xna.Framework.Audio
             inst._voice = SoundSystem.Instance.CreateVoice(_buffer);
             inst._buffer = _buffer;
             inst._voice.Looped = inst.IsLooped;
+            inst._controllerPort = -1;
         }
 
         private static void PlatformSetMasterVolume()
