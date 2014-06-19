@@ -15,6 +15,7 @@ namespace Microsoft.Xna.Framework.Audio
     {
         internal SamplerVoice _voice;
         internal AudioBuffer _buffer;
+        internal int _controllerPort;
 
         private void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
         {
@@ -26,7 +27,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Paused, -1);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Paused, _controllerPort);
         }
 
         private void PlatformPause()
@@ -34,7 +35,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Paused, -1);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Paused, _controllerPort);
         }
 
         private void PlatformPlay()
@@ -42,7 +43,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Playing, -1);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Playing, _controllerPort);
         }
 
         private void PlatformResume()
@@ -50,7 +51,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Playing, -1);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Playing, _controllerPort);
         }
 
         private void PlatformStop(bool immediate)
@@ -58,7 +59,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Stopped, -1);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Stopped, _controllerPort);
         }
 
         private void PlatformSetIsLooped(bool value)
