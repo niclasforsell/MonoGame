@@ -22,11 +22,11 @@ namespace {
 	{
 		for (auto i = 0; i < PLAYER_MAX; i++)
 		{
-			if (users[i] == -1)
+			if (users[i] == SCE_USER_SERVICE_USER_ID_INVALID)
 				return i;
 		}
 
-		return -1;
+		return SCE_USER_SERVICE_USER_ID_INVALID;
 	}
 
 	void OnLogin(UserServiceUserId userId)
@@ -65,14 +65,15 @@ namespace {
 			Input::Mouse::Disable(playerIndex);
 			Audio::SoundSystem::GetInstance()->CloseControllerPort(playerIndex);
 
-			users[playerIndex] = -1;
+			users[playerIndex] = SCE_USER_SERVICE_USER_ID_INVALID;
 		}
 	}
 }
 
 void UserService::Initialize()
 {
-	memset(users, -1, sizeof(UserServiceUserId) * PLAYER_MAX);
+	for (auto i=0; i < PLAYER_MAX; i++)
+		users[i] = SCE_USER_SERVICE_USER_ID_INVALID;
 
 	auto ret = sceUserServiceInitialize(NULL);
 	assert(ret == SCE_OK);
@@ -165,7 +166,7 @@ UserServiceUserId UserService::GetUserByPlayerIndex(int playerIndex)
 	if (playerIndex < 0 || playerIndex >= PLAYER_MAX)
 	{
 		printf("ERROR: Invalid player index %d in %s\n", playerIndex, __FUNCTION__);
-		return -1;
+		return SCE_USER_SERVICE_USER_ID_INVALID;
 	}
 
 	return users[playerIndex];
