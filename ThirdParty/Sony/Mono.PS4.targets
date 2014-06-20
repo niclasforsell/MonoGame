@@ -42,7 +42,7 @@
        <CustomAdditionalCompileOutputs>$CustomAdditionalCompileOutputs;$(AotOutputPath)\$(TargetFileName)</CustomAdditionalCompileOutputs>
        -->
 
-       <MonoDebugFlag Condition="'$(Optimize)' == 'true'">--debug</MonoDebugFlag>
+       <MonoDebugFlag Condition="'$(Optimize)' != 'true'">--debug</MonoDebugFlag>
 
     </PropertyGroup>
 
