@@ -72,19 +72,21 @@
   <ItemGroup>
     <ClCompile Include="main.c" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\..\MonoGame.PS4\ThirdParty\Sony\scePlayStation4\bin\$(Configuration)\scePlayStation4.prx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <Import Condition="'$(ConfigurationType)' == 'Makefile' and Exists('$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets')" Project="$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+
+  <!-- Copy content and PRX files over from the game project --> 
   <ItemGroup>
-    <ArtContent Include="..\bin\$(Platform)\$(Configuration)\Content\**\*.*" />
+	<ContentFiles Include="..\bin\$(Platform)\$(Configuration)\Content\**\*.*" />
+	<PrxFiles Include="..\bin\$(Platform)\$(Configuration)\*.prx" />
   </ItemGroup>
-  <Target Name="ArtContentCopy" AfterTargets="Build" Inputs="@(ArtContent)" Outputs="$(OutputPath)Content\%(RecursiveDir)%(Filename)%(Extension)">
-    <Copy SourceFiles="@(ArtContent)" DestinationFolder="$(OutputPath)Content\%(RecursiveDir)" />
+  <Target Name="ContentFilesCopy" AfterTargets="Build" Inputs="@(ContentFiles)" Outputs="$(OutputPath)Content\%(RecursiveDir)%(Filename)%(Extension)">
+    <Copy SourceFiles="@(ContentFiles)" DestinationFolder="$(OutputPath)Content\%(RecursiveDir)" />
   </Target>
+  <Target Name="PrxFilesCopy" AfterTargets="Build" Inputs="@(PrxFiles)" Outputs="$(OutputPath)%(Filename)%(Extension)">
+    <Copy SourceFiles="@(PrxFiles)" DestinationFolder="$(OutputPath)" />
+  </Target>
+
 </Project>
