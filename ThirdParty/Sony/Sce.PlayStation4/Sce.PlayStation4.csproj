@@ -88,6 +88,12 @@
     <Compile Include="WebBrowserDialog.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\scePlayStation4\bin\$(Configuration)\scePlayStation4.prx">
+      <Link>scePlayStation4.prx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
