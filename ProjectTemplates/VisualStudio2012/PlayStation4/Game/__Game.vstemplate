@@ -5,7 +5,7 @@
     <CreateNewFolder>true</CreateNewFolder>
   </TemplateData>
   <TemplateContent>
-    <Project ReplaceParameters="false" File="Game1.csproj">
+    <Project ReplaceParameters="true" File="Game1.csproj">
       <Folder Name="Content" />
       <Folder Name="Properties">
         <ProjectItem ReplaceParameters="true">AssemblyInfo.cs</ProjectItem>
