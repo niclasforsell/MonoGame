@@ -11,8 +11,9 @@
     <RootNamespace>$safeprojectname$</RootNamespace>
     <AssemblyName>$safeprojectname$</AssemblyName>
     <FileAlignment>512</FileAlignment>
-	<AotOutputPath>$(ProjectDir)..\Launcher\bin\$(Configuration)</AotOutputPath>
-	<AotIntermediateOutputPath>$(ProjectDir)..\Launcher\aot\$(Configuration)</AotIntermediateOutputPath>
+    <AotOutputPath>$(ProjectDir)..\Launcher\bin\$(Configuration)</AotOutputPath>
+    <AotIntermediateOutputPath>$(ProjectDir)..\Launcher\aot\$(Configuration)</AotIntermediateOutputPath>
+    <AotMachineName>$(MONO_PS4_BUILDER)</AotMachineName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|ORBIS' ">
     <PlatformTarget>AnyCPU</PlatformTarget>

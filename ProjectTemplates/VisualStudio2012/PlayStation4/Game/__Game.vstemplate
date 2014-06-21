@@ -1,17 +1,21 @@
-<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
     <ProjectType>CSharp</ProjectType>
+    <RequiredFrameworkVersion>4.0</RequiredFrameworkVersion>
     <SortOrder>1000</SortOrder>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>PlayStation4Game</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
   </TemplateData>
   <TemplateContent>
-    <Project ReplaceParameters="false" File="Game1.csproj">
-      <Folder Name="Content" />
-      <Folder Name="Properties">
-        <ProjectItem ReplaceParameters="true">AssemblyInfo.cs</ProjectItem>
+    <Project File="Game1.csproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" TargetFileName="Game1.cs" OpenInEditor="true">Game1.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Program.cs">Program.cs</ProjectItem>
+      <Folder Name="Properties" TargetFolderName="Properties">
+        <ProjectItem ReplaceParameters="true" TargetFileName="AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
       </Folder>
-      <ProjectItem ReplaceParameters="true">Game1.cs</ProjectItem>
-      <ProjectItem ReplaceParameters="true">Program.cs</ProjectItem>
     </Project>
   </TemplateContent>
 </VSTemplate>

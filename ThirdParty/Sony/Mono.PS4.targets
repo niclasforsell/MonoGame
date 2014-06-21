@@ -1,75 +1,94 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project 
+  InitialTargets="MonoPS4_CheckConfiguration;MonoPS4_CheckAOTConfiguration"
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  
   <PropertyGroup>
-    <MonoPS4BclPath>$(Mono_PS4)\bcl\</MonoPS4BclPath>
+    <MonoPS4Path Condition=" '$(MonoPS4Path)' == '' ">$(Mono_PS4)</MonoPS4Path>      
+    <MonoPS4BclPath>$(MonoPS4Path)\bcl\</MonoPS4BclPath>
   </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(OutputType)' == 'Exe' ">
+    <AotMachineName Condition=" '$(AotMachineName)' == '' ">$(MONO_PS4_BUILDER)</AotMachineName>
+    <MonoOptimize Condition=" '$(Optimize)' != 'true' ">--debug</MonoOptimize>
+  </PropertyGroup>
+ 
+  
+  <Target Name="MonoPS4_CheckConfiguration">
 
-  <Target Name="MonoPS4_ResolveBclAssemblies" BeforeTargets="ResolveReferences">
+    <Error Condition=" '$(OutputType)' != 'Exe' and '$(OutputType)' != 'Library' "
+      Text="Mono.PS4 only supports Exe or Library project types!" />
+    
+    <Error Condition=" '$(MonoPS4Path)' == '' "
+      Text="The property MonoPS4Path or the environment variable MONO_PS4 must be set to the Mono.PS4 SDK path!" />
+    
+    <Error Condition=" !Exists('$(MonoPS4Path)') "
+      Text="The Mono.PS4 SDK path '$(MonoPS4Path)' is not valid!" />
+    
+    <Error Condition=" !Exists('$(MonoPS4BclPath)') "
+      Text="Cannot find the BCL directory in the Mono.PS4 SDK path '$(MonoPS4Path)'!" />
+
+    <Message Text="MonoPS4Path=$(MonoPS4Path)" Importance="Low" />
+    <Message Text="MonoPS4BclPath=$(MonoPS4BclPath)" Importance="Low" />
+
+  </Target>
+  
+  
+  <Target Name="MonoPS4_CheckAOTConfiguration" Condition=" '$(OutputType)' == 'Exe' ">
+
+    <Error Condition=" '$(AotIntermediateOutputPath)' == '' "
+      Text="The property AotIntermediateOutputPath must be set to the output path where the AOT intermediate files are copied!" />
+    
+    <Error Condition=" '$(AotOutputPath)' == '' "
+      Text="The property AotOutputPath must be set to the output path where the AOT compiled assemblies are copied!" />
+    
+    <Error Condition=" '$(AotMachineName)' == '' "
+      Text="The property AotMachineName or the environment variable MONO_PS4_BUILDER must be set to the name of the AOT build machine!" />
+
+    <Message Text="AotIntermediateOutputPath=$(AotIntermediateOutputPath)" Importance="Low" />
+    <Message Text="AotOutputPath=$(AotOutputPath)" Importance="Low" />
+    <Message Text="AotMachineName=$(AotMachineName)" Importance="Low" />
+    <Message Text="MonoOptimize=$(MonoOptimize)" Importance="Low" />
+
+  </Target>
+  
+  
+  <Target Name="MonoPS4_ResolveBclAssemblies" 
+          BeforeTargets="ResolveReferences">
 
     <ItemGroup>
-    
+      
       <!-- Convert references and explicit references over to PS4 BCL references. -->
-      <_MonoBclReference Include="@(Reference->'$(MonoPS4BclPath)%(Identity).dll')" Condition="Exists('$(MonoPS4BclPath)%(Identity).dll')" />
-      <_MonoBclReference Include="@(_ExplicitReference->'$(MonoPS4BclPath)%(Filename)%(Extension)')" Condition="Exists('$(MonoPS4BclPath)%(Filename)%(Extension)')" />
+      <MonoBclReference Include="@(Reference->'$(MonoPS4BclPath)%(Identity).dll')" Condition="Exists('$(MonoPS4BclPath)%(Identity).dll')" />
+      <MonoBclReference Include="@(_ExplicitReference->'$(MonoPS4BclPath)%(Filename)%(Extension)')" Condition="Exists('$(MonoPS4BclPath)%(Filename)%(Extension)')" />
 
       <!-- Remove any references we converted over to Mono BCL. -->
       <_ExplicitReference Remove="@(_ExplicitReference)" Condition="Exists('$(MonoPS4BclPath)%(Filename)%(Extension)')" />
       <Reference Remove="@(Reference)" Condition="Exists('$(MonoPS4BclPath)%(Identity).dll')" />
 
       <!-- Add the Mono BCL references to the explicit references. -->
-      <_ExplicitReference Include="@(_MonoBclReference)" />
+      <_ExplicitReference Include="@(MonoBclReference)" />
 
     </ItemGroup>
-
-    <!--
-    <Message Text="Reference: @(Reference)" Importance="high"/>
-    <Message Text="_ExplicitReference: @(_ExplicitReference)" Importance="high"/>
-    -->
-
+    
+    <Message Text="MonoPS4 References=@(Reference)" Importance="Low"/>
+    <Message Text="MonoPS4 ExplicitReferences=@(_ExplicitReference)" Importance="Low"/>
+    
   </Target>
-
-  <Target Name="MonoPS4_AOTValidate" BeforeTargets="BeforeCompile" Condition=" '$(OutputType)' == 'Exe' ">
-
-    <Error Condition="'$(AotIntermediateOutputPath)' == ''"
-	Text="You must define %24(AotIntermediateOutputPath) to point to the output path where the AOT intermediate files are copied!" />
-    <Error Condition="'$(AotOutputPath)' == ''"
-	Text="You must define %24(AotOutputPath) to point to the output path where the AOT compiled managed assemblies are copied!" />
-
-    <PropertyGroup>
-
-       <!-- Add our AOT output to the additional includes, so that it will force a rebuild -->
-       <!--
-       <CustomAdditionalCompileOutputs>$CustomAdditionalCompileOutputs;$(AotOutputPath)\$(TargetFileName)</CustomAdditionalCompileOutputs>
-       -->
-
-       <MonoDebugFlag Condition="'$(Optimize)' == 'true'">--debug</MonoDebugFlag>
-
-    </PropertyGroup>
-
-  </Target>
-
-  <Target	Name="MonoPS4_AOTCompile" 
-		AfterTargets="CoreBuild"
-		Condition=" '$(OutputType)' == 'Exe' ">
-
-    <!--
-    <Message Text="(Inputs) = $(TargetPath)" Importance="high"/>
-    <Message Text="(Outputs) = $(AotOutputPath)\$(TargetFileName)" Importance="high"/>
-    -->
+  
+  <Target	Name="MonoPS4_AOTCompile"
+    AfterTargets="CoreBuild"        
+    Condition=" '$(OutputType)' == 'Exe' ">
 
     <Message Text="Executing Mono.PS4 AOT..." Importance="high"/>
-
+    
     <!-- Ensure the output paths exist as psbuild will crash otherwise! -->
     <MakeDir Directories="$(AotOutputPath)" />
     <MakeDir Directories="$(AotIntermediateOutputPath)" />
 
-    <Exec Command="$(MONO_PS4)\bin\psbuild.exe $(MonoDebugFlag) --incremental=$(ProjectGuid)_$(Configuration) $(MONO_PS4)\bcl $(TargetDir) $(AotIntermediateOutputPath) $(AotOutputPath) $(MONO_PS4_BUILDER)" />
+    <!-- Kick off the AOT process... -->
+    <Exec Command="$(MonoPS4Path)\bin\psbuild.exe $(MonoOptimize) --incremental=$(ProjectGuid)_$(Configuration) $(MonoPS4BclPath) $(TargetDir) $(AotIntermediateOutputPath) $(AotOutputPath) $(AotMachineName)" />
 
   </Target>
-
-  <!--
-  <Target Name="MonoPS4Clean" AfterTargets="Clean" Condition=" '$(OutputType)' == 'Exe' ">
-  </Target>
-  -->
-
+  
 </Project>
