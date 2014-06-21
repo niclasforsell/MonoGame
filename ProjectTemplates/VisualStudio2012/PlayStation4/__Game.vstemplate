@@ -1,22 +1,26 @@
-<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="ProjectGroup">
+<VSTemplate Version="3.0.0" Type="ProjectGroup" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
     <Name>MonoGame PlayStation4 Project</Name>
     <Description>A MonoGame game project for PlayStation 4.</Description>
-    <ProjectType>CSharp</ProjectType>
-    <SortOrder>1000</SortOrder>
-    <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>Game</DefaultName>
-    <ProvideDefaultName>true</ProvideDefaultName>
-    <LocationField>Enabled</LocationField>
-    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
     <Icon>__TemplateIcon.png</Icon>
     <PreviewImage>__PreviewImage.png</PreviewImage>
+    <ProjectType>CSharp</ProjectType>
+    <RequiredFrameworkVersion>4.0</RequiredFrameworkVersion>
+    <SortOrder>1000</SortOrder>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>PlayStation4Game</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
   </TemplateData>
   <TemplateContent>
     <ProjectCollection>
-        <ProjectTemplateLink ProjectName="$safeprojectname$">Game\__Game.vstemplate</ProjectTemplateLink>
-        <ProjectTemplateLink ProjectName="Launcher">Launcher\__Launcher.vstemplate</ProjectTemplateLink>
+      <ProjectTemplateLink ProjectName="$safeprojectname$">
+          Game\__Game.vstemplate
+        </ProjectTemplateLink>
+      <ProjectTemplateLink ProjectName="Launcher">
+          Launcher\__Launcher.vstemplate
+        </ProjectTemplateLink>
     </ProjectCollection>
   </TemplateContent>
 </VSTemplate>
