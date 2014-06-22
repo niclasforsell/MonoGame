@@ -37,6 +37,7 @@ void IndexBuffer::SetData(GraphicsSystem *system, int32_t offsetInBytes, uint8_t
 	if (discard)
 		system->_discardBuffer(this);
 
+	assert(_actualSize >= _requiredSize);
 	assert(offsetInBytes + bytes <= _requiredSize);
 	memcpy(_bufferData + offsetInBytes, data, bytes);
 }

@@ -79,6 +79,7 @@ void VertexBuffer::SetData(GraphicsSystem *system, int32_t offsetInBytes, unsign
 	if (discard)
 		system->_discardBuffer(this);
 
+	assert(_actualSize >= _requiredSize);
 	assert(offsetInBytes + bytes <= _requiredSize);
 
 	memcpy(_bufferData + offsetInBytes, data, bytes);
