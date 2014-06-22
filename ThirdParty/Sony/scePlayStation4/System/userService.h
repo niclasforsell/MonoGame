@@ -19,6 +19,8 @@ public:
 
 	static int GetPlayerIndexByUserId(UserServiceUserId userId);
 	static UserServiceUserId GetUserByPlayerIndex(int playerIndex);
+
+	static UserServiceUserId GetInitialUser();
 };
 
 } // namespace System

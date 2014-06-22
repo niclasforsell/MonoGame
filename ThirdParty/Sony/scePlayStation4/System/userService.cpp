@@ -171,3 +171,13 @@ UserServiceUserId UserService::GetUserByPlayerIndex(int playerIndex)
 
 	return users[playerIndex];
 }
+
+UserServiceUserId UserService::GetInitialUser()
+{
+	UserServiceUserId result;
+	auto error = sceUserServiceGetInitialUser(&result);
+	if(error < SCE_OK)
+		return SCE_USER_SERVICE_USER_ID_INVALID;
+
+	return result;
+}
