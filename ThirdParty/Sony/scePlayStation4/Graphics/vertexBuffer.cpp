@@ -15,10 +15,10 @@ using namespace Graphics;
 VertexBuffer::VertexBuffer(int32_t *elements, int32_t elementCount, int32_t vertexStride, int32_t vertexCount)
 {
 	_actualSize = _requiredSize = vertexStride * vertexCount;
-	_bufferData = (uint8_t*)Allocator::Get()->allocate(_actualSize, Gnm::kAlignmentOfBufferInBytes, SCE_KERNEL_WC_GARLIC);
+	_bufferData = mem::allocShared<uint8_t>(_actualSize, Gnm::kAlignmentOfBufferInBytes);
 
 	_bufferCount = elementCount;
-	_buffers = (Gnm::Buffer*)Allocator::Get()->allocate(sizeof(Gnm::Buffer) * _bufferCount);
+	_buffers = mem::alloc_array<Gnm::Buffer>(_bufferCount);
 	
 	auto offset = 0;
 	for (auto i=0; i < _bufferCount; i++)
@@ -37,8 +37,8 @@ VertexBuffer::VertexBuffer(int32_t *elements, int32_t elementCount, int32_t vert
 
 VertexBuffer::~VertexBuffer()
 {
-	Allocator::Get()->release(_buffers);	
-	Allocator::Get()->release(_bufferData);
+	mem::free(_buffers);
+	mem::freeShared(_bufferData);
 }
 
 sce::Gnm::DataFormat VertexBuffer::GetFormat(VertexElement element)

@@ -89,7 +89,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 	}
 
 	auto kStencilFormat = depthFormat_ == DepthFormat_Depth24Stencil8 ? Gnm::kStencil8 : Gnm::kStencilInvalid;
-	_displayBuffers = (DisplayBuffer*)Allocator::Get()->allocate(sizeof(DisplayBuffer) * kDisplayBufferCount);
+	_displayBuffers = mem::alloc_array<DisplayBuffer>(kDisplayBufferCount);
 
 	for(uint32_t i=0; i<kDisplayBufferCount; ++i)
 	{
@@ -104,10 +104,9 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		}
 
 		// Allocate the CUE heap memory
-		_displayBuffers[i].cueHeap = Allocator::Get()->allocate(
+		_displayBuffers[i].cueHeap = mem::allocShared(
 			Gnmx::ConstantUpdateEngine::computeHeapSize(kCueRingEntries),
-			Gnm::kAlignmentOfBufferInBytes,
-			SCE_KERNEL_WC_GARLIC);
+			Gnm::kAlignmentOfBufferInBytes);
 
 		if( !_displayBuffers[i].cueHeap )
 		{
@@ -116,10 +115,9 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		}
 
 		// Allocate the draw command buffer
-		_displayBuffers[i].dcbBuffer = Allocator::Get()->allocate(
+		_displayBuffers[i].dcbBuffer = mem::alloc(
 			kDcbSizeInBytes,
-			Gnm::kAlignmentOfBufferInBytes,
-			SCE_KERNEL_WB_ONION);
+			Gnm::kAlignmentOfBufferInBytes);
 
 		if( !_displayBuffers[i].dcbBuffer )
 		{
@@ -128,10 +126,9 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		}
 
 		// Allocate the constants command buffer
-		_displayBuffers[i].ccbBuffer = Allocator::Get()->allocate(
+		_displayBuffers[i].ccbBuffer = mem::alloc(
 			kCcbSizeInBytes,
-			Gnm::kAlignmentOfBufferInBytes,
-			SCE_KERNEL_WB_ONION);
+			Gnm::kAlignmentOfBufferInBytes);
 
 		if( !_displayBuffers[i].ccbBuffer )
 		{
@@ -182,7 +179,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 			NULL);
 
 		// Allocate the render target memory
-		_surfaceAddresses[i] = Allocator::Get()->allocate(sizeAlign, SCE_KERNEL_WC_GARLIC);
+		_surfaceAddresses[i] = mem::allocShared(sizeAlign);
 		if( !_surfaceAddresses[i] )
 		{
 			printf("Cannot allocate the render target memory\n");
@@ -227,7 +224,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 			// Initialize the HTILE buffer, if enabled
 			if( kHtileEnabled )
 			{
-				void *htileMemory = Allocator::Get()->allocate(htileSizeAlign, SCE_KERNEL_WC_GARLIC);
+				void *htileMemory = mem::allocShared(htileSizeAlign);
 				if( !htileMemory )
 				{
 					printf("Cannot allocate the HTILE buffer\n");
@@ -241,7 +238,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 			void *stencilMemory = NULL;
 			if( kStencilFormat != Gnm::kStencilInvalid )
 			{
-				stencilMemory = Allocator::Get()->allocate(stencilSizeAlign, SCE_KERNEL_WC_GARLIC);
+				stencilMemory = mem::allocShared(stencilSizeAlign);
 				if( !stencilMemory )
 				{
 					printf("Cannot allocate the stencil buffer\n");
@@ -250,7 +247,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 			}
 
 			// Allocate the depth buffer
-			void *depthMemory = Allocator::Get()->allocate(depthTargetSizeAlign, SCE_KERNEL_WC_GARLIC);
+			void *depthMemory = mem::allocShared(depthTargetSizeAlign);
 			if( !depthMemory )
 			{
 				printf("Cannot allocate the depth buffer\n");
@@ -259,7 +256,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 			_displayBuffers[i].depthTarget.setAddresses(depthMemory, stencilMemory);
 		}
 
-		_displayBuffers[i].state = (volatile uint32_t*) Allocator::Get()->allocate(4, 8, SCE_KERNEL_WB_ONION);
+		_displayBuffers[i].state = mem::alloc<volatile uint32_t>(4, 8);
 		if( !_displayBuffers[i].state )
 		{
 			printf("Cannot allocate a GPU label\n");
@@ -541,7 +538,7 @@ void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint
 	// have to allocate a new one.
 	if (bestBuffer == NULL)
 	{
-		buffer = (uint8_t*)Allocator::Get()->allocate(requiredSize, Gnm::kAlignmentOfBufferInBytes, SCE_KERNEL_WC_GARLIC);
+		buffer = mem::allocShared<uint8_t>(requiredSize, Gnm::kAlignmentOfBufferInBytes);
 		actualSize = requiredSize;
 		return;
 	}

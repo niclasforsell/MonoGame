@@ -25,7 +25,7 @@ RenderTarget* RenderTarget::Create(TextureFormat format_, int32_t width, int32_t
 		Gnm::kNumFragments1,
 		NULL, NULL);
 
-	void *rtData = Allocator::Get()->allocate(renTargetSizeAlign, SCE_KERNEL_WC_GARLIC);
+	void *rtData = mem::allocShared(renTargetSizeAlign);
 	renderTarget->setAddresses(rtData, 0, 0);;
 
 	result->_texture = new sce::Gnm::Texture();
@@ -60,10 +60,10 @@ RenderTarget* RenderTarget::Create(TextureFormat format_, int32_t width, int32_t
 	// Initialize the stencil buffer, if enabled
 	void *stencilMemory = NULL;
 	if( kStencilFormat != Gnm::kStencilInvalid )
-		stencilMemory = Allocator::Get()->allocate(stencilSizeAlign, SCE_KERNEL_WC_GARLIC);
+		stencilMemory = mem::allocShared(stencilSizeAlign);
 
 	// Allocate the depth buffer
-	void *depthMemory = Allocator::Get()->allocate(depthTargetSizeAlign, SCE_KERNEL_WC_GARLIC);
+	void *depthMemory = mem::allocShared(depthTargetSizeAlign);
 	result->_depthTarget->setAddresses(depthMemory, stencilMemory);
 
 	return result;
@@ -88,12 +88,12 @@ RenderTarget::~RenderTarget()
 {
 	if (_depthTarget)
 	{
-		Allocator::Get()->release(_depthTarget->getStencilReadAddress());
-		Allocator::Get()->release(_depthTarget->getZReadAddress());
+		mem::freeShared(_depthTarget->getStencilReadAddress());
+		mem::freeShared(_depthTarget->getZReadAddress());
 		delete _depthTarget;
 	}
 
-	Allocator::Get()->release(_renderTarget->getBaseAddress());
+	mem::freeShared(_renderTarget->getBaseAddress());
 	delete _renderTarget;
 	delete _texture;
 }

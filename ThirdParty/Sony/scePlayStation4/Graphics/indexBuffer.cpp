@@ -18,7 +18,7 @@ IndexBuffer::IndexBuffer(IndexElement type, int32_t indexCount)
 	_indexCount = indexCount;
 
 	_actualSize = _requiredSize = indexCount * (type == IndexElement_SixteenBits ? sizeof(uint16_t) : sizeof(uint32_t));
-	_bufferData = (uint8_t*)Allocator::Get()->allocate(_actualSize, Gnm::kAlignmentOfBufferInBytes, SCE_KERNEL_WC_GARLIC);
+	_bufferData = mem::allocShared<uint8_t>(_actualSize, Gnm::kAlignmentOfBufferInBytes);
 
 	// TODO: Should we clear the buffer to zeros?  Maybe we
 	// should clear it to 0xd34db33f in debug modes to ensure
@@ -28,7 +28,7 @@ IndexBuffer::IndexBuffer(IndexElement type, int32_t indexCount)
 
 IndexBuffer::~IndexBuffer()
 {
-	Allocator::Get()->release(_bufferData);
+	mem::freeShared(_bufferData);
 }
 
 void IndexBuffer::SetData(GraphicsSystem *system, int32_t offsetInBytes, uint8_t *data, int32_t bytes, bool discard)
