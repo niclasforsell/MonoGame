@@ -67,7 +67,11 @@ AudioBuffer* AudioBuffer::FromRIFF(void* data, size_t dataSize)
 
 	memcpy(result->_loopedWaveformInfo, result->_waveformInfo, sizeof(SceNgs2WaveformInfo));
 
-	for(auto x = 0; x < result->_loopedWaveformInfo->numBlocks; x++)
+	auto x = 0;
+	if (result->_loopedWaveformInfo->loopBeginPosition != 0)
+		x++;
+
+	for(; x < result->_loopedWaveformInfo->numBlocks; x++)
 		result->_loopedWaveformInfo->aBlock[x].numRepeats = SCE_NGS2_WAVEFORM_BLOCK_REPEAT_INFINITE;
 
 	return result;
