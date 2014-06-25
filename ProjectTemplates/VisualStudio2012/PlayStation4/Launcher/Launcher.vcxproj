@@ -76,17 +76,4 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-
-  <!-- Copy content and PRX files over from the game project --> 
-  <ItemGroup>
-	<ContentFiles Include="..\bin\$(Platform)\$(Configuration)\Content\**\*.*" />
-	<PrxFiles Include="..\bin\$(Platform)\$(Configuration)\*.prx" />
-  </ItemGroup>
-  <Target Name="ContentFilesCopy" AfterTargets="Build" Inputs="@(ContentFiles)" Outputs="$(OutputPath)Content\%(RecursiveDir)%(Filename)%(Extension)">
-    <Copy SourceFiles="@(ContentFiles)" DestinationFolder="$(OutputPath)Content\%(RecursiveDir)" />
-  </Target>
-  <Target Name="PrxFilesCopy" AfterTargets="Build" Inputs="@(PrxFiles)" Outputs="$(OutputPath)%(Filename)%(Extension)">
-    <Copy SourceFiles="@(PrxFiles)" DestinationFolder="$(OutputPath)" />
-  </Target>
-
 </Project>
