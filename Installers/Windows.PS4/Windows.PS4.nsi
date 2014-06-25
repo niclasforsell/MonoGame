@@ -1,7 +1,5 @@
 SetCompressor /SOLID /FINAL lzma
 
-!include "header.nsh"
-!define INSTALLERFILENAME "MonoGame.PS4"
 !define APPNAME "MonoGame.PS4"
 
 !include "Sections.nsh"
@@ -9,7 +7,7 @@ SetCompressor /SOLID /FINAL lzma
 !include "InstallOptions.nsh"
 
 !define FrameworkPath "..\"
-!define VERSION "3"
+!define VERSION "3.0"
 !define INSTALLERVERSION "3.0"
 !define REVISION "0.0"
 
@@ -17,8 +15,8 @@ SetCompressor /SOLID /FINAL lzma
 
 !define MUI_UNICON "${FrameworkPath}\monogame.ico"
 
-Name '${APPNAME} ${INSTALLERVERSION}'
-OutFile '${INSTALLERFILENAME}Installer-${INSTALLERVERSION}.exe'
+Name '${APPNAME}'
+OutFile 'MonoGameForPS4Installer.exe'
 InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
 !define MSBuildInstallDir '$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}'
 VIProductVersion "${VERSION}.${REVISION}"
@@ -161,8 +159,6 @@ LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your 
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${CoreComponents} $(CoreComponentsDesc)
-  !insertmacro MUI_DESCRIPTION_TEXT ${OpenAL} $(OpenALDesc)
-  !insertmacro MUI_DESCRIPTION_TEXT ${MonoDevelop} $(MonoDevelopDesc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2012} $(VS2012Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2013} $(VS2013Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${Menu} $(MenuDesc)
