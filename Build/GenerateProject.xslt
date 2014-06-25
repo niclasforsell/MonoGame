@@ -9,6 +9,7 @@
   <xsl:output method="xml" indent="no" />
 
   <msxsl:script language="C#" implements-prefix="user">
+    <msxsl:assembly name="System.Core" />
     <msxsl:assembly name="System.Web" />
     <msxsl:using namespace="System" />
     <msxsl:using namespace="System.Web" />
@@ -31,6 +32,63 @@
       {
         return ex.Message;
       }
+    }
+
+    public bool ProjectAndServiceIsActive(
+      string platformString,
+      string includePlatformString,
+      string excludePlatformString,
+      string serviceString,
+      string includeServiceString,
+      string excludeServiceString,
+      string activePlatform,
+      string activeServicesString)
+    {
+      if (!ProjectIsActive(platformString, includePlatformString, excludePlatformString, activePlatform))
+      {
+        return false;
+      }
+      
+      var activeServices = activeServicesString.Split(',');
+    
+      // Choose either <Services> or <IncludeServices>
+      if (string.IsNullOrEmpty(serviceString))
+      {
+        serviceString = includeServiceString;
+      }
+
+      // If the exclude string is set, then we must check this first.
+      if (!string.IsNullOrEmpty(excludeServiceString))
+      {
+        var excludeServices = excludeServiceString.Split(',');
+        foreach (var i in excludeServices)
+        {
+          if (System.Linq.Enumerable.Contains(activeServices, i))
+          {
+            // This service is excluded.
+            return false;
+          }
+        }
+      }
+
+      // If the service string is empty at this point, then we allow
+      // all services since there's no whitelist of services configured.
+      if (string.IsNullOrEmpty(serviceString))
+      {
+        return true;
+      }
+
+      // Otherwise ensure the service is in the include list.
+      var services = serviceString.Split(',');
+      foreach (var i in services)
+      {
+        if (System.Linq.Enumerable.Contains(activeServices, i))
+        {
+          return true;
+        }
+      }
+
+      return false;
     }
 
     public bool ProjectIsActive(
@@ -95,8 +153,28 @@
       }
     }
 
+    public bool HasXamarinMac()
+    {
+      return System.IO.File.Exists("/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/XamMac.dll");
+    }
+
     ]]>
   </msxsl:script>
+
+  <xsl:variable name="assembly_name">
+    <xsl:choose>
+      <xsl:when test="/Input/Properties/AssemblyName
+	        /Platform[@Name=/Input/Generation/Platform]">
+        <xsl:value-of select="/Input/Properties/AssemblyName/Platform[@Name=/Input/Generation/Platform]" />
+      </xsl:when>
+      <xsl:when test="/Input/Properties/AssemblyName">
+        <xsl:value-of select="/Input/Properties/AssemblyName" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="/Input/Projects/Project[@Name=/Input/Generation/ProjectName]/@Name" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
 
   <xsl:template name="profile_and_version"
     xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -167,6 +245,16 @@
     xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <xsl:param name="type" />
     <xsl:param name="debug" />
+    <xsl:param name="config" />
+    <xsl:param name="platform" />
+    <PropertyGroup>
+      <xsl:attribute name="Condition">
+        <xsl:text> '$(Configuration)|$(Platform)' == '</xsl:text>
+        <xsl:value-of select="$config" />
+	<xsl:text>|</xsl:text>
+	<xsl:value-of select="$platform" />
+        <xsl:text>' </xsl:text>
+      </xsl:attribute>
     <xsl:choose>
       <xsl:when test="$debug = 'true'">
         <DebugSymbols>true</DebugSymbols>
@@ -177,40 +265,36 @@
       </xsl:otherwise>
     </xsl:choose>
     <DebugType>full</DebugType>
-    <OutputPath>
+    <xsl:variable name="platform_path">
       <xsl:choose>
         <xsl:when test="$type = 'Website'">
-          <xsl:text>bin</xsl:text>
+          <xsl:text></xsl:text>
         </xsl:when>
         <xsl:when test="user:IsTrue(/Input/Properties/PlatformSpecificOutputFolder)">
-          <xsl:text>bin\</xsl:text>
           <xsl:value-of select="/Input/Generation/Platform" />
-          <xsl:text>\$(Platform)\$(Configuration)</xsl:text>
+	  <xsl:text>\</xsl:text>
+	  <xsl:value-of select="$platform" />
+	  <xsl:text>\</xsl:text>
+	  <xsl:value-of select="$config" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:text>bin\$(Configuration)</xsl:text>
+          <xsl:value-of select="$config" />
         </xsl:otherwise>
       </xsl:choose>
-    </OutputPath>
-    <IntermediateOutputPath>
-      <xsl:choose>
-        <xsl:when test="$type = 'Website'">
-          <xsl:text>obj</xsl:text>
-        </xsl:when>
-        <xsl:when test="user:IsTrue(/Input/Properties/PlatformSpecificOutputFolder)">
-          <xsl:text>obj\</xsl:text>
-          <xsl:value-of select="/Input/Generation/Platform" />
-          <xsl:text>\$(Platform)\$(Configuration)</xsl:text>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>obj\$(Configuration)</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </IntermediateOutputPath>
+    </xsl:variable>
+    <OutputPath><xsl:text>bin\</xsl:text><xsl:copy-of select="$platform_path" /></OutputPath>
+    <IntermediateOutputPath><xsl:text>obj\</xsl:text><xsl:copy-of select="$platform_path" /></IntermediateOutputPath>
+    <DocumentationFile><xsl:text>bin\</xsl:text><xsl:copy-of select="$platform_path" /><xsl:text>\</xsl:text><xsl:copy-of select="$assembly_name" /><xsl:text>.xml</xsl:text></DocumentationFile>
     <DefineConstants>
       <xsl:if test="$debug = 'true'">
         <xsl:text>DEBUG;</xsl:text>
       </xsl:if>
+      <xsl:for-each select="/Input/Services/Service[@Project=/Input/Generation/ProjectName]">
+        <xsl:for-each select="./AddDefines/AddDefine">
+          <xsl:value-of select="." />
+          <xsl:text>;</xsl:text>
+        </xsl:for-each>
+      </xsl:for-each>
       <xsl:choose>
         <xsl:when test="/Input/Properties/CustomDefinitions">
           <xsl:for-each select="/Input/Properties/CustomDefinitions/Platform">
@@ -250,6 +334,9 @@
             </xsl:when>
             <xsl:when test="/Input/Generation/Platform = 'WindowsPhone'">
               <xsl:text>PLATFORM_WINDOWSPHONE</xsl:text>
+            </xsl:when>
+            <xsl:when test="/Input/Generation/Platform = 'Web'">
+              <xsl:text>PLATFORM_WEB</xsl:text>
             </xsl:when>
           </xsl:choose>
           <xsl:text>;</xsl:text>
@@ -297,10 +384,28 @@
         <EnableCodeSigning>False</EnableCodeSigning>
         <CreatePackage>False</CreatePackage>
         <EnablePackageSigning>False</EnablePackageSigning>
-        <IncludeMonoRuntime>False</IncludeMonoRuntime>
+        <xsl:choose>
+          <xsl:when test="user:HasXamarinMac()">
+            <xsl:choose>
+              <xsl:when test="/Input/Properties/IncludeMonoRuntimeOnMac">
+                <IncludeMonoRuntime><xsl:value-of select="/Input/Properties/IncludeMonoRuntimeOnMac" /></IncludeMonoRuntime>
+	            <xsl:if test="/Input/Properties/MonoMacRuntimeLinkMode">
+	              <LinkMode><xsl:value-of select="/Input/Properties/MonoMacRuntimeLinkMode" /></LinkMode>
+	            </xsl:if>
+              </xsl:when>
+              <xsl:otherwise>
+                <IncludeMonoRuntime>False</IncludeMonoRuntime>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <IncludeMonoRuntime>False</IncludeMonoRuntime>
+          </xsl:otherwise>
+        </xsl:choose>
         <UseSGen>False</UseSGen>
       </xsl:when>
     </xsl:choose>
+    </PropertyGroup>
   </xsl:template>
 
   <xsl:template match="/">
@@ -356,6 +461,19 @@
           <xsl:when test="/Input/Generation/Platform = 'iOS'">
             <ProjectTypeGuids>
               <xsl:text>{6BC8ED88-2882-458C-8E55-DFD12B67127B};</xsl:text>
+              <xsl:text>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</xsl:text>
+            </ProjectTypeGuids>
+          </xsl:when>
+          <xsl:when test="/Input/Generation/Platform = 'MacOS'">
+            <ProjectTypeGuids>
+              <xsl:choose>
+                <xsl:when test="user:HasXamarinMac()">
+                  <xsl:text>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
               <xsl:text>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</xsl:text>
             </ProjectTypeGuids>
           </xsl:when>
@@ -450,21 +568,9 @@
             </xsl:otherwise>
           </xsl:choose>
         </RootNamespace>
-        <AssemblyName>
-          <xsl:choose>
-            <xsl:when test="/Input/Properties/AssemblyName
-                      /Platform[@Name=/Input/Generation/Platform]">
-              <xsl:value-of select="/Input/Properties/AssemblyName
-                                                      /Platform[@Name=/Input/Generation/Platform]
-                                                      " />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$project/@Name" />
-            </xsl:otherwise>
-          </xsl:choose>
-
-        </AssemblyName>
+        <AssemblyName><xsl:copy-of select="$assembly_name" /></AssemblyName>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<NoWarn><xsl:value-of select="/Input/Properties/NoWarn" /></NoWarn>
         <xsl:call-template name="profile_and_version" />
         <xsl:choose>
           <xsl:when test="/Input/Generation/Platform = 'Android' or /Input/Generation/Platform = 'Ouya'">
@@ -503,7 +609,9 @@
             </xsl:choose>
           </xsl:when>
           <xsl:when test="/Input/Generation/Platform = 'MacOS'">
-            <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
+            <xsl:if test="user:HasXamarinMac() = false()">
+              <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
+            </xsl:if>
           </xsl:when>
           <xsl:when test="/Input/Generation/Platform = 'WindowsPhone'">
             <xsl:choose>
@@ -539,153 +647,110 @@
       </PropertyGroup>
       <xsl:choose>
         <xsl:when test="/Input/Generation/Platform = 'iOS'">
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">true</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">false</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">true</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">false</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">false</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">false</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">true</xsl:with-param>
+            <xsl:with-param name="config">Debug</xsl:with-param>
+            <xsl:with-param name="platform">iPhone</xsl:with-param>
+          </xsl:call-template>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">false</xsl:with-param>
+            <xsl:with-param name="config">Release</xsl:with-param>
+            <xsl:with-param name="platform">iPhone</xsl:with-param>
+          </xsl:call-template>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">true</xsl:with-param>
+            <xsl:with-param name="config">Debug</xsl:with-param>
+            <xsl:with-param name="platform">iPhoneSimulator</xsl:with-param>
+          </xsl:call-template>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">false</xsl:with-param>
+            <xsl:with-param name="config">Release</xsl:with-param>
+            <xsl:with-param name="platform">iPhoneSimulator</xsl:with-param>
+          </xsl:call-template>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">false</xsl:with-param>
+            <xsl:with-param name="config">Ad-Hoc</xsl:with-param>
+            <xsl:with-param name="platform">iPhone</xsl:with-param>
+          </xsl:call-template>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">false</xsl:with-param>
+            <xsl:with-param name="config">AppStore</xsl:with-param>
+            <xsl:with-param name="platform">iPhone</xsl:with-param>
+          </xsl:call-template>
         </xsl:when>
         <xsl:when test="/Input/Generation/Platform = 'WindowsPhone'">
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">true</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">false</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">true</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">false</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|ARM' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">true</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|ARM' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">false</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">true</xsl:with-param>
+            <xsl:with-param name="config">Debug</xsl:with-param>
+            <xsl:with-param name="platform">AnyCPU</xsl:with-param>
+          </xsl:call-template>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">false</xsl:with-param>
+            <xsl:with-param name="config">Release</xsl:with-param>
+            <xsl:with-param name="platform">AnyCPU</xsl:with-param>
+          </xsl:call-template>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">true</xsl:with-param>
+            <xsl:with-param name="config">Debug</xsl:with-param>
+            <xsl:with-param name="platform">x86</xsl:with-param>
+          </xsl:call-template>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">false</xsl:with-param>
+            <xsl:with-param name="config">Release</xsl:with-param>
+            <xsl:with-param name="platform">x86</xsl:with-param>
+          </xsl:call-template>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">true</xsl:with-param>
+            <xsl:with-param name="config">Debug</xsl:with-param>
+            <xsl:with-param name="platform">ARM</xsl:with-param>
+          </xsl:call-template>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">false</xsl:with-param>
+            <xsl:with-param name="config">Release</xsl:with-param>
+            <xsl:with-param name="platform">ARM</xsl:with-param>
+          </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">true</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
-          <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-            <xsl:call-template name="configuration">
-              <xsl:with-param name="type">
-                <xsl:value-of select="$project/@Type" />
-              </xsl:with-param>
-              <xsl:with-param name="debug">false</xsl:with-param>
-            </xsl:call-template>
-          </PropertyGroup>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">true</xsl:with-param>
+            <xsl:with-param name="config">Debug</xsl:with-param>
+            <xsl:with-param name="platform">AnyCPU</xsl:with-param>
+          </xsl:call-template>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+            <xsl:with-param name="debug">false</xsl:with-param>
+            <xsl:with-param name="config">Release</xsl:with-param>
+            <xsl:with-param name="platform">AnyCPU</xsl:with-param>
+          </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
       <xsl:if test="/Input/Properties/ForceArchitecture">
-        <PropertyGroup>
-          <xsl:attribute name="Condition">
-            <xsl:text> '$(Configuration)|$(Platform)' == 'Debug|</xsl:text>
-            <xsl:value-of select="/Input/Properties/ForceArchitecture" />
-            <xsl:text>' </xsl:text>
-          </xsl:attribute>
-          <xsl:call-template name="configuration">
-            <xsl:with-param name="type">
-              <xsl:value-of select="$project/@Type" />
-            </xsl:with-param>
-            <xsl:with-param name="debug">true</xsl:with-param>
-          </xsl:call-template>
-        </PropertyGroup>
-        <PropertyGroup>
-          <xsl:attribute name="Condition">
-            <xsl:text> '$(Configuration)|$(Platform)' == 'Release|</xsl:text>
-            <xsl:value-of select="/Input/Properties/ForceArchitecture" />
-            <xsl:text>' </xsl:text>
-          </xsl:attribute>
-          <xsl:call-template name="configuration">
-            <xsl:with-param name="type">
-              <xsl:value-of select="$project/@Type" />
-            </xsl:with-param>
-            <xsl:with-param name="debug">false</xsl:with-param>
-          </xsl:call-template>
-        </PropertyGroup>
+        <xsl:call-template name="configuration">
+          <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+          <xsl:with-param name="debug">true</xsl:with-param>
+          <xsl:with-param name="config">Debug</xsl:with-param>
+          <xsl:with-param name="platform"><xsl:value-of select="/Input/Properties/ForceArchitecture" /></xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="configuration">
+          <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
+          <xsl:with-param name="debug">false</xsl:with-param>
+          <xsl:with-param name="config">Release</xsl:with-param>
+          <xsl:with-param name="platform"><xsl:value-of select="/Input/Properties/ForceArchitecture" /></xsl:with-param>
+        </xsl:call-template>
       </xsl:if>
-
       <xsl:choose>
         <xsl:when test="$project/@Type = 'Website'">
           <Import>
@@ -730,6 +795,17 @@
           </Reference>
         </xsl:if>
 
+        <xsl:if test="/Input/Generation/Platform = 'MacOS'">
+          <xsl:choose>
+            <xsl:when test="user:HasXamarinMac()">
+              <Reference Include="XamMac" />
+            </xsl:when>
+            <xsl:otherwise>
+              <Reference Include="MonoMac" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+
         <xsl:for-each select="$project/References/Reference">
           <xsl:variable name="include-path" select="./@Include" />
           <xsl:if test="
@@ -761,31 +837,59 @@
                 select="/Input/Projects/ExternalProject[@Name=$include-name]" />
 
               <xsl:for-each select="$extern/Reference">
-                <Reference>
-                  <xsl:attribute name="Include">
-                    <xsl:value-of select="@Include" />
-                  </xsl:attribute>
-                  <xsl:if test="@Aliases != ''">
-                    <Aliases><xsl:value-of select="@Aliases" /></Aliases>
-                  </xsl:if>
-                </Reference>
-              </xsl:for-each>
-              <xsl:for-each select="$extern/Platform
-                                      [@Type=/Input/Generation/Platform]">
-                <xsl:for-each select="./Reference">
+                <xsl:variable name="refd-name" select="@Include" />
+                <xsl:if test="count(/Input/Projects/Project[@Name=refd-name]) = 0">
                   <Reference>
                     <xsl:attribute name="Include">
                       <xsl:value-of select="@Include" />
                     </xsl:attribute>
-                    <xsl:if test="@Aliases != ''">
-                      <Aliases><xsl:value-of select="@Aliases" /></Aliases>
-                    </xsl:if>
+                    <xsl:for-each select="./Alias">
+                      <xsl:if test="@Platform = /Input/Generation/Platform">
+                        <Aliases><xsl:value-of select="." /></Aliases>
+                      </xsl:if>
+                    </xsl:for-each>
                   </Reference>
+                </xsl:if>
+              </xsl:for-each>
+              <xsl:for-each select="$extern/Platform
+                                      [@Type=/Input/Generation/Platform]">
+                <xsl:for-each select="./Reference">
+                  <xsl:variable name="refd-name" select="@Include" />
+                  <xsl:if test="count(/Input/Projects/Project[@Name=refd-name]) = 0">
+                    <Reference>
+                      <xsl:attribute name="Include">
+                        <xsl:value-of select="@Include" />
+                      </xsl:attribute>
+                      <xsl:for-each select="./Alias">
+                        <xsl:if test="@Platform = /Input/Generation/Platform">
+                          <Aliases><xsl:value-of select="." /></Aliases>
+                        </xsl:if>
+                      </xsl:for-each>
+                    </Reference>
+                  </xsl:if>
                 </xsl:for-each>
               </xsl:for-each>
             </xsl:if>
           </xsl:if>
         </xsl:for-each>
+
+        <xsl:if test="/Input/Generation/Platform = 'Web'">
+          <Reference>
+            <xsl:attribute name="Include">
+              <xsl:text>JSIL.Meta</xsl:text>
+            </xsl:attribute>
+            <HintPath>
+              <xsl:value-of select="/Input/Generation/JSILDirectory" />
+              <xsl:if test="/Input/Generation/HostPlatform = 'Linux' or /Input/Generation/HostPlatform = 'MacOS'">
+                <xsl:text>/</xsl:text>
+              </xsl:if>
+              <xsl:if test="/Input/Generation/HostPlatform = 'Windows'">
+                <xsl:text>\</xsl:text>
+              </xsl:if>
+              <xsl:text>JSIL.Meta.dll</xsl:text>
+            </HintPath>
+          </Reference>
+        </xsl:if>
 
 		<!-- _ExplicitReference style references -->
         <xsl:for-each select="$project/References/Reference">
@@ -826,9 +930,11 @@
                   <xsl:attribute name="Include">
                     <xsl:value-of select="@Name" />
                   </xsl:attribute>
-                  <xsl:if test="@Aliases != ''">
-                    <Aliases><xsl:value-of select="@Aliases" /></Aliases>
-                  </xsl:if>
+                  <xsl:for-each select="./Alias">
+                    <xsl:if test="@Platform = /Input/Generation/Platform">
+                      <Aliases><xsl:value-of select="." /></Aliases>
+                    </xsl:if>
+                  </xsl:for-each>
                   <HintPath>
                     <xsl:value-of
                       select="user:GetRelativePath(
@@ -843,7 +949,6 @@
                   </HintPath>
                 </Reference>
               </xsl:for-each>
-
               <xsl:for-each select="$extern/Platform
                                       [@Type=/Input/Generation/Platform]">
                 <xsl:for-each select="./Binary">
@@ -851,9 +956,11 @@
                     <xsl:attribute name="Include">
                       <xsl:value-of select="@Name" />
                     </xsl:attribute>
-                    <xsl:if test="@Aliases != ''">
-                      <Aliases><xsl:value-of select="@Aliases" /></Aliases>
-                    </xsl:if>
+                    <xsl:for-each select="./Alias">
+                      <xsl:if test="@Platform = /Input/Generation/Platform">
+                        <Aliases><xsl:value-of select="." /></Aliases>
+                      </xsl:if>
+                    </xsl:for-each>
                     <HintPath>
                       <xsl:value-of
                         select="user:GetRelativePath(
@@ -896,11 +1003,15 @@
 
       <ItemGroup>
         <xsl:for-each select="$project/Files/Compile">
-          <xsl:if test="user:ProjectIsActive(
+          <xsl:if test="user:ProjectAndServiceIsActive(
               ./Platforms,
               ./IncludePlatforms,
               ./ExcludePlatforms,
-              /Input/Generation/Platform)">
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
             <xsl:element
               name="{name()}"
               namespace="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -915,11 +1026,15 @@
 
       <ItemGroup>
         <xsl:for-each select="$project/Files/None">
-          <xsl:if test="user:ProjectIsActive(
+          <xsl:if test="user:ProjectAndServiceIsActive(
               ./Platforms,
               ./IncludePlatforms,
               ./ExcludePlatforms,
-              /Input/Generation/Platform)">
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
             <xsl:element
               name="{name()}"
               namespace="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -934,11 +1049,15 @@
 
       <ItemGroup>
         <xsl:for-each select="$project/Files/Content">
-          <xsl:if test="user:ProjectIsActive(
+          <xsl:if test="user:ProjectAndServiceIsActive(
               ./Platforms,
               ./IncludePlatforms,
               ./ExcludePlatforms,
-              /Input/Generation/Platform)">
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
             <xsl:element
               name="{name()}"
               namespace="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -953,11 +1072,15 @@
 
       <ItemGroup>
         <xsl:for-each select="$project/Files/EmbeddedResource">
-          <xsl:if test="user:ProjectIsActive(
+          <xsl:if test="user:ProjectAndServiceIsActive(
               ./Platforms,
               ./IncludePlatforms,
               ./ExcludePlatforms,
-              /Input/Generation/Platform)">
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
             <xsl:element
               name="{name()}"
               namespace="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -972,11 +1095,60 @@
 
       <ItemGroup>
         <xsl:for-each select="$project/Files/EmbeddedShaderProgram">
-          <xsl:if test="user:ProjectIsActive(
+          <xsl:if test="user:ProjectAndServiceIsActive(
               ./Platforms,
               ./IncludePlatforms,
               ./ExcludePlatforms,
-              /Input/Generation/Platform)">
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
+            <xsl:element
+              name="{name()}"
+              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
+              <xsl:attribute name="Include">
+                <xsl:value-of select="@Include" />
+              </xsl:attribute>
+              <xsl:apply-templates select="node()"/>
+            </xsl:element>
+          </xsl:if>
+        </xsl:for-each>
+      </ItemGroup>
+
+      <xsl:if test="/Input/Generation/Platform = 'Web'">
+        <xsl:if test="$project/@Type = 'App' or $project/@Type = 'Console' or $project/@Type = 'GUI' or $project/@Type = 'GTK'">
+          <ItemGroup>
+            <xsl:for-each select="/Input/Generation/JSILLibraries/Library">
+              <None>
+                <xsl:attribute name="Include">
+                  <xsl:value-of select="./@Path" />
+                </xsl:attribute>
+                <Link>
+                  <xsl:text>Libraries\</xsl:text>
+                  <xsl:value-of select="./@Name" />
+                </Link>
+                <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+              </None>
+            </xsl:for-each>
+            <None Include="index.htm">
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+          </ItemGroup>
+        </xsl:if>
+      </xsl:if>
+
+      <ItemGroup>
+        <xsl:for-each select="$project/Files/ShaderProgram">
+          <xsl:if test="user:ProjectAndServiceIsActive(
+              ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
             <xsl:element
               name="{name()}"
               namespace="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -990,85 +1162,85 @@
       </ItemGroup>
 
       <ItemGroup>
-        <xsl:for-each select="$project/Files/ShaderProgram">
-          <xsl:if test="user:ProjectIsActive(
-              ./Platforms,
-              ./IncludePlatforms,
-              ./ExcludePlatforms,
-              /Input/Generation/Platform)">
-            <xsl:element
-              name="{name()}"
-              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
-              <xsl:attribute name="Include">
-                <xsl:value-of select="@Include" />
-              </xsl:attribute>
-              <xsl:apply-templates select="node()"/>
-            </xsl:element>
-          </xsl:if>
-        </xsl:for-each>
-      </ItemGroup>
-      <ItemGroup>
         <xsl:for-each select="$project/Files/ApplicationDefinition">
-          <xsl:if test="user:ProjectIsActive(
+          <xsl:if test="user:ProjectAndServiceIsActive(
               ./Platforms,
               ./IncludePlatforms,
               ./ExcludePlatforms,
-              /Input/Generation/Platform)">
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
             <xsl:element
               name="{name()}"
               namespace="http://schemas.microsoft.com/developer/msbuild/2003">
               <xsl:attribute name="Include">
                 <xsl:value-of select="@Include" />
               </xsl:attribute>
-              <Generator>MSBuild:Compile</Generator>
-              <SubType>Designer</SubType>
-              <xsl:apply-templates select="node()"/>
-            </xsl:element>
-          </xsl:if>
-        </xsl:for-each>
-        <xsl:for-each select="$project/Files/Page">
-          <xsl:if test="user:ProjectIsActive(
-              ./Platforms,
-              ./IncludePlatforms,
-              ./ExcludePlatforms,
-              /Input/Generation/Platform)">
-            <xsl:element
-              name="{name()}"
-              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
-              <xsl:attribute name="Include">
-                <xsl:value-of select="@Include" />
-              </xsl:attribute>
-              <Generator>MSBuild:Compile</Generator>
-              <SubType>Designer</SubType>
-              <xsl:apply-templates select="node()"/>
-            </xsl:element>
-          </xsl:if>
-        </xsl:for-each>
-        <xsl:for-each select="$project/Files/AppxManifest">
-          <xsl:if test="user:ProjectIsActive(
-              ./Platforms,
-              ./IncludePlatforms,
-              ./ExcludePlatforms,
-              /Input/Generation/Platform)">
-            <xsl:element
-              name="{name()}"
-              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
-              <xsl:attribute name="Include">
-                <xsl:value-of select="@Include" />
-              </xsl:attribute>
-              <SubType>Designer</SubType>
               <xsl:apply-templates select="node()"/>
             </xsl:element>
           </xsl:if>
         </xsl:for-each>
       </ItemGroup>
+
+      <ItemGroup>
+        <xsl:for-each select="$project/Files/Page">
+          <xsl:if test="user:ProjectAndServiceIsActive(
+              ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
+            <xsl:element
+              name="{name()}"
+              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
+              <xsl:attribute name="Include">
+                <xsl:value-of select="@Include" />
+              </xsl:attribute>
+              <xsl:apply-templates select="node()"/>
+            </xsl:element>
+          </xsl:if>
+        </xsl:for-each>
+      </ItemGroup>
+
+      <ItemGroup>
+        <xsl:for-each select="$project/Files/AppxManifest">
+          <xsl:if test="user:ProjectAndServiceIsActive(
+              ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
+            <xsl:element
+              name="{name()}"
+              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
+              <xsl:attribute name="Include">
+                <xsl:value-of select="@Include" />
+              </xsl:attribute>
+              <xsl:apply-templates select="node()"/>
+            </xsl:element>
+          </xsl:if>
+        </xsl:for-each>
+      </ItemGroup>
+
       <ItemGroup>
         <xsl:for-each select="$project/Files/BundleResource">
-          <xsl:if test="user:ProjectIsActive(
+          <xsl:if test="user:ProjectAndServiceIsActive(
               ./Platforms,
               ./IncludePlatforms,
               ./ExcludePlatforms,
-              /Input/Generation/Platform)">
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
             <xsl:element
               name="{name()}"
               namespace="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -1080,13 +1252,18 @@
           </xsl:if>
         </xsl:for-each>
       </ItemGroup>
+
       <ItemGroup>
         <xsl:for-each select="$project/Files/InterfaceDefinition">
-          <xsl:if test="user:ProjectIsActive(
+          <xsl:if test="user:ProjectAndServiceIsActive(
               ./Platforms,
               ./IncludePlatforms,
               ./ExcludePlatforms,
-              /Input/Generation/Platform)">
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
             <xsl:element
               name="{name()}"
               namespace="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -1098,13 +1275,18 @@
           </xsl:if>
         </xsl:for-each>
       </ItemGroup>
+
       <ItemGroup>
         <xsl:for-each select="$project/Files/AndroidResource">
-          <xsl:if test="user:ProjectIsActive(
+          <xsl:if test="user:ProjectAndServiceIsActive(
               ./Platforms,
               ./IncludePlatforms,
               ./ExcludePlatforms,
-              /Input/Generation/Platform)">
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
             <xsl:element
               name="{name()}"
               namespace="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -1116,6 +1298,53 @@
           </xsl:if>
         </xsl:for-each>
       </ItemGroup>
+
+      <ItemGroup>
+        <xsl:for-each select="$project/Files/SplashScreen">
+          <xsl:if test="user:ProjectAndServiceIsActive(
+              ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
+            <xsl:element
+              name="{name()}"
+              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
+              <xsl:attribute name="Include">
+                <xsl:value-of select="@Include" />
+              </xsl:attribute>
+              <xsl:apply-templates select="node()"/>
+            </xsl:element>
+          </xsl:if>
+        </xsl:for-each>
+      </ItemGroup>
+
+      <ItemGroup>
+        <xsl:for-each select="$project/Files/Resource">
+          <xsl:if test="user:ProjectAndServiceIsActive(
+              ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
+            <xsl:element
+              name="{name()}"
+              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
+              <xsl:attribute name="Include">
+                <xsl:value-of select="@Include" />
+              </xsl:attribute>
+              <xsl:apply-templates select="node()"/>
+            </xsl:element>
+          </xsl:if>
+        </xsl:for-each>
+      </ItemGroup>
+
       <ItemGroup>
         <xsl:for-each select="$project/References/Reference">
           <xsl:variable name="include-path" select="./@Include" />
@@ -1169,6 +1398,28 @@
                       <xsl:value-of select="current()/RelativePath" />
                     </Link>
                   </AndroidAsset>
+                </xsl:when>
+                <xsl:when test="/Input/Generation/Platform = 'MacOS' or /Input/Generation/Platform = 'iOS'">
+                  <Content>
+                    <xsl:attribute name="Include">
+                      <xsl:value-of
+                        select="user:GetRelativePath(
+                      concat(
+                        /Input/Generation/RootPath,
+                        $project/@Path,
+                        '\',
+                        $project/@Name,
+                        '.',
+                        /Input/Generation/Platform,
+                        '.csproj'),
+                      current()/FullPath)" />
+                    </xsl:attribute>
+                    <Link>
+                      <xsl:text>Content</xsl:text>
+                      <xsl:value-of select="current()/RelativePath" />
+                    </Link>
+                    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+                  </Content>
                 </xsl:when>
                 <xsl:otherwise>
                   <None>
@@ -1236,6 +1487,81 @@
         </xsl:otherwise>
       </xsl:choose>
 
+      <xsl:if test="/Input/Generation/Platform = 'Web'">
+        <xsl:if test="$project/@Type = 'App' or $project/@Type = 'Console' or $project/@Type = 'GUI' or $project/@Type = 'GTK'">
+
+          <xsl:choose>
+            <xsl:when test="user:IsTrue(/Input/Generation/Properties/IgnoreWebPlatform)">
+            </xsl:when>
+            <xsl:otherwise>
+              <Target Name="JSILCompile" AfterTargets="AfterBuild">
+                <Exec>
+                  <xsl:attribute name="WorkingDirectory">
+                    <xsl:value-of
+                      select="/Input/Generation/JSILDirectory" />
+                  </xsl:attribute>
+                  <xsl:attribute name="Command">
+                    <xsl:if test="/Input/Generation/HostPlatform = 'Linux' or /Input/Generation/HostPlatform = 'MacOS'">
+                      <xsl:text>mono </xsl:text>
+                    </xsl:if>
+                    <xsl:value-of select="/Input/Generation/JSILCompilerFile" />
+                    <xsl:text> "</xsl:text>
+                    <xsl:value-of select="/Input/Generation/RootPath" />
+                    <xsl:value-of select="$project/@Path" />
+                    <xsl:if test="/Input/Generation/HostPlatform = 'Linux' or /Input/Generation/HostPlatform = 'MacOS'">
+                      <xsl:text>/bin/</xsl:text>
+                      <xsl:if test="user:IsTrue(/Input/Properties/PlatformSpecificOutputFolder)">
+                        <xsl:value-of select="/Input/Generation/Platform" />
+                        <xsl:text>/$(Platform)/</xsl:text>
+                      </xsl:if>
+                      <xsl:text>$(Configuration)/</xsl:text>
+                    </xsl:if>
+                    <xsl:if test="/Input/Generation/HostPlatform = 'Windows'">
+                      <xsl:text>\bin\</xsl:text>
+                      <xsl:if test="user:IsTrue(/Input/Properties/PlatformSpecificOutputFolder)">
+                        <xsl:value-of select="/Input/Generation/Platform" />
+                        <xsl:text>\$(Platform)\</xsl:text>
+                      </xsl:if>
+                      <xsl:text>$(Configuration)\</xsl:text>
+                    </xsl:if>
+                    <xsl:choose>
+                      <xsl:when test="/Input/Properties/AssemblyName">
+                        <xsl:value-of select="/Input/Properties/AssemblyName" />
+                        <xsl:text>.exe</xsl:text>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$project/@Name" />
+                        <xsl:text>.exe</xsl:text>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:text>" --out="</xsl:text>
+                    <xsl:value-of select="/Input/Generation/RootPath" />
+                    <xsl:value-of select="$project/@Path" />
+                    <xsl:if test="/Input/Generation/HostPlatform = 'Linux' or /Input/Generation/HostPlatform = 'MacOS'">
+                      <xsl:text>/bin/</xsl:text>
+                      <xsl:if test="user:IsTrue(/Input/Properties/PlatformSpecificOutputFolder)">
+                        <xsl:value-of select="/Input/Generation/Platform" />
+                        <xsl:text>/$(Platform)/</xsl:text>
+                      </xsl:if>
+                      <xsl:text>$(Configuration)</xsl:text>
+                    </xsl:if>
+                    <xsl:if test="/Input/Generation/HostPlatform = 'Windows'">
+                      <xsl:text>\bin\</xsl:text>
+                      <xsl:if test="user:IsTrue(/Input/Properties/PlatformSpecificOutputFolder)">
+                        <xsl:value-of select="/Input/Generation/Platform" />
+                        <xsl:text>\$(Platform)\</xsl:text>
+                      </xsl:if>
+                      <xsl:text>$(Configuration)</xsl:text>
+                    </xsl:if>
+                    <xsl:text>"</xsl:text>
+                  </xsl:attribute>
+                </Exec>
+              </Target>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+      </xsl:if>
+
       {ADDITIONAL_TRANSFORMS}
 
       <ItemGroup>
@@ -1265,8 +1591,14 @@
                   </xsl:attribute>
                   <Project>{<xsl:value-of select="./@Guid" />}</Project>
                   <Name><xsl:value-of select="./@Name" /></Name>
+                  <xsl:for-each select="./Alias">
+                    <xsl:if test="@Platform = /Input/Generation/Platform">
+                      <Aliases><xsl:value-of select="." /></Aliases>
+                    </xsl:if>
+                  </xsl:for-each>
                 </ProjectReference>
               </xsl:for-each>
+
               <xsl:for-each select="$extern/Platform
                                       [@Type=/Input/Generation/Platform]">
                 <xsl:for-each select="./Project">
@@ -1285,9 +1617,107 @@
                     </xsl:attribute>
                     <Project>{<xsl:value-of select="./@Guid" />}</Project>
                     <Name><xsl:value-of select="./@Name" /></Name>
+                    <xsl:for-each select="./Alias">
+                      <xsl:if test="@Platform = /Input/Generation/Platform">
+                        <Aliases><xsl:value-of select="." /></Aliases>
+                      </xsl:if>
+                    </xsl:for-each>
                   </ProjectReference>
                 </xsl:for-each>
               </xsl:for-each>
+
+              <xsl:for-each select="$extern/Reference">
+                <xsl:variable name="refd-name" select="./@Include" />
+                <xsl:if test="count(/Input/Projects/Project[@Name=$refd-name]) > 0">
+                  <xsl:variable name="refd"
+                    select="/Input/Projects/Project[@Name=$refd-name]" />
+
+                  <xsl:if test="user:ProjectIsActive(
+                    $refd/@Platforms,
+                    '',
+                    '',
+                    /Input/Generation/Platform)">
+
+                    <ProjectReference>
+                      <xsl:attribute name="Include">
+                        <xsl:value-of
+                          select="user:GetRelativePath(
+                            concat(
+                              $project/@Path,
+                              '\',
+                              $project/@Name,
+                              '.',
+                              /Input/Generation/Platform,
+                              '.csproj'),
+                            concat(
+                              $refd/@Path,
+                              '\',
+                              $refd/@Name,
+                              '.',
+                              /Input/Generation/Platform,
+                              '.csproj'))" />
+                      </xsl:attribute>
+                      <Project>{<xsl:value-of select="$refd/@Guid" />}</Project>
+                      <Name><xsl:value-of select="$refd/@Name" /><xsl:text>.</xsl:text><xsl:value-of select="/Input/Generation/Platform" /></Name>
+                      <xsl:for-each select="$refd/Alias">
+                        <xsl:if test="@Platform = /Input/Generation/Platform">
+                          <Aliases><xsl:value-of select="." /></Aliases>
+                        </xsl:if>
+                      </xsl:for-each>
+                    </ProjectReference>
+                  </xsl:if>
+
+                </xsl:if>
+              </xsl:for-each>
+
+
+              <xsl:for-each select="$extern/Platform
+                                      [@Type=/Input/Generation/Platform]">
+                <xsl:for-each select="./Reference">
+                  <xsl:variable name="refd-name" select="./@Include" />
+                  <xsl:if test="count(/Input/Projects/Project[@Name=$refd-name]) > 0">
+                    <xsl:variable name="refd"
+                      select="/Input/Projects/Project[@Name=$refd-name]" />
+
+                    <xsl:if test="user:ProjectIsActive(
+                      $refd/@Platforms,
+                      '',
+                      '',
+                      /Input/Generation/Platform)">
+
+                      <ProjectReference>
+                        <xsl:attribute name="Include">
+                          <xsl:value-of
+                            select="user:GetRelativePath(
+                              concat(
+                                $project/@Path,
+                                '\',
+                                $project/@Name,
+                                '.',
+                                /Input/Generation/Platform,
+                                '.csproj'),
+                              concat(
+                                $refd/@Path,
+                                '\',
+                                $refd/@Name,
+                                '.',
+                                /Input/Generation/Platform,
+                                '.csproj'))" />
+                        </xsl:attribute>
+                        <Project>{<xsl:value-of select="$refd/@Guid" />}</Project>
+                        <Name><xsl:value-of select="$refd/@Name" /><xsl:text>.</xsl:text><xsl:value-of select="/Input/Generation/Platform" /></Name>
+                        <xsl:for-each select="$refd/Alias">
+                          <xsl:if test="@Platform = /Input/Generation/Platform">
+                            <Aliases><xsl:value-of select="." /></Aliases>
+                          </xsl:if>
+                        </xsl:for-each>
+                      </ProjectReference>
+                    </xsl:if>
+
+                  </xsl:if>
+                </xsl:for-each>
+              </xsl:for-each>
+
             </xsl:if>
           </xsl:if>
         </xsl:for-each>
@@ -1326,6 +1756,11 @@
                   </xsl:attribute>
                   <Project>{<xsl:value-of select="/Input/Projects/Project[@Name=$include-path]/@Guid" />}</Project>
                   <Name><xsl:value-of select="@Include" /><xsl:text>.</xsl:text><xsl:value-of select="/Input/Generation/Platform" /></Name>
+                  <xsl:for-each select="./Alias">
+                    <xsl:if test="@Platform = /Input/Generation/Platform">
+                      <Aliases><xsl:value-of select="." /></Aliases>
+                    </xsl:if>
+                  </xsl:for-each>
                 </ProjectReference>
               </xsl:if>
             </xsl:if>
@@ -1337,7 +1772,7 @@
         <ProjectExtensions>
           <MonoDevelop>
             <Properties>
-              <xsl:value-of 
+              <xsl:value-of
                 select="user:ReadFile(concat(/Input/Generation/RootPath, '\', /Input/Properties/MonoDevelopPoliciesFile))"
                 disable-output-escaping="yes" />
             </Properties>

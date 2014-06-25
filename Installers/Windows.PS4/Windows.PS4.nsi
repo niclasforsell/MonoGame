@@ -1,7 +1,5 @@
 SetCompressor /SOLID /FINAL lzma
 
-!include "header.nsh"
-!define INSTALLERFILENAME "MonoGame.PS4"
 !define APPNAME "MonoGame.PS4"
 
 !include "Sections.nsh"
@@ -9,17 +7,18 @@ SetCompressor /SOLID /FINAL lzma
 !include "InstallOptions.nsh"
 
 !define FrameworkPath "..\"
-!define VERSION "3"
+!define VERSION "3.0"
 !define INSTALLERVERSION "3.0"
 !define REVISION "0.0"
 
 !define MUI_ICON "${FrameworkPath}\monogame.ico"
+
 !define MUI_UNICON "${FrameworkPath}\monogame.ico"
 
-Name '${APPNAME} ${INSTALLERVERSION}'
-OutFile '${INSTALLERFILENAME}Installer-${INSTALLERVERSION}.exe'
+Name '${APPNAME} SDK'
+OutFile 'MonoGameForPS4Installer.exe'
 InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
-MSBuildInstallDir '$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}'
+!define MSBuildInstallDir '$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}'
 VIProductVersion "${VERSION}.${REVISION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} Development SDK"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "MonoGame Team"
@@ -41,7 +40,7 @@ RequestExecutionLevel admin
 ;Languages
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "License.txt"
+;!insertmacro MUI_PAGE_LICENSE "License.txt"
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -64,28 +63,24 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   ; be removed after we kill off the old XNA content 
   ; pipeline support.
 
-  SetOutPath $MSBuildInstallDir
+  SetOutPath ${MSBuildInstallDir}
   File '..\monogame.ico'
   File '..\..\ThirdParty\Sony\*.targets'
 
-  ; Install the MonoGame tools to individual subfolders both
-  ; to avoid conflicting assemblies and to make it easy for end
-  ; users to copy all the necessary files for distribution.
-
-  SetOutPath $MSBuildInstallDir\2MGFX
+  
+  ; Install the MonoGame tools to a single shared folder.
+  SetOutPath ${MSBuildInstallDir}\Tools
   File /r '..\..\Tools\2MGFX\bin\x64\Release\*.exe'
   File /r '..\..\Tools\2MGFX\bin\x64\Release\*.dll'
-
-  SetOutPath $MSBuildInstallDir\MGCB
   File /r '..\..\Tools\MGCB\bin\x64\Release\*.exe'
   File /r '..\..\Tools\MGCB\bin\x64\Release\*.dll'
-
-  ; TODO: Add the new Pipeline GUI tool here along with
-  ; registration of file extensions and shortcuts.
+  File /r '..\..\Tools\Pipeline\bin\Windows\Release\*.exe'
+  File /r '..\..\Tools\Pipeline\bin\Windows\Release\*.dll'
+  File /r '..\..\Tools\Pipeline\bin\Windows\Release\Templates'
 
 
   ; Install PlayStation4 Assemblies
-  SetOutPath '$InstallDir\Assemblies\PlayStation4'
+  SetOutPath '$INSTDIR\Assemblies\PlayStation4'
   File '..\..\MonoGame.Framework\bin\PlayStation4\AnyCPU\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\PlayStation4\AnyCPU\Release\*.prx'
   File '..\..\MonoGame.Framework\bin\PlayStation4\AnyCPU\Release\*.pdb'
@@ -100,7 +95,8 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'Publisher' 'MonoGame'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'UninstallString' '$INSTDIR\uninstall.exe'
 
-  SetOutPath '$InstallDir'
+
+  SetOutPath '$INSTDIR'
   File '..\monogame.ico'
 
   WriteUninstaller "uninstall.exe"
@@ -139,11 +135,20 @@ SectionEnd
 Section "Start Menu Shortcuts" Menu
 
 	CreateDirectory $SMPROGRAMS\${APPNAME}
-	CreateShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$InstallDir\uninstall.exe" "" "$InstallDir\uninstall.exe" 0
-	CreateShortCut "$SMPROGRAMS\${APPNAME}\MGCB For PS4.lnk" "$MSBuildInstallDir\MGCB\MGCB.exe" "" "$MSBuildInstallDir\MGCB\MGCB.exe" 0
-	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Web Site.url" "InternetShortcut" "URL" "http://www.monogame.net"
-	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Web Site.url" "InternetShortcut" "IconFile" "$InstallDir\monogame.ico"
-	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Web Site.url" "InternetShortcut" "IconIndex" "0"
+	CreateShortCut "$SMPROGRAMS\${APPNAME}\Uninstall MonoGame.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+	CreateShortCut "$SMPROGRAMS\${APPNAME}\MonoGame Pipeline For PS4.lnk" "${MSBuildInstallDir}\Tools\Pipeline.exe" "" "${MSBuildInstallDir}\Tools\Pipeline.exe" 0
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "URL" "http://www.monogame.net"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconIndex" "0"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "URL" "http://www.monogame.net/documentation"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "IconIndex" "0"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "URL" "http://community.monogame.net/"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "IconIndex" "0"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "URL" "https://github.com/mono/MonoGame/issues"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "IconIndex" "0"
 
 SectionEnd
 
@@ -154,8 +159,6 @@ LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your 
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${CoreComponents} $(CoreComponentsDesc)
-  !insertmacro MUI_DESCRIPTION_TEXT ${OpenAL} $(OpenALDesc)
-  !insertmacro MUI_DESCRIPTION_TEXT ${MonoDevelop} $(MonoDevelopDesc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2012} $(VS2012Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2013} $(VS2013Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${Menu} $(MenuDesc)
@@ -170,14 +173,15 @@ FunctionEnd
 
 Section "Uninstall"
 
-  DeleteRegKey HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}'
+  DeleteRegKey HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME} SDK'
 
   Delete "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame\PlayStation4.zip"
   Delete "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame\PlayStation4.zip"
-  RMDir /r "$MSBuildInstallDir"
+  RMDir /r "${MSBuildInstallDir}"
   RMDir /r "$SMPROGRAMS\${APPNAME}"
 
   Delete "$INSTDIR\Uninstall.exe"
   RMDir /r "$INSTDIR"
 
 SectionEnd
+

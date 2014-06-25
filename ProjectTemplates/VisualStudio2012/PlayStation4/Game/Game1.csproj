@@ -45,16 +45,25 @@
     <Folder Include="Content\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="$(MSBuildProgramFiles32)\MonoGame.PS4\v3.0\Assemblies\PlayStation4\scePlayStation4.prx">
+      <Link>scePlayStation4.prx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="MonoGame.Framework">
-       <HintPath>$(MSBuildExtensionsPath)\MonoGame.PS4\MonoGame.Framework.PlayStation4.dll</HintPath>
+      <HintPath>$(MSBuildProgramFiles32)\MonoGame.PS4\v3.0\Assemblies\PlayStation4\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Sce.PlayStation4">
-       <HintPath>$(MSBuildExtensionsPath)\MonoGame.PS4\Sce.PlayStation4.dll</HintPath>
+      <HintPath>$(MSBuildProgramFiles32)\MonoGame.PS4\v3.0\Assemblies\PlayStation4\Sce.PlayStation4.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="ReadMe.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(MSBuildExtensionsPath)\MonoGame.PS4\Mono.PS4.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\MonoGame.PS4\v3.0\Mono.PS4.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -62,4 +71,23 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <!-- Copy content and PRX files over to the Launcher project -->
+  <Target Name="CollectLauncherFiles" AfterTargets="MonoPS4_AOTCompile">
+	  <ItemGroup>
+		<ContentFiles Include="$(OutputPath)Content\**\*.*" />
+		<PrxFiles Include="$(OutputPath)*.prx" />
+	  </ItemGroup>
+  </Target>
+  <Target	Name="CopyContentFiles" 
+			AfterTargets="CollectLauncherFiles" 
+			Inputs="@(ContentFiles)" 
+			Outputs="..\Launcher\bin\$(Configuration)\Content\%(RecursiveDir)%(Filename)%(Extension)">
+    <Copy SourceFiles="@(ContentFiles)" DestinationFolder="..\Launcher\bin\$(Configuration)Content\%(RecursiveDir)" />
+  </Target>
+  <Target	Name="CopyPrxFiles" 
+			AfterTargets="CollectLauncherFiles" 
+			Inputs="@(PrxFiles)" 
+			Outputs="..\Launcher\bin\$(Configuration)\%(Filename)%(Extension)">
+    <Copy SourceFiles="@(PrxFiles)" DestinationFolder="..\Launcher\bin\$(Configuration)\" />
+  </Target>
 </Project>
