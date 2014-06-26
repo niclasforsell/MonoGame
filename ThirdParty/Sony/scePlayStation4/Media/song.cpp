@@ -12,6 +12,7 @@
 #include <audiodec.h>
 #include <audioout.h>
 #include <sceerror.h>
+#include <string.h>
 
 using namespace Media;
 
@@ -250,8 +251,8 @@ Song::~Song()
 		_state->eventFlag = NULL;
 	}
 
-	Allocator::Get()->release(_state->fileName);
-	Allocator::Get()->release(_state);
+	mem::free(_state->fileName);
+	mem::free(_state);
 
 	printf("Song cleanup complete.\n");
 }
@@ -262,9 +263,9 @@ bool Song::Load(const char* fileName)
 	if (len > FILENAME_MAX || len == 0)
 		return false;
 
-	_state = (Media::SongState*)Allocator::Get()->allocate(sizeof(SongState));
+	_state = mem::alloc<Media::SongState>();
 	memset(_state, 0, sizeof(SongState));
-	_state->fileName = (char*)Allocator::Get()->allocate(len);
+	_state->fileName = mem::alloc<char>(len);
 	strcpy(_state->fileName, fileName);
 
 	return true;

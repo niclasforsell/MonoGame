@@ -39,7 +39,7 @@ VideoRecordingResult VideoRecording::Open(const char* videoFileName, ThreadPrio 
 {
 	if (heap != nullptr)
 	{
-		Allocator::Get()->release(heap);
+		mem::free(heap);
 		heap = nullptr;
 	}
 
@@ -66,7 +66,7 @@ VideoRecordingResult VideoRecording::Open(const char* videoFileName, ThreadPrio 
 	if (heapSize < 0)
 		return (VideoRecordingResult)heapSize;
 
-	heap = Allocator::Get()->allocate(heapSize);
+	heap = mem::alloc(heapSize);
 
 	char videoPath[FILENAME_MAX];
 	memset(videoPath, 0, FILENAME_MAX);
@@ -90,8 +90,11 @@ VideoRecordingResult VideoRecording::Close(bool discardRecording)
 {
 	auto ret = (VideoRecordingResult)sceVideoRecordingClose(discardRecording);
 
-	Allocator::Get()->release(heap);
-	heap = nullptr;
+	if (heap != nullptr)
+	{
+		mem::free(heap);
+		heap = nullptr;
+	}
 
 	return ret;
 }

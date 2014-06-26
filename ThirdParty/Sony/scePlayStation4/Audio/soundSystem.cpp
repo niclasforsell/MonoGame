@@ -21,7 +21,7 @@ SoundSystem* SoundSystem::GetInstance()
 
 static int32_t bufferAlloc(SceNgs2ContextBufferInfo *bufferInfo)
 {
-	bufferInfo->hostBuffer = Allocator::Get()->allocate(bufferInfo->hostBufferSize);
+	bufferInfo->hostBuffer = mem::alloc(bufferInfo->hostBufferSize);
 	printf("# Allocate (%p,%zd[byte])\n", bufferInfo->hostBuffer, bufferInfo->hostBufferSize);
 	return (bufferInfo->hostBuffer)? SCE_OK : SCE_NGS2_ERROR_EMPTY_BUFFER;
 }
@@ -29,7 +29,7 @@ static int32_t bufferAlloc(SceNgs2ContextBufferInfo *bufferInfo)
 static int32_t bufferFree(SceNgs2ContextBufferInfo *bufferInfo)
 {
 	printf("# Free (%p,%zd[byte])\n", bufferInfo->hostBuffer, bufferInfo->hostBufferSize);
-	Allocator::Get()->release(bufferInfo->hostBuffer);
+	mem::free(bufferInfo->hostBuffer);
 	return SCE_OK;
 }
 

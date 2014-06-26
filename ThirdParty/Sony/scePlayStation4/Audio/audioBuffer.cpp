@@ -16,8 +16,8 @@ AudioBuffer* AudioBuffer::FromPCM(void* data, size_t dataSize, int sampleRate, i
 
 	auto result = new AudioBuffer();
 
-	result->_waveformInfo = (SceNgs2WaveformInfo*)Allocator::Get()->allocate(sizeof(SceNgs2WaveformInfo));
-	result->_waveformData = Allocator::Get()->allocate(dataSize);
+	result->_waveformInfo = new SceNgs2WaveformInfo();
+	result->_waveformData = mem::alloc(dataSize);
 	memcpy(result->_waveformData, data, dataSize);
 
 	int numSamples = (dataSize / numChannels) / 2;
@@ -43,7 +43,7 @@ AudioBuffer* AudioBuffer::FromPCM(void* data, size_t dataSize, int sampleRate, i
 	result->_waveformInfo->aBlock[0].reserved = 0;
 	result->_waveformInfo->aBlock[0].userData = 0;
 
-	result->_loopedWaveformInfo = (SceNgs2WaveformInfo*)Allocator::Get()->allocate(sizeof(SceNgs2WaveformInfo));
+	result->_loopedWaveformInfo = mem::alloc<SceNgs2WaveformInfo>();
 	memcpy(result->_loopedWaveformInfo, result->_waveformInfo, sizeof(SceNgs2WaveformInfo));
 	result->_loopedWaveformInfo->aBlock[0].numRepeats = SCE_NGS2_WAVEFORM_BLOCK_REPEAT_INFINITE;
 
@@ -54,11 +54,11 @@ AudioBuffer* AudioBuffer::FromRIFF(void* data, size_t dataSize)
 {
 	auto result = new AudioBuffer();
 
-	result->_waveformData = Allocator::Get()->allocate(dataSize);
+	result->_waveformData = mem::alloc(dataSize);
 	memcpy(result->_waveformData, data, dataSize);
 
-	result->_waveformInfo = (SceNgs2WaveformInfo*)Allocator::Get()->allocate(sizeof(SceNgs2WaveformInfo));
-	result->_loopedWaveformInfo = (SceNgs2WaveformInfo*)Allocator::Get()->allocate(sizeof(SceNgs2WaveformInfo));
+	result->_waveformInfo = new SceNgs2WaveformInfo();
+	result->_loopedWaveformInfo = mem::alloc<SceNgs2WaveformInfo>();
 
 	int errorCode;
 
@@ -67,7 +67,11 @@ AudioBuffer* AudioBuffer::FromRIFF(void* data, size_t dataSize)
 
 	memcpy(result->_loopedWaveformInfo, result->_waveformInfo, sizeof(SceNgs2WaveformInfo));
 
-	for(auto x = 0; x < result->_loopedWaveformInfo->numBlocks; x++)
+	auto x = 0;
+	if (result->_loopedWaveformInfo->loopBeginPosition != 0)
+		x++;
+
+	for(; x < result->_loopedWaveformInfo->numBlocks; x++)
 		result->_loopedWaveformInfo->aBlock[x].numRepeats = SCE_NGS2_WAVEFORM_BLOCK_REPEAT_INFINITE;
 
 	return result;
@@ -77,19 +81,19 @@ AudioBuffer::~AudioBuffer(void)
 {
 	if (_waveformData)
 	{
-		Allocator::Get()->release(_waveformData);
+		mem::free(_waveformData);
 		_waveformData = NULL;
 	}
 
 	if (_waveformInfo)
 	{
-		Allocator::Get()->release(_waveformInfo);
+		delete _waveformInfo;
 		_waveformInfo = NULL;
 	}
 
 	if (_loopedWaveformInfo)
 	{
-		Allocator::Get()->release(_loopedWaveformInfo);
+		mem::free(_loopedWaveformInfo);
 		_loopedWaveformInfo = NULL;
 	}
 }
