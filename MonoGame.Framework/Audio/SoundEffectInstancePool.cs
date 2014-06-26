@@ -81,7 +81,8 @@ namespace Microsoft.Xna.Framework.Audio
             _playingInstances.Remove(inst);
 
 #if PLAYSTATION4
-            Sce.PlayStation4.Audio.SoundSystem.Instance.DestroyVoice(inst._voice);
+            inst._voice.Dispose();
+            inst._voice = null;
 #endif
         }
 
