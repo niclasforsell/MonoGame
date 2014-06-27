@@ -9,6 +9,8 @@ class CS_API UserService
 {
 	UserService() {}
 
+	static bool _initialized;
+
 public:
 	static void Initialize();
 	static void Terminate();
