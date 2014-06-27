@@ -20,12 +20,12 @@ OutFile 'MonoGameForPS4Installer.exe'
 InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
 !define MSBuildInstallDir '$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}'
 VIProductVersion "${VERSION}.${REVISION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} Development SDK"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} SDK"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "The MonoGame Team"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${INSTALLERVERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} Installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "� Copyright The MonoGame Team 2014"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} SDK Installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © The MonoGame Team"
 
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
@@ -135,7 +135,9 @@ SectionEnd
 Section "Start Menu Shortcuts" Menu
 
 	CreateDirectory $SMPROGRAMS\${APPNAME}
+	SetOutPath "$INSTDIR"
 	CreateShortCut "$SMPROGRAMS\${APPNAME}\Uninstall MonoGame.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+	SetOutPath "${MSBuildInstallDir}\Tools"
 	CreateShortCut "$SMPROGRAMS\${APPNAME}\MonoGame Pipeline For PS4.lnk" "${MSBuildInstallDir}\Tools\Pipeline.exe" "" "${MSBuildInstallDir}\Tools\Pipeline.exe" 0
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "URL" "http://www.monogame.net"
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
