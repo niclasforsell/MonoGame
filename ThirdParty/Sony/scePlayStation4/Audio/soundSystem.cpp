@@ -163,7 +163,7 @@ void SoundSystem::SubmitPlaybackEvent(SamplerVoice* voiceHandle, AudioBuffer *bu
 	// configuration.
 	if (evt == PlaybackEvent::Play || evt == PlaybackEvent::Resume)
 	{
-		uint32_t stateFlags = SCE_NGS2_VOICE_STATE_FLAG_STOPPED;
+		uint32_t stateFlags = SCE_NGS2_VOICE_STATE_FLAG_ERROR;
 		errorCode = sceNgs2VoiceGetStateFlags(handle, &stateFlags);
 		assert(errorCode >= 0);
 
