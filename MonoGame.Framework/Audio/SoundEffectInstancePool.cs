@@ -76,17 +76,17 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 _pooledInstances.Add(inst);
                 inst._effect = null;
+
+#if PLAYSTATION4
+                if (inst._voice != null)
+                {
+                    inst._voice.Dispose();
+                    inst._voice = null;
+                }
+#endif
             }
 
             _playingInstances.Remove(inst);
-
-#if PLAYSTATION4
-            if (inst._voice != null)
-            {
-                inst._voice.Dispose();
-                inst._voice = null;
-            }
-#endif
         }
 
         /// <summary>
