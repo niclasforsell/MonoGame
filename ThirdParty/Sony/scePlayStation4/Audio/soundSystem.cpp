@@ -216,6 +216,7 @@ void SoundSystem::DestroyVoice(SamplerVoice* voice)
 		SubmitPlaybackEvent(voice, NULL, PlaybackEvent::StopImmediate);
 
 	((std::queue<unsigned int>*)_freeVoiceIDs)->push(voice->_voiceHandleID);
+	voice->_voiceHandleID = 0;
 }
 
 void SoundSystem::OpenControllerPort(int playerIdx, uint32_t userID)
