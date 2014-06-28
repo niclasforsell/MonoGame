@@ -163,10 +163,17 @@ void SoundSystem::SubmitPlaybackEvent(SamplerVoice* voiceHandle, AudioBuffer *bu
 	// configuration.
 	if (evt == PlaybackEvent::Play || evt == PlaybackEvent::Resume)
 	{
+		uint32_t stateFlags = SCE_NGS2_VOICE_STATE_FLAG_STOPPED;
+		errorCode = sceNgs2VoiceGetStateFlags(handle, &stateFlags);
+		assert(errorCode >= 0);
+
 		// In XNA, Play can be used to resume a paused sound 
 		// as well as resume. This isn't the case on PS4, so 
 		// always ensure we're performing the correct operation.
-		evt = voiceHandle->GetState() == SoundState::Paused ? PlaybackEvent::Resume : PlaybackEvent::Play;
+		if (stateFlags & SCE_NGS2_VOICE_STATE_FLAG_PAUSED)
+			evt = PlaybackEvent::Resume;
+		else
+			evt = PlaybackEvent::Play;
 
 		if (portHandle == -1 && _masteringPadVoiceHandle[portHandle] != 0)
 			errorCode = sceNgs2VoicePatch(handle, 0, _masteringVoiceHandle, 0);
