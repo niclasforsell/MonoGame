@@ -17,14 +17,10 @@ namespace {
 	const int PLAYER_MAX = 4;
 	const int SYSTEM_UI_SLEEP_MICROSEC = 5000;
 
-	bool isActive;
 	KeyboardState states[PLAYER_MAX];
 
 	void HandleKeyboard(void* arg, const SceImeEvent* e)
 	{
-		auto userId = e->param.keycode.userId;
-		auto playerIndex = System::UserService::GetPlayerIndexByUserId(userId);
-
 		auto usbKeyCode = (uint8_t)e->param.keycode.keycode;
 		auto virtKeyCode = toVKcode[usbKeyCode];
 		auto mask = (uint32_t)1 << (((uint32_t)virtKeyCode) & 0x1f);
@@ -35,17 +31,35 @@ namespace {
 		case SCE_IME_KEYBOARD_EVENT_ABORT:
 			// Per the sceImeKeyboardOpen docs, an abort event can occur immediately
 			// after calling open, in which case we should close and re-open.
-			Keyboard::Restart();
+			break;
+
+		case SCE_IME_KEYBOARD_EVENT_DISCONNECTION:
+			{
+				auto userId = e->param.resourceIdArray.userId;
+				auto playerIndex = System::UserService::GetPlayerIndexByUserId(userId);
+				if (playerIndex < 0)
+				{
+					printf("WARNING: User %d not found for keyboard disconnect event.\n", userId);
+					return;
+				}
+
+				// Clear the keyboard state for the one player.
+				assert(playerIndex < PLAYER_MAX);
+				memset(&states[playerIndex], 0, sizeof(KeyboardState));
+			}
 			break;
 
 		case SCE_IME_KEYBOARD_EVENT_KEYCODE_DOWN:
 			{
+				auto userId = e->param.keycode.userId;
+				auto playerIndex = System::UserService::GetPlayerIndexByUserId(userId);
 				if (playerIndex < 0)
 				{
 					printf("WARNING: User %d not found for keydown event.\n", userId);
 					return;
 				}
 
+				assert(playerIndex < PLAYER_MAX);
 				auto state = &states[playerIndex];
 				switch(keys)
 				{
@@ -63,12 +77,15 @@ namespace {
 
 		case SCE_IME_KEYBOARD_EVENT_KEYCODE_UP:
 			{
+				auto userId = e->param.keycode.userId;
+				auto playerIndex = System::UserService::GetPlayerIndexByUserId(userId);
 				if (playerIndex < 0)
 				{
 					printf("WARNING: User %d not found for keyup event.\n", userId);
 					return;
 				}
 
+				assert(playerIndex < PLAYER_MAX);
 				auto state = &states[playerIndex];
 				switch(keys)
 				{
@@ -114,21 +131,12 @@ void Keyboard::Initialize()
 	// Allow for tracking multiple keyboards in parallel by opening the
 	// special everyone user and tracking the user id from the update handler.
 	auto ret = sceImeKeyboardOpen(SCE_USER_SERVICE_USER_ID_EVERYONE, &param);
-
-	// If we're waiting on the system UI, the first call may return
-	// a not active error. The docs suggest periodically retrying in
-	// that case.
-	while (ret == SCE_IME_ERROR_NOT_ACTIVE)
+	if (ret == SCE_IME_ERROR_NOT_ACTIVE)
 	{
-		sceKernelUsleep(SYSTEM_UI_SLEEP_MICROSEC);
-		ret = sceImeKeyboardOpen(SCE_USER_SERVICE_USER_ID_EVERYONE, &param);
+		// This can happen... don't worry we'll 
+		// retry on the next update!
 	}
-
-	if (ret == SCE_OK)
-	{
-		isActive = true;
-	}
-	else
+	else if (ret != SCE_OK)
 	{
 		printf("ERROR: Couldn't open keyboard: 0x%08X\n", ret);
 	}
@@ -136,48 +144,41 @@ void Keyboard::Initialize()
 
 void Keyboard::Terminate()
 {
-	isActive = false;
-	sceSysmoduleUnloadModule(SCE_SYSMODULE_LIBIME);
-}
-
-void Keyboard::Restart()
-{
 	sceImeKeyboardClose(SCE_USER_SERVICE_USER_ID_EVERYONE);
-	Initialize();
+	sceSysmoduleUnloadModule(SCE_SYSMODULE_LIBIME);
+	memset(states, 0, sizeof(KeyboardState) * PLAYER_MAX);
 }
 
 void Keyboard::Update()
 {
-	if (!isActive)
-		return;
-
 	auto ret = sceImeUpdate(HandleKeyboard);
-	if (ret == SCE_IME_ERROR_CONNECTION_FAILED)
+	if (ret == SCE_IME_ERROR_NOT_OPENED)
 	{
-		// This semi-fatal error occurs when plugging in the keyboard and then
-		// selecting a user. It doesn't appear to be documented, but handling
-		// it similarly to the abort message appears to work.
-		isActive = false;
-		Restart();
+		// Try initializing again for the next frame.
+		Initialize();
+	}
+	else if (ret == SCE_IME_ERROR_CONNECTION_FAILED)
+	{
+		// This happens when we loose focus, just
+		// close the connection and retry later.
+		sceImeKeyboardClose(SCE_USER_SERVICE_USER_ID_EVERYONE);
+		memset(states, 0, sizeof(KeyboardState) * PLAYER_MAX);
 	}
 	else if (ret != SCE_OK)
 	{
-		printf("ERROR: Couldn't update keyboard: 0x%08X\n", ret);
-		isActive = false;
+		printf("WARNING: Couldn't update keyboard: 0x%08X\n", ret);
 	}
 }
 
 int Keyboard::Enable(SceUserServiceUserId userId, int playerIndex)
 {
 	memset(&states[playerIndex], 0, sizeof(KeyboardState));
-
 	return 0;
 }
 
 int Keyboard::Disable(int playerIndex)
 {
 	memset(&states[playerIndex], 0, sizeof(KeyboardState));
-
 	return 0;
 }
 
@@ -185,6 +186,5 @@ KeyboardState* Keyboard::GetState(int playerIndex)
 {
 	assert(playerIndex >= 0);
 	assert(playerIndex < PLAYER_MAX);
-
 	return &states[playerIndex];
 }
