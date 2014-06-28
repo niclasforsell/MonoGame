@@ -57,7 +57,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 	//printf("Initialize!\n");
 
 	// Open the video output port
-	_videoOutHandle = sceVideoOutOpen(0, SCE_VIDEO_OUT_BUS_TYPE_MAIN, 0, NULL);
+	_videoOutHandle = sceVideoOutOpen(SCE_USER_SERVICE_USER_ID_SYSTEM, SCE_VIDEO_OUT_BUS_TYPE_MAIN, 0, NULL);
 	if( _videoOutHandle < 0 )
 	{
 		printf("sceVideoOutOpen failed: 0x%08X\n", _videoOutHandle);

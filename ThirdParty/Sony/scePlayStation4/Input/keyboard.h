@@ -11,7 +11,6 @@ class CS_API Keyboard
 public:
 	CS_IGNORE static void Initialize();
 	CS_IGNORE static void Terminate();
-	CS_IGNORE static void Restart();
 	CS_IGNORE static void Update();
 
 	CS_IGNORE static int Enable(SceUserServiceUserId userId, int playerIndex);

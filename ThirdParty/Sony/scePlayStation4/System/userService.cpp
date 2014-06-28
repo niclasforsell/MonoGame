@@ -11,6 +11,9 @@
 
 using namespace System;
 
+bool UserService::_initialized = false;
+
+
 namespace {
 	const int PLAYER_MAX = 4;
 	UserServiceUserId users[PLAYER_MAX];
@@ -72,16 +75,26 @@ namespace {
 
 void UserService::Initialize()
 {
+	if (_initialized)
+		return;
+
+	auto ret = sceUserServiceInitialize(NULL);
+	if (ret != SCE_OK)
+	{
+		if (ret == SCE_USER_SERVICE_ERROR_ALREADY_INITIALIZED)
+			printf("WARNING: UserService was already initialized.\n");
+		else
+		{
+			assert(ret == SCE_OK);
+			printf("ERROR: Couldn't initialize UserService: 0x%08X\n", ret);
+			return;
+		}
+	}
+
 	for (auto i=0; i < PLAYER_MAX; i++)
 		users[i] = SCE_USER_SERVICE_USER_ID_INVALID;
 
-	auto ret = sceUserServiceInitialize(NULL);
-	assert(ret == SCE_OK);
-	if (ret != SCE_OK)
-	{
-		printf("ERROR: Couldn't initialize User Service: 0x%08X\n", ret);
-		return;
-	}
+	_initialized = true;
 
 	Input::GamePad::Initialize();
 	Input::Keyboard::Initialize();
@@ -93,6 +106,9 @@ void UserService::Initialize()
 
 void UserService::Terminate()
 {
+	if (!_initialized)
+		return;
+
 	Input::GamePad::Terminate();
 	Input::Keyboard::Terminate();
 	Input::Mouse::Terminate();
@@ -100,10 +116,12 @@ void UserService::Terminate()
 	auto ret = sceUserServiceTerminate();
 	assert(ret == SCE_OK);
 	if (ret != SCE_OK)
-	{
 		printf("ERROR: Couldn't terminate User Service: 0x%08X\n", ret);
-		return;
-	}
+
+	for (auto i=0; i < PLAYER_MAX; i++)
+		users[i] = SCE_USER_SERVICE_USER_ID_INVALID;
+
+	_initialized = false;
 }
 
 void UserService::Update(float elapsedSeconds)

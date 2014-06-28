@@ -81,8 +81,11 @@ namespace Microsoft.Xna.Framework.Audio
             _playingInstances.Remove(inst);
 
 #if PLAYSTATION4
-            inst._voice.Dispose();
-            inst._voice = null;
+            if (inst._voice != null)
+            {
+                inst._voice.Dispose();
+                inst._voice = null;
+            }
 #endif
         }
 
