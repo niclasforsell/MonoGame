@@ -147,7 +147,7 @@ void SoundSystem::Initialize()
 		_masteringPadVoiceHandle[x] = 0;
 }
 
-void SoundSystem::SubmitPlaybackEvent(SamplerVoice* voiceHandle, AudioBuffer *buffer, int evt, int portHandle)
+void SoundSystem::SubmitPlaybackEvent(SamplerVoice* voiceHandle, AudioBuffer *buffer, PlaybackEvent evt, int portHandle)
 {
 	// TODO: It appears that all of this is necessary before playing a sound
 	// ... Should confirm that there's not a way to do this by saving the handle.
@@ -159,12 +159,21 @@ void SoundSystem::SubmitPlaybackEvent(SamplerVoice* voiceHandle, AudioBuffer *bu
 
 	// If we're about to play a paused or stopped sound,
 	// ensure that the waveform data and info is current.
-	if (evt == 0)
+	// Stop and pause can just happen immediately without any voice 
+	// configuration.
+	if (evt == PlaybackEvent::Play || evt == PlaybackEvent::Resume)
 	{
-		if(voiceHandle->GetState() == SoundState::Paused)
-				evt = SCE_NGS2_VOICE_EVENT_RESUME;
-			else
-				evt = SCE_NGS2_VOICE_EVENT_PLAY;
+		uint32_t stateFlags = SCE_NGS2_VOICE_STATE_FLAG_ERROR;
+		errorCode = sceNgs2VoiceGetStateFlags(handle, &stateFlags);
+		assert(errorCode >= 0);
+
+		// In XNA, Play can be used to resume a paused sound 
+		// as well as resume. This isn't the case on PS4, so 
+		// always ensure we're performing the correct operation.
+		if (stateFlags & SCE_NGS2_VOICE_STATE_FLAG_PAUSED)
+			evt = PlaybackEvent::Resume;
+		else
+			evt = PlaybackEvent::Play;
 
 		if (portHandle == -1 && _masteringPadVoiceHandle[portHandle] != 0)
 			errorCode = sceNgs2VoicePatch(handle, 0, _masteringVoiceHandle, 0);
@@ -173,23 +182,8 @@ void SoundSystem::SubmitPlaybackEvent(SamplerVoice* voiceHandle, AudioBuffer *bu
 
 		assert(errorCode >= 0);
 	}
-	else
-	{
-		// Stop and pause can just happen immediately without any voice 
-		// configuration.
-		switch(evt)
-		{
-			case 1:
-				evt = SCE_NGS2_VOICE_EVENT_PAUSE;
-			break;
 
-			case 2:
-				evt = SCE_NGS2_VOICE_EVENT_STOP;
-			break;
-		}
-	}
-
-	errorCode = sceNgs2VoiceKickEvent(handle, evt);
+	errorCode = sceNgs2VoiceKickEvent(handle, (int)evt);
 
 	assert(errorCode >= 0);
 }
@@ -226,7 +220,7 @@ SamplerVoice* SoundSystem::CreateVoice(AudioBuffer* buffer)
 void SoundSystem::DestroyVoice(SamplerVoice* voice)
 {
 	if (voice->GetState() != SoundState::Stopped)
-		SubmitPlaybackEvent(voice, NULL, 2);
+		SubmitPlaybackEvent(voice, NULL, PlaybackEvent::StopImmediate);
 
 	((std::queue<unsigned int>*)_freeVoiceIDs)->push(voice->_voiceHandleID);
 	voice->_voiceHandleID = 0;

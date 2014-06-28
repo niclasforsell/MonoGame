@@ -5,6 +5,7 @@
 using Microsoft.Xna.Framework.Audio;
 using System;
 using System.IO;
+using PlaybackEvent = Sce.PlayStation4.Audio.PlaybackEvent;
 using AudioBuffer = Sce.PlayStation4.Audio.AudioBuffer;
 using SamplerVoice = Sce.PlayStation4.Audio.SamplerVoice;
 using SoundSystem = Sce.PlayStation4.Audio.SoundSystem;
@@ -27,7 +28,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Paused, _controllerPort);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, PlaybackEvent.Pause, _controllerPort);
         }
 
         private void PlatformPause()
@@ -35,7 +36,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Paused, _controllerPort);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, PlaybackEvent.Pause, _controllerPort);
         }
 
         private void PlatformPlay()
@@ -43,7 +44,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Playing, _controllerPort);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, PlaybackEvent.Play, _controllerPort);
         }
 
         private void PlatformResume()
@@ -51,7 +52,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Playing, _controllerPort);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, PlaybackEvent.Resume, _controllerPort);
         }
 
         private void PlatformStop(bool immediate)
@@ -59,7 +60,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, (int)SoundState.Stopped, _controllerPort);
+            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, immediate ? PlaybackEvent.StopImmediate : PlaybackEvent.StopAsAuthored, _controllerPort);
         }
 
         private void PlatformSetIsLooped(bool value)

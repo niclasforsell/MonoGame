@@ -4,6 +4,15 @@
 #include <ngs2.h>
 
 namespace Audio {
+		
+enum class PlaybackEvent
+{
+	Play = SCE_NGS2_VOICE_EVENT_PLAY, // 0-Play
+	StopAsAuthored = SCE_NGS2_VOICE_EVENT_STOP, // 1-Stop as authored
+	StopImmediate = SCE_NGS2_VOICE_EVENT_STOP_IMM, // 2- Stop immediately (Slight fade out)
+	Pause = SCE_NGS2_VOICE_EVENT_PAUSE, // 4- Pause
+	Resume = SCE_NGS2_VOICE_EVENT_RESUME // 5- Resume
+};
 
 class CS_API SoundSystem
 {
@@ -41,7 +50,7 @@ public:
 
 	void Initialize();
 
-	void SubmitPlaybackEvent(SamplerVoice* voiceHandle, AudioBuffer *buffer, int evt, int portHandle = -1);
+	void SubmitPlaybackEvent(SamplerVoice* voiceHandle, AudioBuffer *buffer, PlaybackEvent evt, int portHandle = -1);
 
 	void OpenControllerPort(int playerIdx, uint32_t userID);
 	void CloseControllerPort(int playerIdx);
