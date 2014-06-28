@@ -67,6 +67,7 @@ TrophyResult TrophySet::IsUnlocked(int32_t trophyId, CS_OUT bool* isUnlocked)
 
 	*isUnlocked = SCE_NP_TROPHY_FLAG_ISSET(trophyId, &flags);
 
+	sceNpTrophyDestroyHandle(handle);
 	return (TrophyResult)ret;
 }
 
