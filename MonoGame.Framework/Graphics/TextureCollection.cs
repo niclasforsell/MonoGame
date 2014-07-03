@@ -74,6 +74,35 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+#elif PLAYSTATION4
+
+        internal void ClearTargets(GraphicsDevice device, RenderTargetBinding[] targets)
+        {
+            // We assume 4 targets to avoid a loop within a loop below.
+            var target0 = targets[0].RenderTarget;
+            var target1 = targets[1].RenderTarget;
+            var target2 = targets[2].RenderTarget;
+            var target3 = targets[3].RenderTarget;
+
+            // Make one pass across all the texture slots.
+            for (var i = 0; i < _textures.Length; i++)
+            {
+                var tex = _textures[i];
+                if (tex == null || 
+                    (   tex != target0 &&
+                        tex != target1 &&
+                        tex != target2 &&
+                        tex != target3))
+                    continue;
+
+                // Immediately clear the texture from the device.
+                _dirty &= ~(1 << i);
+                _textures[i] = null;
+
+                device._system.SetTexture(i, null);
+            }
+        }
+
 #endif
 
         internal void Clear()

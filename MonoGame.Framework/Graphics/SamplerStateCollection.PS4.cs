@@ -48,8 +48,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         PSGraphicsDevice.CreateSamplerState(
                             (PSTextureFilter)sampler.Filter,
                             (PSTextureAddressMode)sampler.AddressU,
-                            (PSTextureAddressMode)sampler.AddressU,
-                            (PSTextureAddressMode)sampler.AddressU,
+                            (PSTextureAddressMode)sampler.AddressV,
+                            (PSTextureAddressMode)sampler.AddressW,
                             sampler.MaxAnisotropy,
                             sampler.MaxMipLevel,
                             sampler.MipMapLevelOfDetailBias,

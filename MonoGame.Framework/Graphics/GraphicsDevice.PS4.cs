@@ -101,6 +101,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private IRenderTarget PlatformApplyRenderTargets()
         {
+            Textures.ClearTargets(this, _currentRenderTargetBindings);
+
             var target0 = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
             var target1 = _currentRenderTargetBindings[1].RenderTarget as RenderTarget2D;
             var target2 = _currentRenderTargetBindings[2].RenderTarget as RenderTarget2D;
