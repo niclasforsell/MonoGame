@@ -87,10 +87,12 @@ namespace Microsoft.Xna.Framework.Graphics
             // Make one pass across all the texture slots.
             for (var i = 0; i < _textures.Length; i++)
             {
-                if (_textures[i] != target0 &&
-                    _textures[i] != target1 &&
-                    _textures[i] != target2 &&
-                    _textures[i] != target3)
+                var tex = _textures[i];
+                if (tex == null || 
+                    (   tex != target0 &&
+                        tex != target1 &&
+                        tex != target2 &&
+                        tex != target3))
                     continue;
 
                 // Immediately clear the texture from the device.
