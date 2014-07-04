@@ -68,6 +68,12 @@ void SamplerVoice::SetLooped(bool loop)
 	assert(errorCode == 0);
 	errorCode = sceNgs2SamplerVoiceAddWaveformBlocks(_voiceHandle, _buffer->_waveformData, waveformInfo->aBlock, waveformInfo->numBlocks, 0);
 	assert(errorCode == 0);
+
+	// samplerVoiceSetupParam/AddWaveFormBlocks will stomp over state.
+	// Update the Volume/Pan/Pitch so they aren't overwritten.
+	SetVolume(_volume);
+	SetPitch(_pitch);
+	SetPan(_pan);
 }
 
 void SamplerVoice::SetFade(float fadeinTime, float fadeOutTime)
