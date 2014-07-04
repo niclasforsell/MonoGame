@@ -1154,3 +1154,21 @@ void GraphicsSystem::DrawYCbCr(Gnm::Texture* luma,
 	gfxc.setPrimitiveType(Gnm::kPrimitiveTypeTriStrip);
 	gfxc.drawIndexAuto(4);
 }
+
+void GraphicsSystem::SetMarker(const char* markerName, uint32_t rgbColor)
+{
+	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
+	gfxc.setMarker(markerName, rgbColor);
+}
+
+void GraphicsSystem::PushMarker(const char* markerName, uint32_t rgbColor)
+{
+	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
+	gfxc.pushMarker(markerName, rgbColor);
+}
+
+void GraphicsSystem::PopMarker()
+{
+	Gnmx::GfxContext &gfxc = _displayBuffers[_backBufferIndex].context;
+	gfxc.popMarker();
+}
