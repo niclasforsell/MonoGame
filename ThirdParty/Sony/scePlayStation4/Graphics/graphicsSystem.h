@@ -145,6 +145,10 @@ public:
 								float right,
 								float top,
 								float bottom);
+
+	void SetMarker(const char* markerName, uint32_t rgbColor = 0);
+	void PushMarker(const char* markerName, uint32_t rgbColor = 0);
+	void PopMarker();
 };
 
 } // namespace Graphics
