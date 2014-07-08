@@ -8,6 +8,15 @@
     <Binary
       Name="SharpDX.D3DCompiler"
       Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.D3DCompiler.dll" />
+
+    <!-- PlayStation 4 Only Stuff -->
+    <Project
+      Name="scePlayStation4Tools"
+      Guid="80316BFA-C181-4977-BF9C-D68469101604"
+	  Type="Cpp"
+      Path="ThirdParty\Sony\scePlayStation4Tools\scePlayStation4Tools.vcxproj">
+    </Project>
+
   </Platform>
 
 </ExternalProject>
