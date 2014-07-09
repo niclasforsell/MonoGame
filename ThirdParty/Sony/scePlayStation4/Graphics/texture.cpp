@@ -177,7 +177,7 @@ void Texture::GetData(uint32_t mipLevel, uint8_t* data, uint32_t offset, uint32_
 	baseAddr += levelOffset;
 
 	if (offset == 0 && length == levelSize)
-		memcpy(baseAddr, data, length);
+		memcpy(data, baseAddr, length);
 	else
 	{
 		GpuAddress::TilingParameters tile;
