@@ -5,7 +5,7 @@ namespace TwoMGFX
 {
     partial class EffectObject
     {
-        private static byte[] CompilePSSL(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile)
+        private static byte[] CompilePSSL(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, ref string errorsAndWarnings)
         {
             var compiler = new sce.PlayStation4.Tools.ShaderCompiler();
 
