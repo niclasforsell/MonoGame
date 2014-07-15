@@ -19,6 +19,9 @@ namespace TwoMGFX
                                     shaderInfo.Debug,
                                     out buildOutput);
 
+                // Store all the errors and warnings to log out later.
+                errorsAndWarnings += buildOutput;
+
                 if (shaderInfo.Debug && compiler.ShaderDebugData != null)
                 {
                     var baseFile = Path.GetFileName(shaderInfo.FilePath);
@@ -34,7 +37,8 @@ namespace TwoMGFX
             }
             catch (Exception ex)
             {
-                throw ex;
+                errorsAndWarnings += ex.Message;
+                throw new ShaderCompilerException();
             }
 
             return compiler.Bytecode;
