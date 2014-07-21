@@ -1,7 +1,9 @@
 #include "renderTarget.h"
+#include "texture.h"
 
 #include "graphicsHelpers.h"
 #include "..\allocator.h"
+#include <assert.h>
 #include <gnm.h>
 
 using namespace Graphics;
@@ -31,6 +33,7 @@ RenderTarget* RenderTarget::Create(TextureFormat format_, int32_t width, int32_t
 	result->_texture = new sce::Gnm::Texture();
 	result->_texture->initFromRenderTarget(renderTarget, isCubemap);
 	result->_texture->setResourceMemoryType(sce::Gnm::kResourceMemoryTypeRO);
+	result->_ownsTexture = true;
 
 	result->_depthTarget = NULL;
 	result->_hasStencil = depthFormat_ == DepthFormat_Depth24Stencil8;
@@ -84,6 +87,58 @@ RenderTarget* RenderTarget::CreateCube(TextureFormat format, int32_t width, int3
     return RenderTarget::Create(format, width, height, 1, depthFormat, true);
 }
 
+RenderTarget* RenderTarget::CreateFromTexture2D(Texture* texture, DepthFormat depthFormat_)
+{
+	auto colorTex = texture->GetInternalData();
+	auto colorWidth = colorTex->getWidth();
+	auto colorHeight = colorTex->getHeight();
+
+	auto renderTarget = new sce::Gnm::RenderTarget();
+	auto result = new RenderTarget();
+	result->_renderTarget = renderTarget;
+	result->_texture = colorTex;
+	result->_ownsTexture = false;
+
+	auto ret = renderTarget->initFromTexture(colorTex, 0);
+	assert(ret == GpuAddress::kStatusSuccess);
+
+	result->_depthTarget = NULL;
+	result->_hasStencil = depthFormat_ == DepthFormat_Depth24Stencil8;
+	if (depthFormat_ == DepthFormat_None)
+		return result;
+
+	result->_depthTarget = new sce::Gnm::DepthRenderTarget();
+
+	auto kStencilFormat = result->_hasStencil ? Gnm::kStencil8 : Gnm::kStencilInvalid;
+	auto depthFormat = ToDataFormat(depthFormat_);
+	Gnm::TileMode depthTileMode;
+	GpuAddress::computeSurfaceTileMode(&depthTileMode, GpuAddress::kSurfaceTypeDepthOnlyTarget, depthFormat, 1);
+
+	// Initialize the depth buffer descriptor
+	Gnm::SizeAlign stencilSizeAlign;
+	Gnm::SizeAlign htileSizeAlign;
+	auto depthTargetSizeAlign = result->_depthTarget->init(
+		colorWidth,
+		colorHeight,
+		depthFormat.getZFormat(),
+		kStencilFormat,
+		depthTileMode,
+		Gnm::kNumFragments1,
+		kStencilFormat != Gnm::kStencilInvalid ? &stencilSizeAlign : NULL,
+		NULL);
+
+	// Initialize the stencil buffer, if enabled
+	void *stencilMemory = NULL;
+	if( kStencilFormat != Gnm::kStencilInvalid )
+		stencilMemory = mem::allocShared(stencilSizeAlign);
+
+	// Allocate the depth buffer
+	void *depthMemory = mem::allocShared(depthTargetSizeAlign);
+	result->_depthTarget->setAddresses(depthMemory, stencilMemory);
+
+	return result;
+}
+
 RenderTarget::~RenderTarget()
 {
 	if (_depthTarget)
@@ -93,9 +148,13 @@ RenderTarget::~RenderTarget()
 		delete _depthTarget;
 	}
 
-	mem::freeShared(_renderTarget->getBaseAddress());
 	delete _renderTarget;
-	delete _texture;
+
+	if (_ownsTexture)
+	{
+		mem::freeShared(_renderTarget->getBaseAddress());
+		delete _texture;
+	}
 }
 
 /*
