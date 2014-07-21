@@ -96,6 +96,7 @@
     <ClCompile Include="Graphics\graphicsSystem.cpp" />
     <ClCompile Include="Graphics\indexBuffer.cpp" />
     <ClCompile Include="Graphics\pixelShader.cpp" />
+    <ClCompile Include="Graphics\pngReader.cpp" />
     <ClCompile Include="Graphics\renderTarget.cpp" />
     <ClCompile Include="Graphics\texture.cpp" />
     <ClCompile Include="Graphics\vertexBuffer.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="Graphics\graphicsSystem.h" />
     <ClInclude Include="Graphics\indexBuffer.h" />
     <ClInclude Include="Graphics\pixelShader.h" />
+    <ClInclude Include="Graphics\pngReader.h" />
     <ClInclude Include="Graphics\predecls.h" />
     <ClInclude Include="Graphics\renderTarget.h" />
     <ClInclude Include="Graphics\texture.h" />
