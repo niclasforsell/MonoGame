@@ -97,6 +97,7 @@ RenderTarget* RenderTarget::CreateFromTexture2D(Texture* texture, DepthFormat de
 	auto result = new RenderTarget();
 	result->_renderTarget = renderTarget;
 	result->_texture = colorTex;
+	result->_ownsTexture = false;
 
 	auto ret = renderTarget->initFromTexture(colorTex, 0);
 	assert(ret == GpuAddress::kStatusSuccess);
