@@ -14,6 +14,7 @@ private:
 
 	sce::Gnm::RenderTarget *_renderTarget;
 	sce::Gnm::Texture *_texture;
+	bool _ownsTexture;
 
 	sce::Gnm::DepthRenderTarget *_depthTarget;
 	bool _hasStencil;
@@ -28,6 +29,8 @@ public:
 	static RenderTarget* Create2D(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat);
 	static RenderTarget* Create3D(TextureFormat format, int32_t width, int32_t height, int32_t slices, DepthFormat depthFormat);
 	static RenderTarget* CreateCube(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat);
+
+	static RenderTarget* CreateFromTexture2D(Texture* texture, DepthFormat depthFormat);
 
 	virtual ~RenderTarget();
 
