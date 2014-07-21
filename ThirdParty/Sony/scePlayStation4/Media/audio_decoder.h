@@ -43,6 +43,7 @@ public:
 	AudioDecoder(uint32_t codecType);
 	virtual ~AudioDecoder(void);
 	int decode(InputStream *input, OutputStream *output);
+	int seek(InputStream *input, float startSeconds);
 	uint32_t codecType(void) { return m_codecType; }
 	uint32_t sampleRate(void) { return m_sampleRate; }
 	uint32_t numChannels(void) { return m_numChannels; }

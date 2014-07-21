@@ -47,6 +47,9 @@ struct Media::SongState
 	AudioOutputStream* outputStream;
 	AudioDecoder* decoder;
 
+	std::atomic<float> startSeconds;
+	std::atomic<float> fadeInSeconds;
+
 	std::atomic<bool> isPaused;
 	std::atomic<bool> isRunning;
 };
@@ -115,6 +118,10 @@ void* decodeMain(void* arg)
 	sceKernelSetEventFlag(state->eventFlag, EventFlags::Decoder);
 	scePthreadBarrierWait(&state->barrier);
 
+	// Seek ahead to start position if specified
+	if (state->startSeconds > 0.0f)
+		state->decoder->seek(state->inputStream, state->startSeconds);
+
 	while (state->isRunning)
 	{
 		if (state->inputStream->isEmpty())
@@ -180,6 +187,14 @@ void* outputMain(void* arg)
 	sceKernelSetEventFlag(state->eventFlag, EventFlags::Output);
 	scePthreadBarrierWait(&state->barrier);
 
+	auto fadeEnabled = state->fadeInSeconds > 0.0f;
+	auto audioOut = state->outputStream->getOutput();
+	auto fullVolume = audioOut->getVolume();
+	auto startFade = state->startSeconds.load();
+	auto finishFade = state->startSeconds + state->fadeInSeconds;
+	if (fadeEnabled)
+		audioOut->setVolume(0.0f);
+
 	while(state->isRunning)
 	{
 		if (state->isPaused)
@@ -187,6 +202,22 @@ void* outputMain(void* arg)
 
 		if (state->inputStream->isEmpty() && state->outputStream->isEmpty())
 			break;
+
+		if (fadeEnabled)
+		{
+			auto pos = state->decoder->getElapsedSeconds();
+			if (pos >= startFade && pos <= finishFade)
+			{
+				auto amount = (pos - startFade) / state->fadeInSeconds;
+				audioOut->setVolume(amount * fullVolume);
+			}
+
+			if (pos > finishFade)
+			{
+				fadeEnabled = false;
+				audioOut->setVolume(fullVolume);
+			}
+		}
 
 		auto ret = state->outputStream->output();
 		if (ret < 0)
@@ -322,6 +353,13 @@ term:
 		scePthreadAttrDestroy(&attr);
 		attr = 0;
 	}
+}
+
+void Song::PlayFrom(float seconds, float fadeInSeconds)
+{
+	_state->startSeconds = seconds;
+	_state->fadeInSeconds = fadeInSeconds;
+	Play();
 }
 
 void Song::Resume()
