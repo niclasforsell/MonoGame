@@ -61,6 +61,7 @@ namespace BindingGen
             options.Headers.Add(@"Graphics\VertexShader.h");
             options.Headers.Add(@"Graphics\FetchShader.h");
             options.Headers.Add(@"Graphics\PixelShader.h");
+            options.Headers.Add(@"Graphics\PngReader.h");
             options.Headers.Add(@"Graphics\VertexBuffer.h");
             options.Headers.Add(@"Graphics\IndexBuffer.h");
             options.Headers.Add(@"Input\Camera.h");

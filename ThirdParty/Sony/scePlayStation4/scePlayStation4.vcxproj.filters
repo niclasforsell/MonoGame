@@ -142,6 +142,7 @@
     <ClCompile Include="Media\videoPlayer.cpp">
       <Filter>Media</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\pngReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -359,5 +360,6 @@
     <ClInclude Include="Graphics\videoShaders.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\pngReader.h" />
   </ItemGroup>
 </Project>
