@@ -8,12 +8,13 @@
 using namespace Audio;
 
 SamplerVoice::SamplerVoice(unsigned int id, SceNgs2Handle rackHandle, SceNgs2Handle voiceHandle, AudioBuffer* buffer) :
-	_voiceHandle(voiceHandle),
 	_rackHandle(rackHandle),
+	_voiceHandle(voiceHandle),
 	_voiceHandleID(id),
 	_pitch(0.0f),
-	_looped(false),
+	_pan(0.0f),
 	_volume(1.0f),
+	_looped(false),
 	_buffer(buffer)
 {
 }
