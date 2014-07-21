@@ -21,6 +21,7 @@ public:
 	bool Load(const char* fileName);
 
 	void Play();
+	void PlayFrom(float seconds, float fadeInSeconds);
 	void Resume();
 	void Pause();
 	void Stop();

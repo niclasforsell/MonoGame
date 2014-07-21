@@ -103,7 +103,6 @@ AudioDecoder::AudioDecoder(uint32_t codecType) :
 	m_codecType(codecType),
 	m_elapsedSeconds(0.0f)
 {
-	printf("  init: [%5u]\n", m_numFrames);
 }
 
 AudioDecoder::~AudioDecoder(void)
@@ -120,8 +119,6 @@ AudioDecoder::~AudioDecoder(void)
 		}
 		m_handle = AUDIODEC_HANDLE_INVALID;
 	}
-
-	printf("  term: [%5u]\n", m_numFrames);
 }
 
 int AudioDecoder::decode(InputStream *input, OutputStream *output)
@@ -149,12 +146,42 @@ term:
 	input->unlock(m_bst.uiAuSize);
 	output->unlock(m_pcm.uiPcmSize);
 
-	if (((++m_numFrames) % 256) == 0) {
-		printf("decode: [%5u]\n", m_numFrames);
-	}
-
 	auto rate = sizeof(int16_t) * m_sampleRate * m_numChannels;
 	m_elapsedSeconds += (float)m_pcm.uiPcmSize / (float)rate;
+
+	return ret;
+}
+
+int AudioDecoder::seek(InputStream* input, float startSeconds)
+{
+	int ret = 0;
+
+	assert(input);
+
+	auto rate = sizeof(int16_t) * m_sampleRate * m_numChannels;
+	uint32_t skipBytes = startSeconds * m_maxBstSize;
+
+	auto buffer = new uint8_t[m_maxPcmSize];
+	while (m_elapsedSeconds < startSeconds)
+	{
+		auto inAddr = input->lock(m_maxBstSize);
+
+		m_bst.pAuAddr = const_cast<uint8_t *>(inAddr);
+		m_bst.uiAuSize = input->readingSize();
+		m_pcm.pPcmAddr = buffer;
+		m_pcm.uiPcmSize = m_maxPcmSize;
+		ret = sceAudiodecDecode(m_handle, &m_ctrl);
+		if (ret < 0) {
+			printf("error: sceAudiodecDecode() failed: 0x%08X\n", ret);
+		}
+
+		input->unlock(m_bst.uiAuSize);
+
+		auto rate = sizeof(int16_t)* m_sampleRate * m_numChannels;
+		m_elapsedSeconds += (float)m_pcm.uiPcmSize / (float)rate;
+	}
+
+	delete[] buffer;
 
 	return ret;
 }
