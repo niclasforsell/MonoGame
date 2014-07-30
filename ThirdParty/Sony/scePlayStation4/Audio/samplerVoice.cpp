@@ -179,21 +179,21 @@ float SamplerVoice::GetPan()
 
 void SamplerVoice::SetPitch(float pitch)
 {
+	_pitch = pitch;
+
+	// Convert from XNA octive ratio of -1, 0, 1 to 
+	// the Ngs2 pitch scale of 0, 1, 2.
+	float pitchRatio = powf(2, pitch);
+
 	sceNgs2RackGetVoiceHandle(_rackHandle, _voiceHandleID, &_voiceHandle);
-	auto errorCode = sceNgs2SamplerVoiceSetPitch(_voiceHandle, pitch);
+	auto errorCode = sceNgs2SamplerVoiceSetPitch(_voiceHandle, pitchRatio);
 
 	assert(errorCode >= 0);
 }
 
 float SamplerVoice::GetPitch()
 {
-    // NOTE: This is copy of what XAudio2.FrequencyRatioToSemitones()
-	auto semitones = 39.86313713864835f * log10(_pitch);
-
-    // Convert from semitones to octaves.
-    semitones /= 12.0f;
-
-    return semitones;
+    return _pitch;
 }
 
 SamplerVoice::~SamplerVoice(void)

@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            _voice.Pitch = (float)Math.Pow(2.0, value);
+            _voice.Pitch = value;
         }
 
         private float PlatformGetPitch()
