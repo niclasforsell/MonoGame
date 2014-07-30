@@ -52,6 +52,7 @@
     <Compile Include="GraphicsEnums.cs" />
     <Compile Include="GraphicsSystem.cs" />
     <Compile Include="IndexBuffer.cs" />
+    <Compile Include="Internals.cs" />
     <Compile Include="Keyboard.cs" />
     <Compile Include="KeyboardState.cs" />
     <Compile Include="Mouse.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="TrophySet.cs" />
     <Compile Include="TrophySet.Public.cs" />
     <Compile Include="UserService.cs" />
+    <Compile Include="UserService.Public.cs" />
     <Compile Include="VertexBuffer.cs" />
     <Compile Include="VertexShader.cs" />
     <Compile Include="VideoPlayer.cs" />
@@ -95,7 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
-  </ItemGroup>  
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\Mono.PS4.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
