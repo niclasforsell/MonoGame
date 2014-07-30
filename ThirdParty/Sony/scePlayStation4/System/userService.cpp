@@ -12,64 +12,59 @@
 using namespace System;
 
 bool UserService::_initialized = false;
+UserService::_UserCallback UserService::_loginCallback = NULL;
+UserService::_UserCallback UserService::_logoutCallback = NULL;
+UserServiceUserId UserService::_users[PLAYER_MAX];
 
 
-namespace {
-	const int PLAYER_MAX = 4;
-	UserServiceUserId users[PLAYER_MAX];
-
-	user_event_callback loginCallback = NULL;
-	user_event_callback logoutCallback = NULL;
-
-	int findOpenSlot()
+int UserService::FindOpenSlot()
+{
+	for (auto i = 0; i < PLAYER_MAX; i++)
 	{
-		for (auto i = 0; i < PLAYER_MAX; i++)
-		{
-			if (users[i] == SCE_USER_SERVICE_USER_ID_INVALID)
-				return i;
-		}
-
-		return SCE_USER_SERVICE_USER_ID_INVALID;
+		if (_users[i] == SCE_USER_SERVICE_USER_ID_INVALID)
+			return i;
 	}
 
-	void OnLogin(UserServiceUserId userId)
+	return SCE_USER_SERVICE_USER_ID_INVALID;
+}
+
+void UserService::OnLogin(UserServiceUserId userId)
+{
+	auto playerIndex = FindOpenSlot();
+	if (playerIndex >= 0)
 	{
-		auto playerIndex = findOpenSlot();
-		if (playerIndex >= 0)
-		{
-			users[playerIndex] = userId;
+		_users[playerIndex] = userId;
 
-			if (loginCallback != NULL)
-				loginCallback(userId, playerIndex);
+		if (_loginCallback != NULL)
+			_loginCallback(userId, playerIndex);
 
-			Input::GamePad::Enable(userId, playerIndex);
-			Input::Keyboard::Enable(userId, playerIndex);
-			Input::Mouse::Enable(userId, playerIndex);
-			Audio::SoundSystem::GetInstance()->OpenControllerPort(playerIndex, userId);
-		}
-		else
-		{
-			printf("ERROR: Couldn't assign user %d to player slot!\n", userId);
-		}
+		Input::GamePad::Enable(userId, playerIndex);
+		Input::Keyboard::Enable(userId, playerIndex);
+		Input::Mouse::Enable(userId, playerIndex);
+		Audio::SoundSystem::GetInstance()->OpenControllerPort(playerIndex, userId);
 	}
-
-	void OnLogout(UserServiceUserId userId)
+	else
 	{
-		for (auto playerIndex = 0; playerIndex < PLAYER_MAX; playerIndex++)
-		{
-			if (users[playerIndex] != userId)
-				continue;
+		printf("ERROR: Couldn't assign user %d to player slot!\n", userId);
+	}
+}
 
-			if (logoutCallback != NULL)
-				logoutCallback(userId, playerIndex);
+void UserService::OnLogout(UserServiceUserId userId)
+{
+	for (auto playerIndex = 0; playerIndex < PLAYER_MAX; playerIndex++)
+	{
+		if (_users[playerIndex] != userId)
+			continue;
 
-			Input::GamePad::Disable(playerIndex);
-			Input::Keyboard::Disable(playerIndex);
-			Input::Mouse::Disable(playerIndex);
-			Audio::SoundSystem::GetInstance()->CloseControllerPort(playerIndex);
+		if (_logoutCallback != NULL)
+			_logoutCallback(userId, playerIndex);
 
-			users[playerIndex] = SCE_USER_SERVICE_USER_ID_INVALID;
-		}
+		Input::GamePad::Disable(playerIndex);
+		Input::Keyboard::Disable(playerIndex);
+		Input::Mouse::Disable(playerIndex);
+		Audio::SoundSystem::GetInstance()->CloseControllerPort(playerIndex);
+
+		_users[playerIndex] = SCE_USER_SERVICE_USER_ID_INVALID;
 	}
 }
 
@@ -92,7 +87,7 @@ void UserService::Initialize()
 	}
 
 	for (auto i=0; i < PLAYER_MAX; i++)
-		users[i] = SCE_USER_SERVICE_USER_ID_INVALID;
+		_users[i] = SCE_USER_SERVICE_USER_ID_INVALID;
 
 	_initialized = true;
 
@@ -119,7 +114,7 @@ void UserService::Terminate()
 		printf("ERROR: Couldn't terminate User Service: 0x%08X\n", ret);
 
 	for (auto i=0; i < PLAYER_MAX; i++)
-		users[i] = SCE_USER_SERVICE_USER_ID_INVALID;
+		_users[i] = SCE_USER_SERVICE_USER_ID_INVALID;
 
 	_initialized = false;
 }
@@ -156,21 +151,21 @@ void UserService::Update(float elapsedSeconds)
 	Input::Mouse::Update();
 }
 
-void UserService::SetLoginCallback(user_event_callback callback)
+void UserService::_SetLoginCallback(_UserCallback callback)
 {
-	loginCallback = callback;
+	_loginCallback = callback;
 }
 
-void UserService::SetLogoutCallback(user_event_callback callback)
+void UserService::_SetLogoutCallback(_UserCallback callback)
 {
-	logoutCallback = callback;
+	_logoutCallback = callback;
 }
 
 int UserService::GetPlayerIndexByUserId(SceUserServiceUserId userId)
 {
 	for (auto i = 0; i < PLAYER_MAX; i++)
 	{
-		if (users[i] == userId)
+		if (_users[i] == userId)
 			return i;
 	}
 
@@ -187,7 +182,7 @@ UserServiceUserId UserService::GetUserByPlayerIndex(int playerIndex)
 		return SCE_USER_SERVICE_USER_ID_INVALID;
 	}
 
-	return users[playerIndex];
+	return _users[playerIndex];
 }
 
 UserServiceUserId UserService::GetInitialUser()
@@ -199,3 +194,22 @@ UserServiceUserId UserService::GetInitialUser()
 
 	return result;
 }
+
+const char* UserService::GetUserName(UserServiceUserId userId)
+{
+	// TODO: This is not thread safe!
+	static char temp[SCE_USER_SERVICE_MAX_USER_NAME_LENGTH + 1];
+	auto result = sceUserServiceGetUserName(userId, temp, sizeof(temp));
+	if (result != SCE_OK)
+		return NULL;
+
+	return temp;
+}
+
+UserServiceUserColor UserService::GetUserColor(UserServiceUserId userId)
+{
+	auto color = SCE_USER_SERVICE_USER_COLOR_BLUE;
+	sceUserServiceGetUserColor(userId, &color);
+	return (UserServiceUserColor)color;
+}
+
