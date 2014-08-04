@@ -158,6 +158,31 @@
       return System.IO.File.Exists("/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/XamMac.dll");
     }
 
+    public bool CodesignKeyExists()
+    {
+      var home = System.Environment.GetEnvironmentVariable("HOME");
+      if (string.IsNullOrEmpty(home))
+      {
+        home = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
+      }
+      var path = System.IO.Path.Combine(home, ".codesignkey");
+      return System.IO.File.Exists(path);
+    }
+    
+    public string GetCodesignKey()
+    {
+      var home = System.Environment.GetEnvironmentVariable("HOME");
+      if (string.IsNullOrEmpty(home))
+      {
+        home = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
+      }
+      var path = System.IO.Path.Combine(home, ".codesignkey");
+      using (var reader = new System.IO.StreamReader(path))
+      {
+        return reader.ReadToEnd().Trim();
+      }
+    }
+
     ]]>
   </msxsl:script>
 
@@ -196,10 +221,10 @@
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="/Input/Generation/Platform = 'Android'">
-            <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+            <TargetFrameworkVersion>v4.2</TargetFrameworkVersion>
           </xsl:when>
           <xsl:when test="/Input/Generation/Platform = 'Ouya'">
-            <TargetFrameworkVersion>v4.1</TargetFrameworkVersion>
+            <TargetFrameworkVersion>v4.2</TargetFrameworkVersion>
           </xsl:when>
           <xsl:when test="/Input/Generation/Platform = 'Windows8'">
           </xsl:when>
@@ -368,17 +393,56 @@
         </xsl:choose>
       </xsl:when>
       <xsl:when test="/Input/Generation/Platform = 'iOS'">
-        <xsl:choose>
-          <xsl:when test="$debug = 'true'">
-            <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-            <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-            <MtouchDebug>True</MtouchDebug>
-            <MtouchUseArmv7>false</MtouchUseArmv7>
-          </xsl:when>
-          <xsl:otherwise>
-            <MtouchUseArmv7>false</MtouchUseArmv7>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:if test="$debug = 'true'">
+          <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+          <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+          <MtouchDebug>True</MtouchDebug>
+        </xsl:if>
+        <MtouchUseArmv7>
+          <xsl:choose>
+            <xsl:when test="/Input/Properties/iOSUseArmv7">
+              <xsl:value-of select="/Input/Properties/iOSUseArmv7" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </MtouchUseArmv7>
+        <xsl:if test="/Input/Properties/iOSUseLlvm">
+          <MtouchUseLlvm>
+            <xsl:value-of select="/Input/Properties/iOSUseLlvm" />
+          </MtouchUseLlvm>
+        </xsl:if>
+        <xsl:if test="/Input/Properties/iOSUseSGen">
+          <MtouchUseSGen>
+            <xsl:value-of select="/Input/Properties/iOSUseSGen" />
+          </MtouchUseSGen>
+        </xsl:if>
+        <xsl:if test="/Input/Properties/iOSUseRefCounting">
+          <MtouchUseRefCounting>
+            <xsl:value-of select="/Input/Properties/iOSUseRefCounting" />
+          </MtouchUseRefCounting>
+        </xsl:if>
+        <xsl:if test="/Input/Properties/iOSI18n">
+          <MtouchI18n>
+            <xsl:value-of select="/Input/Properties/iOSI18n" />
+          </MtouchI18n>
+        </xsl:if>
+        <xsl:if test="/Input/Properties/iOSArch">
+          <MtouchArch>
+            <xsl:value-of select="/Input/Properties/iOSArch" />
+          </MtouchArch>
+        </xsl:if>
+        <xsl:if test="/Input/Properties/SignAssembly">
+          <SignAssembly>
+            <xsl:value-of select="/Input/Properties/SignAssembly" />
+          </SignAssembly>
+        </xsl:if>
+        <xsl:if test="user:CodesignKeyExists()">
+          <CodesignKey>
+            <xsl:value-of select="user:GetCodesignKey()" />
+          </CodesignKey>
+        </xsl:if>
       </xsl:when>
       <xsl:when test="/Input/Generation/Platform = 'MacOS'">
         <EnableCodeSigning>False</EnableCodeSigning>
@@ -570,7 +634,7 @@
         </RootNamespace>
         <AssemblyName><xsl:copy-of select="$assembly_name" /></AssemblyName>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<NoWarn><xsl:value-of select="/Input/Properties/NoWarn" /></NoWarn>
+        <NoWarn><xsl:value-of select="/Input/Properties/NoWarn" /></NoWarn>
         <xsl:call-template name="profile_and_version" />
         <xsl:choose>
           <xsl:when test="/Input/Generation/Platform = 'Android' or /Input/Generation/Platform = 'Ouya'">
@@ -578,23 +642,23 @@
             <AndroidSupportedAbis>armeabi,armeabi-v7a,x86</AndroidSupportedAbis>
             <AndroidStoreUncompressedFileExtensions />
             <MandroidI18n />
-            <xsl:choose>
-              <xsl:when test="Input/Properties/ManifestPrefix">
-                <AndroidManifest>
-                  <xsl:value-of select="concat(
-                                '..\',
-                                $project/@Name,
-                                '.',
-                                /Input/Generation/Platform,
-                                '\Properties\AndroidManifest.xml')"/>
-                </AndroidManifest>
-              </xsl:when>
-              <xsl:otherwise>
-                <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-              </xsl:otherwise>
-            </xsl:choose>
             <DeployExternal>False</DeployExternal>
             <xsl:if test="$project/@Type = 'App'">
+              <xsl:choose>
+                <xsl:when test="Input/Properties/ManifestPrefix">
+                  <AndroidManifest>
+                    <xsl:value-of select="concat(
+                                  '..\',
+                                  $project/@Name,
+                                  '.',
+                                  /Input/Generation/Platform,
+                                  '\Properties\AndroidManifest.xml')"/>
+                  </AndroidManifest>
+                </xsl:when>
+                <xsl:otherwise>
+                  <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+                </xsl:otherwise>
+              </xsl:choose>
               <AndroidApplication>True</AndroidApplication>
               <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
               <AndroidResgenClass>Resource</AndroidResgenClass>
@@ -737,20 +801,6 @@
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
-      <xsl:if test="/Input/Properties/ForceArchitecture">
-        <xsl:call-template name="configuration">
-          <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
-          <xsl:with-param name="debug">true</xsl:with-param>
-          <xsl:with-param name="config">Debug</xsl:with-param>
-          <xsl:with-param name="platform"><xsl:value-of select="/Input/Properties/ForceArchitecture" /></xsl:with-param>
-        </xsl:call-template>
-        <xsl:call-template name="configuration">
-          <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
-          <xsl:with-param name="debug">false</xsl:with-param>
-          <xsl:with-param name="config">Release</xsl:with-param>
-          <xsl:with-param name="platform"><xsl:value-of select="/Input/Properties/ForceArchitecture" /></xsl:with-param>
-        </xsl:call-template>
-      </xsl:if>
       <xsl:choose>
         <xsl:when test="$project/@Type = 'Website'">
           <Import>
@@ -1094,6 +1144,29 @@
       </ItemGroup>
 
       <ItemGroup>
+        <xsl:for-each select="$project/Files/EmbeddedNativeLibrary">
+          <xsl:if test="user:ProjectAndServiceIsActive(
+              ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
+            <xsl:element
+              name="{name()}"
+              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
+              <xsl:attribute name="Include">
+                <xsl:value-of select="@Include" />
+              </xsl:attribute>
+              <xsl:apply-templates select="node()"/>
+            </xsl:element>
+          </xsl:if>
+        </xsl:for-each>
+      </ItemGroup>
+
+      <ItemGroup>
         <xsl:for-each select="$project/Files/EmbeddedShaderProgram">
           <xsl:if test="user:ProjectAndServiceIsActive(
               ./Platforms,
@@ -1324,6 +1397,29 @@
 
       <ItemGroup>
         <xsl:for-each select="$project/Files/Resource">
+          <xsl:if test="user:ProjectAndServiceIsActive(
+              ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
+              ./Services,
+              ./IncludeServices,
+              ./ExcludeServices,
+              /Input/Generation/Platform,
+              /Input/Services/ActiveServicesNames)">
+            <xsl:element
+              name="{name()}"
+              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
+              <xsl:attribute name="Include">
+                <xsl:value-of select="@Include" />
+              </xsl:attribute>
+              <xsl:apply-templates select="node()"/>
+            </xsl:element>
+          </xsl:if>
+        </xsl:for-each>
+      </ItemGroup>
+
+      <ItemGroup>
+        <xsl:for-each select="$project/Files/XamarinComponentReference">
           <xsl:if test="user:ProjectAndServiceIsActive(
               ./Platforms,
               ./IncludePlatforms,
@@ -1730,7 +1826,7 @@
               count(/Input/Projects/ExternalProject[@Name=$include-path]) = 0">
 
               <xsl:if test="user:ProjectIsActive(
-                $project/@Platforms,
+                /Input/Projects/Project[@Name=$include-path]/@Platforms,
                 '',
                 '',
                 /Input/Generation/Platform)">
