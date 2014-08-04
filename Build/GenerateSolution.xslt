@@ -101,6 +101,16 @@
         <xsl:with-param name="path" select="current()/@Path" />
       </xsl:call-template>
     </xsl:for-each>
+    <xsl:for-each select="/Input/Projects/ExternalProject
+                          /Platform[@Type=/Input/Generation/Platform]
+                          /RelatedProject">
+      <xsl:call-template name="project-definition">
+        <xsl:with-param name="type" select="current()/@Type" />
+        <xsl:with-param name="name" select="current()/@Name" />
+        <xsl:with-param name="guid" select="current()/@Guid" />
+        <xsl:with-param name="path" select="current()/@Path" />
+      </xsl:call-template>
+    </xsl:for-each>
     <xsl:choose>
       <xsl:when test="/Input/Generation/Platform = 'iOS'">
         <xsl:text>Global
