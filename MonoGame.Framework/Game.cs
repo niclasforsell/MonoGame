@@ -407,11 +407,11 @@ namespace Microsoft.Xna.Framework
 
             if (!_initialized) {
                 DoInitialize ();
+                _gameTimer = Stopwatch.StartNew();
                 _initialized = true;
             }
 
-            BeginRun();
-            _gameTimer = Stopwatch.StartNew();
+            BeginRun();            
 
             //Not quite right..
             Tick ();
@@ -703,13 +703,12 @@ namespace Microsoft.Xna.Framework
                 // playing sounds to see if they've stopped,
                 // and return them back to the pool if so.
                 SoundEffectInstancePool.Update();
-                
-                //The TouchPanel needs to know the time for when touches arrive
-                TouchPanelState.Update(gameTime);
 
                 Update(gameTime);
+
+                //The TouchPanel needs to know the time for when touches arrive
+                TouchPanelState.CurrentTimestamp = gameTime.TotalGameTime;
             }
-                
         }
 
         internal void DoDraw(GameTime gameTime)
