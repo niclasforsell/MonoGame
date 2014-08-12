@@ -84,6 +84,19 @@ int32_t SystemService::GetNumRecieveEvents()
 	return status.eventNum;
 }
 
+bool SystemService::ReceiveEvent(CS_OUT SystemServiceEvent *eventType)
+{
+	SceSystemServiceEvent event;
+	auto result = sceSystemServiceReceiveEvent(&event);
+	if (result != SCE_OK)
+		return false;
+
+	*eventType = (SystemServiceEvent)event.eventType;
+	// TODO: Return data too!
+
+	return true;
+}
+
 bool SystemService::GetIsSystemUIOverlaid()
 {
 	SceSystemServiceStatus status;
