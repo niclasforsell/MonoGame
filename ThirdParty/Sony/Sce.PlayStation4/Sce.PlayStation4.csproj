@@ -75,6 +75,7 @@
     <Compile Include="SoundSystem.cs" />
     <Compile Include="RenderTarget.cs" />
     <Compile Include="SystemService.cs" />
+    <Compile Include="SystemService.Public.cs" />
     <Compile Include="Texture.cs" />
     <Compile Include="threadPrio.cs" />
     <Compile Include="TitleStorage.cs" />

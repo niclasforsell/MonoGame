@@ -32,14 +32,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CppSharp">
+      <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.dll</HintPath>
+    </Reference>
     <Reference Include="CppSharp.AST">
       <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.AST.dll</HintPath>
     </Reference>
     <Reference Include="CppSharp.Generator">
       <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.Generator.dll</HintPath>
     </Reference>
-    <Reference Include="CppSharp.Parser">
-      <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.Parser.dll</HintPath>
+    <Reference Include="CppSharp.Parser.CLI">
+      <HintPath>..\..\Dependencies\CppSharp\Windows\CppSharp.Parser.CLI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,6 +55,12 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="ScePlayStation4.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Dependencies\CppSharp\Windows\CppSharp.CppParser.dll">
+      <Link>CppSharp.CppParser.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

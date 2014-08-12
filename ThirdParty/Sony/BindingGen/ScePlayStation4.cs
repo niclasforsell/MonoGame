@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CppSharp;
-using CppSharp.AST;
+﻿using CppSharp;
+using CppSharp.Parser.AST;
 using CppSharp.Passes;
 
 namespace BindingGen
@@ -40,11 +35,11 @@ namespace BindingGen
             options.OutputNamespace = "Sce.PlayStation4";
             options.SharedLibraryName = "scePlayStation4.prx";
 
-            options.Defines.Add("__ORBIS__");
-            options.Defines.Add("CS_BINDING_GEN");
+            options.addDefines("__ORBIS__");
+            options.addDefines("CS_BINDING_GEN");
             
             // The paths to search for headers.
-            options.IncludeDirs.Add(@".\");
+            options.addIncludeDirs(@".\");
 
             // The headers to process.
             //
@@ -57,7 +52,7 @@ namespace BindingGen
             options.Headers.Add(@"Graphics\Texture.h");
             options.Headers.Add(@"Graphics\RenderTarget.h");
             options.Headers.Add(@"Graphics\GraphicsSystem.h");
-            options.Headers.Add(@"Graphics\TextureFormat.h");
+            //options.Headers.Add(@"Graphics\TextureFormat.h");
             options.Headers.Add(@"Graphics\VertexShader.h");
             options.Headers.Add(@"Graphics\FetchShader.h");
             options.Headers.Add(@"Graphics\PixelShader.h");
@@ -93,9 +88,9 @@ namespace BindingGen
 
             // Make sure any system headers needed is available.
             var orbisSDK = System.Environment.GetEnvironmentVariable("SCE_ORBIS_SDK_DIR");
-            options.SystemIncludeDirs.Add(orbisSDK + @"\host_tools\lib\clang\include");
-            options.SystemIncludeDirs.Add(orbisSDK + @"\target\include");
-            options.SystemIncludeDirs.Add(orbisSDK + @"\target\include_common");
+            options.addSystemIncludeDirs(orbisSDK + @"\host_tools\lib\clang\include");
+            options.addSystemIncludeDirs(orbisSDK + @"\target\include");
+            options.addSystemIncludeDirs(orbisSDK + @"\target\include_common");
 
             // Output it to the C# wrapper project.
             options.OutputDir = @"..\Sce.PlayStation4";
@@ -111,13 +106,13 @@ namespace BindingGen
             driver.AddTranslationUnitPass(new CheckMacroPass());
         }
 
-        public void Preprocess(Driver driver, ASTContext lib)
+        public void Preprocess(Driver driver, CppSharp.AST.ASTContext lib)
         {
             // Force it to skip generation of anything in the predecls header.
             lib.IgnoreHeadersWithName("predecls");
         }
 
-        public void Postprocess(Driver driver, ASTContext lib)
+        public void Postprocess(Driver driver, CppSharp.AST.ASTContext lib)
         {
         }
     }

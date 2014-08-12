@@ -65,10 +65,26 @@ enum class GpuLoadEmulationMode
 	High = SCE_SYSTEM_SERVICE_GPU_LOAD_EMULATION_MODE_HIGH,
 };
 
+enum class SystemServiceEvent
+{
+	OnResume = SCE_SYSTEM_SERVICE_EVENT_ON_RESUME,
+	GameLiveStreamingStatusUpdate = SCE_SYSTEM_SERVICE_EVENT_GAME_LIVE_STREAMING_STATUS_UPDATE,
+	SessionInvitation = SCE_SYSTEM_SERVICE_EVENT_SESSION_INVITATION,
+	EntitlementUpdate = SCE_SYSTEM_SERVICE_EVENT_ENTITLEMENT_UPDATE,
+	GameCustomData = SCE_SYSTEM_SERVICE_EVENT_GAME_CUSTOM_DATA,
+	DisplaySafeAreaUpdate = SCE_SYSTEM_SERVICE_EVENT_DISPLAY_SAFE_AREA_UPDATE,
+};
+
 
 class CS_API SystemService
 {
 	SystemService() { }
+
+protected:
+
+	static int32_t GetNumRecieveEvents();
+
+	static bool ReceiveEvent(CS_OUT SystemServiceEvent *eventType);
 
 public:
 
@@ -93,8 +109,6 @@ public:
 	static void ShowDisplaySafeAreaSettings();
 
 	static SystemServiceResult GetDisplaySafeAreaInfo(CS_OUT float *ratio);
-
-	static int32_t GetNumRecieveEvents();
 
 	static bool GetIsSystemUIOverlaid();
 
