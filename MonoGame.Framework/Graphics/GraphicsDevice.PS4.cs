@@ -99,6 +99,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _system.SetRenderTargets(null, null, null, null);
         }
 
+        internal void PlatformResolveRenderTargets()
+        {
+            // Resolving MSAA render targets should be done here.
+        }
+
         private IRenderTarget PlatformApplyRenderTargets()
         {
             Textures.ClearTargets(this, _currentRenderTargetBindings);
