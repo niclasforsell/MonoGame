@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         public bool Play(PlayerIndex playerIndex, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f)
         {
-            var inst = GetPooledInstance();
+            var inst = GetPooledInstance(false);
             if (inst == null)
                 return false;
 
@@ -73,11 +73,6 @@ namespace Microsoft.Xna.Framework.Audio
             inst._buffer = _buffer;
             inst._voice.Looped = inst.IsLooped;
             inst._controllerPort = -1;
-        }
-
-        private static void PlatformSetMasterVolume()
-        {
-            SoundEffectInstancePool.UpdateVolumes();
         }
 
         internal static void PlatformShutdown()
