@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// SoundEffectInstance if the pool is empty.
         /// </summary>
         /// <returns>The SoundEffectInstance.</returns>
-        internal static SoundEffectInstance GetInstance()
+        internal static SoundEffectInstance GetInstance(bool forXAct)
         {
             SoundEffectInstance inst = null;
             var count = _pooledInstances.Count;
@@ -115,15 +115,19 @@ namespace Microsoft.Xna.Framework.Audio
                 _pooledInstances.RemoveAt(count - 1);
 
                 // Reset used instance to the "default" state.
+                inst._isPooled = true;
+                inst._isXAct = forXAct;
                 inst.Volume = 1.0f;
                 inst.Pan = 0.0f;
                 inst.Pitch = 0.0f;
                 inst.IsLooped = false;
             }
             else
+            {
                 inst = new SoundEffectInstance();
-
-            inst._isPooled = true;
+                inst._isPooled = true;
+                inst._isXAct = forXAct;
+            }
 
             return inst;
         }
@@ -163,13 +167,19 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        /// <summary>
-        /// Updates the volumes of all currently playing instances. Used when SoundEffect.MasterVolume is changed.
-        /// </summary>
-        internal static void UpdateVolumes()
+        internal static void UpdateMasterVolume()
         {
             foreach (var inst in _playingInstances)
+            {
+                // XAct sounds are not controlled by the SoundEffect
+                // master volume, so we can skip them completely.
+                if (inst._isXAct)
+                    continue;
+
+                // Re-applying the volume to itself will update
+                // the sound with the current master volume.
                 inst.Volume = inst.Volume;
+            }
         }
     }
 }
