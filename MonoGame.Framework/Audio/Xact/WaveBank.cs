@@ -401,7 +401,15 @@ namespace Microsoft.Xna.Framework.Audio
                         }
                     }
 #endif
-                } else {
+                } 
+#if PLAYSTATION4
+                else if (codec == MiniFormatTag_XMA)
+                {
+                    // We hijack XMA flag and assume it is AT9 audio!
+                    _sounds[current_entry] = new SoundEffect(audiodata, 0);
+                }
+#endif                
+                else {
                     throw new NotImplementedException();
                 }
                 
