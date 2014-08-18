@@ -50,18 +50,9 @@
   </msxsl:script> 
  
   <xsl:template match="/">
-    <xsl:choose>
-      <xsl:when test="/Input/Generation/Platform = 'Windows8' or /Input/Generation/Platform = 'WindowsPhone' or /Input/Generation/Platform = 'PlayStation4'">
 <xsl:text>Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 </xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-<xsl:text>Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-</xsl:text>
-      </xsl:otherwise>
-    </xsl:choose>
     <xsl:for-each select="/Input/Projects/Project">
       <xsl:if test="user:ProjectIsActive(
           current()/@Platforms,
