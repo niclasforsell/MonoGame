@@ -171,6 +171,14 @@
         <xsl:with-param name="root" select="current()" />
       </xsl:call-template>
     </xsl:for-each>
+    <xsl:for-each select="/Input/Projects/ExternalProject
+                          /Platform[@Type=/Input/Generation/Platform]
+                          /RelatedProject[not(@Guid=preceding::RelatedProject/@Guid)]">
+      <xsl:call-template name="project-configuration">
+        <xsl:with-param name="guid" select="current()/@Guid" />
+        <xsl:with-param name="root" select="current()" />
+      </xsl:call-template>
+    </xsl:for-each>
     <xsl:text>        EndGlobalSection
 EndGlobal
 </xsl:text>
