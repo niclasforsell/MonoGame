@@ -618,6 +618,9 @@
     <Compile Include="Graphics\TextureCollection.Web.cs">
         <Platforms>Web</Platforms>
     </Compile>
+    <Compile Include="Graphics\TextureCollection.PS4.cs">
+      <Platforms>PlayStation4</Platforms>
+    </Compile>
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\Texture.DirectX.cs">
         <Platforms>Windows,Windows8,WindowsPhone</Platforms>
