@@ -34,6 +34,13 @@ namespace Microsoft.Xna.Framework
             _window = new PS4GameWindow(this);
 
             Window = _window;
+
+            // Initializing this early because SaveData requires User Service
+            // And UserService requires SoundSystem. This allows for 
+            // users to initialize SaveGame data in the game constructor.
+            // should they want to.
+            SoundSystem.Instance.Initialize();
+            UserService.Initialize();
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -49,11 +56,6 @@ namespace Microsoft.Xna.Framework
         public override void BeforeInitialize()
         {
             _window.Initialize(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight);
-
-            SoundSystem.Instance.Initialize();
-            UserService.Initialize();
-
-//            SaveDataSystem.Initialize();
             Sce.PlayStation4.Game.ManagedCollect = CollectAndWait;
 
             base.BeforeInitialize();
