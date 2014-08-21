@@ -60,13 +60,17 @@ int32_t SoundSystem::audioOutMain(AudioOutBufferInfo* aBufferInfo, uint32_t numI
 	return 0;
 }
 
-SoundSystem::SoundSystem(void)
+SoundSystem::SoundSystem(void) :
+	_initialized(false)
 {
 	_freeVoiceIDs = new std::queue<unsigned int>();
 }
 
 void SoundSystem::Initialize()
 {
+	if (_initialized)
+		return;
+
 	// Initialize padPort array.
 	for(auto x = 0; x < 4; x++)
 		m_padPort[x] = -1;
@@ -145,6 +149,8 @@ void SoundSystem::Initialize()
 
 	for (auto x = 0; x < 4; x++)
 		_masteringPadVoiceHandle[x] = 0;
+
+	_initialized = true;
 }
 
 void SoundSystem::SubmitPlaybackEvent(SamplerVoice* voiceHandle, AudioBuffer *buffer, PlaybackEvent evt, int portHandle)

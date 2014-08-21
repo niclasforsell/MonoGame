@@ -21,6 +21,8 @@ private:
 	
 	SoundSystem();
 
+	bool _initialized;
+
 	unsigned int _currentVoiceHandle;
 
 	SceNgs2Handle _systemHandle;			// NGS2 system handle
