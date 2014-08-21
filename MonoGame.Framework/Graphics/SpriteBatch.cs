@@ -115,6 +115,11 @@ namespace Microsoft.Xna.Framework.Graphics
             Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0, out projection);
 #elif PLAYSTATION4
             Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, -1, out projection);
+            
+            // Requires a half-pixel offset for some reason,
+            // Or sprites rendered will appear blurry.
+            projection.M41 += -0.5f * projection.M11;
+            projection.M42 += -0.5f * projection.M22;
 #else
             // GL requires a half pixel offset to match DX.
             Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1, out projection);
