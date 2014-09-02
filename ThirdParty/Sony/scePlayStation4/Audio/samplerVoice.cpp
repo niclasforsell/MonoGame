@@ -156,19 +156,24 @@ void SamplerVoice::SetPan(float pan)
 
 	auto params = SceNgs2PanParam();
 	params.angle = panAmount;
+	params.distance  = 1.0f;
+	params.fbwLevel  = 1.0f;
 
-	auto panWork = SceNgs2PanWork();
-	panWork.numSpeakers = 2;
-	panWork.aSpeakerAngle[0] = 270;
-	panWork.aSpeakerAngle[1] = 90;
-	panWork.unitAngle = SCE_NGS2_PAN_ANGLE_DEGREE;
+	SceNgs2PanWork panWork;
 
-	static float levelArray[2] = { 1.0f, 1.0f };
-	auto errorCode = sceNgs2PanGetVolumeMatrix(&panWork, &params, 1, SCE_NGS2_PAN_MATRIX_FORMAT_2_0CH, levelArray);
+	auto errorCode = sceNgs2PanInit( &panWork, NULL, SCE_NGS2_PAN_ANGLE_DEGREE, SCE_NGS2_PAN_SPEAKER_2_0CH);
+	assert(errorCode >= 0);
+
+	static float levelArray[2];
+
+	errorCode = sceNgs2PanGetVolumeMatrix(&panWork, &params, 1, SCE_NGS2_PAN_MATRIX_FORMAT_2_0CH, levelArray);
 	assert(errorCode >= 0);
 
 	sceNgs2RackGetVoiceHandle(_rackHandle, _voiceHandleID, &_voiceHandle);
 	errorCode = sceNgs2VoiceSetMatrixLevels(_voiceHandle, 0, levelArray, 2);
+	assert(errorCode >= 0);
+
+	errorCode = sceNgs2VoiceSetPortMatrix( _voiceHandle, 0, 0);
 	assert(errorCode >= 0);
 }
 
