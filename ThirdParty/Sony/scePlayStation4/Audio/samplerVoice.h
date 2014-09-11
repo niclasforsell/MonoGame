@@ -35,6 +35,9 @@ protected:
 	AudioBuffer *_buffer;
 
 
+	void GetPanLevels(float angle, float *panLevels);
+	void SetMatrixLevels(float *panLevels);
+
 public:
 
 	void SetFade(float fadeinTime, float fadeOutTime);

@@ -92,7 +92,7 @@ void SoundSystem::Initialize()
 	m_audioOut = new AudioOut();
 	errorCode = m_audioOut->init(
 			48000,	// [Hz]
-			2,		// [ch]
+			8,		// [ch]
 			256,	// [samples]
 			SoundSystem::_audioOutMain,
 			this,
@@ -130,7 +130,7 @@ void SoundSystem::Initialize()
 	errorCode = sceNgs2RackGetVoiceHandle(_masteringRackHandle, 0, &_masteringVoiceHandle);
 	assert(errorCode == 0);
 
-	errorCode = sceNgs2MasteringVoiceSetup(_masteringVoiceHandle,SCE_NGS2_CHANNELS_2_0CH, 0);
+	errorCode = sceNgs2MasteringVoiceSetup(_masteringVoiceHandle,SCE_NGS2_CHANNELS_7_1CH, 0);
 	assert(errorCode == 0);
 
 	errorCode = sceNgs2MasteringVoiceSetOutput( _masteringVoiceHandle, m_audioOut->getBufferId( mainPort ));
