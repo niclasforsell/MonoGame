@@ -128,22 +128,22 @@ void SoundSystem::Initialize()
 	// Setup the mastering rack.
 	SceNgs2MasteringRackOption masteringOption;
 	sceNgs2MasteringRackResetOption(&masteringOption);
-	strcpy(masteringOption.rackOption.name, "master_rack");
 	masteringOption.rackOption.maxVoices = m_audioOut->getNumPorts();
 #if _DEBUG
+	strcpy(masteringOption.rackOption.name, "master_rack");
 	masteringOption.rackOption.flags = SCE_NGS2_RACK_OPTION_FLAG_DIAG;
 #endif
 
 	errorCode = sceNgs2RackCreateWithAllocator(_systemHandle, SCE_NGS2_RACK_ID_MASTERING, &masteringOption.rackOption, &allocator, &_masteringRackHandle);
 	assert(errorCode == 0);
 
-	// Setup thje 
+	// Setup the sampler rack.
 	SceNgs2SamplerRackOption samplerOption;
 	sceNgs2SamplerRackResetOption(&samplerOption);
-	strcpy(samplerOption.rackOption.name, "sampler_rack");
 	samplerOption.rackOption.maxVoices = MAX_VOICES;
 	samplerOption.maxChannelWorks = MAX_VOICES;
 #if _DEBUG
+	strcpy(samplerOption.rackOption.name, "sampler_rack");
 	samplerOption.rackOption.flags = SCE_NGS2_RACK_OPTION_FLAG_DIAG;
 #endif
 
