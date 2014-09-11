@@ -18,9 +18,9 @@ using namespace Media;
 
 namespace {
 	void* videoAlloc(void* argP, uint32_t argAlignment, uint32_t argSize) { return mem::alloc(argSize, argAlignment); }
-	void videoFree(void* argP, void* argMemory) { mem::free(argP); }
+	void videoFree(void* argP, void* argMemory) { mem::free(argMemory); }
 	void* videoAllocTexture(void* argP, uint32_t argAlignment, uint32_t argSize) { return mem::alloc(argSize, argAlignment); }
-	void videoFreeTexture(void* argP, void* argMemory) { mem::free(argP); }
+	void videoFreeTexture(void* argP, void* argMemory) { mem::free(argMemory); }
 
 	void* videoOutputThread(void* arg)
 	{
