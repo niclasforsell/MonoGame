@@ -88,11 +88,10 @@ namespace {
 
 VideoPlayer::VideoPlayer(GraphicsSystem* graphics)
 {
-	if (sceSysmoduleIsLoaded(SCE_SYSMODULE_AV_PLAYER) != SCE_SYSMODULE_LOADED)
-	{
-		auto ret = sceSysmoduleLoadModule(SCE_SYSMODULE_AV_PLAYER);
-		assert(ret == SCE_OK);
-	}
+	auto ret = sceSysmoduleLoadModule(SCE_SYSMODULE_VIDEODEC);
+	assert(ret == SCE_OK);
+	ret = sceSysmoduleLoadModule(SCE_SYSMODULE_AV_PLAYER);
+	assert(ret == SCE_OK);
 
 	memset(&_videoFrame, 0, sizeof(SceAvPlayerFrameInfoEx));
 	scePthreadMutexInit(&_frameMutex, NULL, "av_frame_mutex");
