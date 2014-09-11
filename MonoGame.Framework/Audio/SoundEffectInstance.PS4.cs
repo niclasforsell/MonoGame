@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice == null)
                 return;
 
-            SoundSystem.Instance.SubmitPlaybackEvent(_voice, _buffer, PlaybackEvent.Pause, _controllerPort);
+            // TODO: Fix me!
         }
 
         private void PlatformPause()

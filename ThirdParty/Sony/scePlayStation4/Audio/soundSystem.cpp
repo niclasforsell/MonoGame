@@ -6,6 +6,7 @@
 
 #include <ngs2.h>
 #include <libsysmodule.h>
+#include <sulpha.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <queue>
@@ -71,14 +72,29 @@ void SoundSystem::Initialize()
 	if (_initialized)
 		return;
 
+	int errorCode;
+
+#ifdef _DEBUG
+
+	{
+		errorCode = sceSysmoduleLoadModule( SCE_SYSMODULE_SULPHA );
+		assert(errorCode == 0);
+		SceSulphaConfig config;
+		sceSulphaGetDefaultConfig(&config);
+		size_t size;
+		sceSulphaGetNeededMemory(&config, &size);
+		auto sulphaMem = mem::alloc(size);
+		sceSulphaInit(&config, sulphaMem, size);
+	}
+
+#endif
+
 	// Initialize padPort array.
 	for(auto x = 0; x < 4; x++)
 		m_padPort[x] = -1;
 	
 	SceNgs2BufferAllocator allocator;
-
-	int errorCode;
-
+	
 	errorCode = sceSysmoduleLoadModule( SCE_SYSMODULE_NGS2 );
 	assert(errorCode == 0);
 
@@ -92,7 +108,7 @@ void SoundSystem::Initialize()
 	m_audioOut = new AudioOut();
 	errorCode = m_audioOut->init(
 			48000,	// [Hz]
-			2,		// [ch]
+			8,		// [ch]
 			256,	// [samples]
 			SoundSystem::_audioOutMain,
 			this,
@@ -109,28 +125,35 @@ void SoundSystem::Initialize()
 	errorCode = sceNgs2SystemCreateWithAllocator(NULL, &allocator, &_systemHandle);
 	assert(errorCode == 0);
 
+	// Setup the mastering rack.
 	SceNgs2MasteringRackOption masteringOption;
-	sceNgs2MasteringRackResetOption( &masteringOption );
+	sceNgs2MasteringRackResetOption(&masteringOption);
 	masteringOption.rackOption.maxVoices = m_audioOut->getNumPorts();
+#if _DEBUG
+	strcpy(masteringOption.rackOption.name, "master_rack");
+	masteringOption.rackOption.flags = SCE_NGS2_RACK_OPTION_FLAG_DIAG;
+#endif
 
 	errorCode = sceNgs2RackCreateWithAllocator(_systemHandle, SCE_NGS2_RACK_ID_MASTERING, &masteringOption.rackOption, &allocator, &_masteringRackHandle);
 	assert(errorCode == 0);
 
-	SceNgs2SamplerRackOption option;
-	// Reset rack option and modify some values
-	errorCode = sceNgs2SamplerRackResetOption(&option);
-	option.rackOption.maxVoices = MAX_VOICES;
-	option.maxChannelWorks = MAX_VOICES;
+	// Setup the sampler rack.
+	SceNgs2SamplerRackOption samplerOption;
+	sceNgs2SamplerRackResetOption(&samplerOption);
+	samplerOption.rackOption.maxVoices = MAX_VOICES;
+	samplerOption.maxChannelWorks = MAX_VOICES;
+#if _DEBUG
+	strcpy(samplerOption.rackOption.name, "sampler_rack");
+	samplerOption.rackOption.flags = SCE_NGS2_RACK_OPTION_FLAG_DIAG;
+#endif
 
-	assert(errorCode == 0);
-
-	errorCode = sceNgs2RackCreateWithAllocator(_systemHandle, SCE_NGS2_RACK_ID_SAMPLER, &option.rackOption, &allocator, &_samplerRackHandle);
+	errorCode = sceNgs2RackCreateWithAllocator(_systemHandle, SCE_NGS2_RACK_ID_SAMPLER, &samplerOption.rackOption, &allocator, &_samplerRackHandle);
 	assert(errorCode == 0);
 
 	errorCode = sceNgs2RackGetVoiceHandle(_masteringRackHandle, 0, &_masteringVoiceHandle);
 	assert(errorCode == 0);
 
-	errorCode = sceNgs2MasteringVoiceSetup(_masteringVoiceHandle,SCE_NGS2_CHANNELS_2_0CH, 0);
+	errorCode = sceNgs2MasteringVoiceSetup(_masteringVoiceHandle,SCE_NGS2_CHANNELS_7_1CH, 0);
 	assert(errorCode == 0);
 
 	errorCode = sceNgs2MasteringVoiceSetOutput( _masteringVoiceHandle, m_audioOut->getBufferId( mainPort ));
