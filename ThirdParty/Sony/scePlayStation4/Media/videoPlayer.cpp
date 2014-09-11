@@ -18,9 +18,9 @@ using namespace Media;
 
 namespace {
 	void* videoAlloc(void* argP, uint32_t argAlignment, uint32_t argSize) { return mem::alloc(argSize, argAlignment); }
-	void videoFree(void* argP, void* argMemory) { mem::free(argP); }
+	void videoFree(void* argP, void* argMemory) { mem::free(argMemory); }
 	void* videoAllocTexture(void* argP, uint32_t argAlignment, uint32_t argSize) { return mem::alloc(argSize, argAlignment); }
-	void videoFreeTexture(void* argP, void* argMemory) { mem::free(argP); }
+	void videoFreeTexture(void* argP, void* argMemory) { mem::free(argMemory); }
 
 	void* videoOutputThread(void* arg)
 	{
@@ -88,11 +88,10 @@ namespace {
 
 VideoPlayer::VideoPlayer(GraphicsSystem* graphics)
 {
-	if (sceSysmoduleIsLoaded(SCE_SYSMODULE_AV_PLAYER) != SCE_SYSMODULE_LOADED)
-	{
-		auto ret = sceSysmoduleLoadModule(SCE_SYSMODULE_AV_PLAYER);
-		assert(ret == SCE_OK);
-	}
+	auto ret = sceSysmoduleLoadModule(SCE_SYSMODULE_VIDEODEC);
+	assert(ret == SCE_OK);
+	ret = sceSysmoduleLoadModule(SCE_SYSMODULE_AV_PLAYER);
+	assert(ret == SCE_OK);
 
 	memset(&_videoFrame, 0, sizeof(SceAvPlayerFrameInfoEx));
 	scePthreadMutexInit(&_frameMutex, NULL, "av_frame_mutex");
