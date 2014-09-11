@@ -534,7 +534,7 @@ void RegionAllocator::releaseRegion(uint64_t start, uint64_t type)
 	}
 
 	fprintf(stderr, "Pointer 0x%p was not allocated through the allocator!\n", start);
-	assert(!"Pointer Not Allocated With GNM");
+	assert(!"Pointer not allocator with this allocator");
 }
 
 // Allocator
@@ -618,6 +618,7 @@ void Allocator::release(void *ptr)
 	else
 	{
 		printf("Unknown memory range: 0x%016lX\n", address);
+		assert(!"Unknown memory pointer");
 	}
 }
 
