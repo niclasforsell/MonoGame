@@ -13,6 +13,10 @@
 
 using namespace Audio;
 
+#if _DEBUG
+//#define SOUND_LOGGING 1
+#endif
+
 SoundSystem* SoundSystem::GetInstance()
 {
 	static SoundSystem instance;
@@ -23,13 +27,17 @@ SoundSystem* SoundSystem::GetInstance()
 static int32_t bufferAlloc(SceNgs2ContextBufferInfo *bufferInfo)
 {
 	bufferInfo->hostBuffer = mem::alloc(bufferInfo->hostBufferSize);
-	printf("# Allocate (%p,%zd[byte])\n", bufferInfo->hostBuffer, bufferInfo->hostBufferSize);
+#if SOUND_LOGGING
+	printf("SoundSystem Allocate (%p,%zd[byte])\n", bufferInfo->hostBuffer, bufferInfo->hostBufferSize);
+#endif
 	return (bufferInfo->hostBuffer)? SCE_OK : SCE_NGS2_ERROR_EMPTY_BUFFER;
 }
 	
 static int32_t bufferFree(SceNgs2ContextBufferInfo *bufferInfo)
 {
-	printf("# Free (%p,%zd[byte])\n", bufferInfo->hostBuffer, bufferInfo->hostBufferSize);
+#if SOUND_LOGGING
+	printf("SoundSystem Free (%p,%zd[byte])\n", bufferInfo->hostBuffer, bufferInfo->hostBufferSize);
+#endif
 	mem::free(bufferInfo->hostBuffer);
 	return SCE_OK;
 }
@@ -224,6 +232,7 @@ SamplerVoice* SoundSystem::CreateVoice(AudioBuffer* buffer)
 	if (ids->size() == 0)
 	{
 		printf("WARNING: Couldn't find a free voice ID to use.\n");
+		assert(!"SoundSystem::CreateVoice - Ran out of voices!");
 		return NULL;
 	}
 
@@ -232,6 +241,10 @@ SamplerVoice* SoundSystem::CreateVoice(AudioBuffer* buffer)
 
 	auto nextID = ids->front();
 	ids->pop();
+
+#if SOUND_LOGGING
+	printf("SoundSystem::CreateVoice: %d voices free.\n", ids->size());
+#endif
 
 	errorCode = sceNgs2RackGetVoiceHandle(_samplerRackHandle, nextID, &voiceHandle);
 	assert(errorCode >= 0);
@@ -251,8 +264,13 @@ void SoundSystem::DestroyVoice(SamplerVoice* voice)
 	if (voice->GetState() != SoundState::Stopped)
 		SubmitPlaybackEvent(voice, NULL, PlaybackEvent::StopImmediate);
 
-	((std::queue<unsigned int>*)_freeVoiceIDs)->push(voice->_voiceHandleID);
+	auto ids = ((std::queue<unsigned int>*)_freeVoiceIDs);
+	ids->push(voice->_voiceHandleID);
 	voice->_voiceHandleID = 0;
+
+#if SOUND_LOGGING
+	printf("SoundSystem::DestroyVoice: %d voices free.\n", ids->size());
+#endif
 }
 
 void SoundSystem::OpenControllerPort(int playerIdx, uint32_t userID)
