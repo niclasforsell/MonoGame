@@ -194,6 +194,23 @@ namespace MonoGame.Tools.Pipeline
             ContextMenu_OpenFile_Click(sender, args);            
         }
 
+        public void UpdateRecentProjectList()
+        {
+            _openRecentMenuItem.DropDownItems.Clear();
+
+            foreach (var project in History.Default.ProjectHistory)
+            {
+                var recentItem = new ToolStripMenuItem(project);
+                recentItem.Click += (sender, args) =>
+                {
+                    _controller.OpenProject(project);
+                };
+
+                _openRecentMenuItem.DropDownItems.Insert(0, recentItem);
+            }
+
+        }
+
         public AskResult AskSaveOrCancel()
         {
             var result = MessageBox.Show(
@@ -489,12 +506,17 @@ namespace MonoGame.Tools.Pipeline
         }
 
         private void MainView_Load(object sender, EventArgs e)
-        {
-            //Priority is given to any command line arguments.
-            if (string.IsNullOrEmpty(OpenProjectPath) && History.Default.ProjectHistory.Count > 0)
+        {            
+            // We only load the History.StartupProject if there was not
+            // already a project specified via command line.
+            if (string.IsNullOrEmpty(OpenProjectPath))
             {
-                OpenProjectPath = History.Default.ProjectHistory.Last();
+                var startupProject = History.Default.StartupProject;
+                if (!string.IsNullOrEmpty(startupProject) && File.Exists(startupProject))                
+                    OpenProjectPath = startupProject;                
             }
+
+            History.Default.StartupProject = null;
             
             if (!string.IsNullOrEmpty(OpenProjectPath))
             {
@@ -661,6 +683,7 @@ namespace MonoGame.Tools.Pipeline
             _cancelBuildMenuItem.Visible = !notBuilding;
       
             UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
+            UpdateRecentProjectList();
         }
         
         private void UpdateUndoRedo(bool canUndo, bool canRedo)
