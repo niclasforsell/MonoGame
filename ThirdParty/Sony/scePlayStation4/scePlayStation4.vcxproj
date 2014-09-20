@@ -132,6 +132,7 @@
     <ClCompile Include="System\playGo.cpp" />
     <ClCompile Include="System\remotePlay.cpp" />
     <ClCompile Include="System\saveData.cpp" />
+    <ClCompile Include="System\saveDataDialog.cpp" />
     <ClCompile Include="System\screenShot.cpp" />
     <ClCompile Include="System\systemService.cpp" />
     <ClCompile Include="System\userService.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="System\predecls.h" />
     <ClInclude Include="System\remotePlay.h" />
     <ClInclude Include="System\saveData.h" />
+    <ClInclude Include="System\saveDataDialog.h" />
     <ClInclude Include="System\screenShot.h" />
     <ClInclude Include="System\systemService.h" />
     <ClInclude Include="System\threadPrio.h" />
