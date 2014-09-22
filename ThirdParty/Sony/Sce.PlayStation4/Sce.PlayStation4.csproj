@@ -51,6 +51,7 @@
     <Compile Include="GamePadState.cs" />
     <Compile Include="GraphicsEnums.cs" />
     <Compile Include="GraphicsSystem.cs" />
+    <Compile Include="ImeDialog.cs" />
     <Compile Include="IndexBuffer.cs" />
     <Compile Include="Internals.cs" />
     <Compile Include="Keyboard.cs" />

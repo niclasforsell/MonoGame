@@ -143,6 +143,9 @@
       <Filter>Media</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\pngReader.cpp" />
+    <ClCompile Include="System\imeDialog.cpp">
+      <Filter>System</Filter>
+    </ClCompile>    
     <ClCompile Include="System\saveDataDialog.cpp">
       <Filter>System</Filter>
     </ClCompile>
@@ -364,6 +367,9 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\pngReader.h" />
+    <ClInclude Include="System\imeDialog.h">
+      <Filter>System</Filter>
+    </ClInclude>
     <ClInclude Include="System\saveDataDialog.h">
       <Filter>System</Filter>
     </ClInclude>
