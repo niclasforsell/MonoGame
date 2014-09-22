@@ -140,9 +140,15 @@ class CS_API ImeDialog
 {
 private:
 
-	wchar_t _inputText[SCE_IME_MAX_TEXT_LENGTH+1];
-	wchar_t _placeholder[SCE_IME_DIALOG_MAX_PLACEHOLDER_LENGTH+1];
-	wchar_t _title[SCE_IME_DIALOG_MAX_TITLE_LENGTH+1];
+	wchar_t _inputTextW[SCE_IME_MAX_TEXT_LENGTH+1];
+	wchar_t _placeholderW[SCE_IME_DIALOG_MAX_PLACEHOLDER_LENGTH+1];
+	wchar_t _titleW[SCE_IME_DIALOG_MAX_TITLE_LENGTH+1];
+
+	// HACK FOR CPPSHARP NOT SUPPORTING wchar_t!
+	char _inputText[SCE_IME_MAX_TEXT_LENGTH+1];
+	char _placeholder[SCE_IME_DIALOG_MAX_PLACEHOLDER_LENGTH+1];
+	char _title[SCE_IME_DIALOG_MAX_TITLE_LENGTH+1];
+
 	SceImeDialogParam _params;
 
 public:
@@ -150,11 +156,11 @@ public:
 	ImeDialog();
 	~ImeDialog();
 
-	ImeError Open();
+	ImeError Init();
 
 	ImeError Abort();
 
-	ImeError Close();
+	ImeError Term();
 	
 	ImeDialogStatus GetStatus();
 
@@ -189,13 +195,13 @@ public:
 	void SetVerticalAlignment(ImeVerticalAlignment align);
 	ImeVerticalAlignment GetVerticalAlignment();
 
-	void SetPlaceholder(const wchar_t *text);
-	const wchar_t* GetPlaceholder();
+	void SetPlaceholder(const char *text);
+	const char* GetPlaceholder();
 
-	void SetTitle(const wchar_t *text);
-	const wchar_t* GetTitle();
+	void SetTitle(const char *text);
+	const char* GetTitle();
 
-	const wchar_t* GetInputText();
+	const char* GetInputText();
 };
 
 } // namespace System

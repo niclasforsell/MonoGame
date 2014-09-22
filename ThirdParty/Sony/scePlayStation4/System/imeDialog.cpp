@@ -12,21 +12,26 @@ ImeDialog::ImeDialog()
 	_params.maxTextLength = SCE_IME_MAX_TEXT_LENGTH;
 
 	memset(&_inputText, 0, sizeof(_inputText));
-	_params.inputTextBuffer = _inputText;
+	memset(&_inputTextW, 0, sizeof(_inputTextW));
+	_params.inputTextBuffer = _inputTextW;
 
 	memset(&_placeholder, 0, sizeof(_placeholder));
-	_params.placeholder = _placeholder;
+	memset(&_placeholderW, 0, sizeof(_placeholderW));
+	_params.placeholder = _placeholderW;
 
 	memset(&_title, 0, sizeof(_title));
-	_params.title = _title;
+	memset(&_titleW, 0, sizeof(_titleW));
+	_params.title = _titleW;
 }
 
 ImeDialog::~ImeDialog()
 {
+	Term();
 }
 
-ImeError ImeDialog::Open()
+ImeError ImeDialog::Init()
 {
+	sceSysmoduleLoadModule(SCE_SYSMODULE_IME_DIALOG);
 	auto err = sceImeDialogInit(&_params, NULL);
 	return (ImeError)err;
 }
@@ -37,7 +42,7 @@ ImeError ImeDialog::Abort()
 	return (ImeError)err;
 }
 
-ImeError ImeDialog::Close()
+ImeError ImeDialog::Term()
 {
 	auto err = sceImeDialogTerm();
 	return (ImeError)err;
@@ -49,9 +54,12 @@ ImeDialogStatus ImeDialog::GetStatus()
 	return (ImeDialogStatus)status;
 }
 
-ImeError ImeDialog::GetResult(CS_OUT ImeDialogEndStatus* result)
+ImeError ImeDialog::GetResult(CS_OUT ImeDialogEndStatus* status)
 {
-	auto err = sceImeDialogGetResult((SceImeDialogResult*)result);
+	SceImeDialogResult result;
+	memset(&result, 0, sizeof(result));
+	auto err = sceImeDialogGetResult(&result);
+	*status = (ImeDialogEndStatus)result.endstatus;
 	return (ImeError)err;
 }
 
@@ -150,29 +158,32 @@ ImeVerticalAlignment ImeDialog::GetVerticalAlignment()
 	return (ImeVerticalAlignment)_params.verticalAlignment;
 }
 
-void ImeDialog::SetPlaceholder(const wchar_t* text)
+void ImeDialog::SetPlaceholder(const char* text)
 {
-	auto len = MIN(wcslen(text), SCE_IME_DIALOG_MAX_PLACEHOLDER_LENGTH);
-	wcsncpy(_placeholder, text, len);	
+	auto len = MIN(strlen(text), SCE_IME_DIALOG_MAX_PLACEHOLDER_LENGTH);
+	strncpy(_placeholder, text, len);	
+	mbstowcs(_placeholderW, _placeholder, len);
 }
 
-const wchar_t* ImeDialog::GetPlaceholder()
+const char* ImeDialog::GetPlaceholder()
 {
 	return _placeholder;
 }
 
-void ImeDialog::SetTitle(const wchar_t* text)
+void ImeDialog::SetTitle(const char* text)
 {
-	auto len = MIN(wcslen(text), SCE_IME_DIALOG_MAX_TITLE_LENGTH);
-	wcsncpy(_title, text, len);	
+	auto len = MIN(strlen(text), SCE_IME_DIALOG_MAX_TITLE_LENGTH);
+	strncpy(_title, text, len);	
+	mbstowcs(_titleW, _title, len);
 }
 
-const wchar_t* ImeDialog::GetTitle()
+const char* ImeDialog::GetTitle()
 {
 	return _title;
 }
 
-const wchar_t* ImeDialog::GetInputText()
+const char* ImeDialog::GetInputText()
 {
+	wcstombs(_inputText, _inputTextW, wcslen(_inputTextW));
 	return _inputText;
 }
