@@ -13,6 +13,10 @@ using namespace sce;
 #define DISABLE_MEMORY_CLEAR 0
 #define GNM_MEMORY_DEBUG_OVERFLOW_CHECK 0
 
+#if _DEBUG
+//#define MEMORY_LOGGING 1
+#endif
+
 namespace {
 	const uint64_t kRegionTypeMask = 0xE000000000000000ULL;
 	const uint64_t kRegionStartMask = 0x1FFFFFFFFFFFFFFFULL;
@@ -534,7 +538,7 @@ void RegionAllocator::releaseRegion(uint64_t start, uint64_t type)
 	}
 
 	fprintf(stderr, "Pointer 0x%p was not allocated through the allocator!\n", start);
-	assert(!"Pointer Not Allocated With GNM");
+	assert(!"Pointer not allocator with this allocator");
 }
 
 // Allocator
@@ -579,15 +583,15 @@ void* Allocator::allocate(size_t size, size_t align, SceKernelMemoryType type)
 	{
 	case SCE_KERNEL_WB_ONION:
 		ret = m_onionAllocator.allocate(size, align);
-#ifndef NDEBUG
-		//printf("Total System: %s\n", humanSize(m_onionAllocator.getMemoryUsage()));
+#if MEMORY_LOGGING
+		printf("System alloc - %s used.\n", humanSize(m_onionAllocator.getMemoryUsage()));
 #endif
 		return ret;
 
 	case SCE_KERNEL_WC_GARLIC:
 		ret = m_garlicAllocator.allocate(size, align);
-#ifndef NDEBUG
-		//printf("Total Shared:  %s\n", humanSize(m_garlicAllocator.getMemoryUsage()));
+#if MEMORY_LOGGING
+		printf("Shared alloc - %s used.\n", humanSize(m_garlicAllocator.getMemoryUsage()));
 #endif
 		return ret;
 
@@ -610,14 +614,21 @@ void Allocator::release(void *ptr)
 	if( address >= m_onionMemAddr && address < m_onionMemAddr+m_onionMemSize )
 	{
 		m_onionAllocator.release(ptr);
+#if MEMORY_LOGGING
+	printf("System free - %s used.\n", humanSize(m_onionAllocator.getMemoryUsage()));
+#endif
 	}
 	else if( address >= m_garlicMemAddr && address < m_garlicMemAddr+m_garlicMemSize )
 	{
 		m_garlicAllocator.release(ptr);
+#if MEMORY_LOGGING
+	printf("Shared free - %s used.\n", humanSize(m_garlicAllocator.getMemoryUsage()));
+#endif
 	}
 	else
 	{
 		printf("Unknown memory range: 0x%016lX\n", address);
+		assert(!"Unknown memory pointer");
 	}
 }
 

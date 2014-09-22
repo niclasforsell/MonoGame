@@ -84,6 +84,7 @@ namespace BindingGen
             options.Headers.Add(@"System\ErrorDialog.h");
             options.Headers.Add(@"System\MsgDialog.h");
             options.Headers.Add(@"System\ImeDialog.h");
+            options.Headers.Add(@"System\SaveDataDialog.h");
             options.Headers.Add(@"System\ScreenShot.h");
             options.Headers.Add(@"System\VideoRecording.h");
 

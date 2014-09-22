@@ -212,6 +212,7 @@
     <Compile Include="Audio\Xact\ClipEvent.cs" />
     <Compile Include="Audio\Xact\Cue.cs" />
     <Compile Include="Audio\Xact\PlayWaveEvent.cs" />
+    <Compile Include="Audio\Xact\VolumeEvent.cs" />
     <Compile Include="Audio\Xact\SoundBank.cs" />
     <Compile Include="Audio\Xact\WaveBank.cs" />
     <Compile Include="Audio\Xact\XactClip.cs" />
@@ -786,7 +787,10 @@
     <Compile Include="Media\Genre.cs" />
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaLibrary.Default.cs">
-      <ExcludePlatforms>iOS,Windows8,WindowsPhone</ExcludePlatforms>
+      <ExcludePlatforms>iOS,Windows8,WindowsPhone,Android,Ouya</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Media\MediaLibrary.Android.cs">
+      <Platforms>Android,Ouya</Platforms>
     </Compile>
     <Compile Include="Media\MediaLibrary.IOS.cs">
       <Platforms>iOS</Platforms>

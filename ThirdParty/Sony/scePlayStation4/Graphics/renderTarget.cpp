@@ -148,13 +148,13 @@ RenderTarget::~RenderTarget()
 		delete _depthTarget;
 	}
 
-	delete _renderTarget;
-
 	if (_ownsTexture)
 	{
 		mem::freeShared(_renderTarget->getBaseAddress());
 		delete _texture;
 	}
+
+	delete _renderTarget;
 }
 
 /*

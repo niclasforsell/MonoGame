@@ -23,8 +23,7 @@ SoundState SamplerVoice::GetState()
 {
 	uint32_t stateFlags;
 
-	sceNgs2RackGetVoiceHandle(_rackHandle, _voiceHandleID, &_voiceHandle);
-	int errorCode = sceNgs2VoiceGetStateFlags(_voiceHandle, &stateFlags);
+	auto errorCode = sceNgs2VoiceGetStateFlags(_voiceHandle, &stateFlags);
 
 	assert(errorCode >= 0);
 
@@ -55,15 +54,12 @@ void SamplerVoice::SetLooped(bool loop)
 {
 	_looped = loop;
 
-	auto errorCode = sceNgs2RackGetVoiceHandle(_rackHandle, _voiceHandleID, &_voiceHandle);
-	assert(errorCode == 0);
-
 	auto waveformInfo = _looped ? _buffer->_loopedWaveformInfo : _buffer->_waveformInfo;
 
 	SceNgs2SamplerVoiceSetupParam param;
 	param.flags = SCE_NGS2_SAMPLER_VOICE_ADD_WAVEFORM_BLOCKS;
 
-	errorCode = sceNgs2SamplerVoiceSetupParam(&param.header, 0, &waveformInfo->format, 0);
+	auto errorCode = sceNgs2SamplerVoiceSetupParam(&param.header, 0, &waveformInfo->format, 0);
 	assert(errorCode == 0);
 	errorCode = sceNgs2VoiceControl(_voiceHandle, &param.header);
 	assert(errorCode == 0);
@@ -130,8 +126,6 @@ void SamplerVoice::SetVolume(float newVol)
 {
 	_volume = newVol;
 
-	sceNgs2RackGetVoiceHandle(_rackHandle, _voiceHandleID, &_voiceHandle);
-
 	auto errorCode = sceNgs2VoiceSetPortVolume(_voiceHandle, 0, newVol);
 	assert(errorCode >= 0);
 }
@@ -140,40 +134,57 @@ void SamplerVoice::SetPan(float pan)
 {
 	_pan = pan;
 
-	// PS4 Sets defines its pan values between 0-360 degrees. 0 is front/center,
-	// 90 is to the right, 180 is rear and 270 is to the left.
-	// Scale out -1 - 1 range between 270 and 90.
-	auto panMagnitude = abs(pan);
+	// Convert the -1 to 1 pan to 0 to 360 panning. 
+	//
+	// 0 is front
+	// 90 is right
+	// 180 is rear
+	// 270 is left
 
-	auto panAmount = 90.0f * panMagnitude;
-
-	// If we are setting this to the left of center, wrap the angle
-	if(pan < 0.0f)
+	auto panAmount = 90.0f * abs(pan);
+	if (pan < 0.0f)
 		panAmount = 360.0f -  panAmount;
 
-	// Calculate our new panned volume matrix
-	// and push it into the system.
+	// Calculate our panned volume levels for each output channel.
+	float panLevels[SCE_NGS2_MAX_VOICE_CHANNELS] = {0};
+	GetPanLevels(panAmount, panLevels);
 
+	// Apply the panning levels to the output matrix.
+	SetMatrixLevels(panLevels);
+}
+
+void SamplerVoice::GetPanLevels(float angle, float *panLevels)
+{
 	auto params = SceNgs2PanParam();
-	params.angle = panAmount;
+	params.angle = angle;
 	params.distance  = 1.0f;
-	params.fbwLevel  = 1.0f;
+	params.lfeLevel  = 1.0f; // Low frequency effects (subwoofer) levels.
+	params.fbwLevel  = 1.0f; // Full band width (the speakers that are not subwoofers) levels.
 
 	SceNgs2PanWork panWork;
-
-	auto errorCode = sceNgs2PanInit( &panWork, NULL, SCE_NGS2_PAN_ANGLE_DEGREE, SCE_NGS2_PAN_SPEAKER_2_0CH);
+	auto errorCode = sceNgs2PanInit( &panWork, NULL, SCE_NGS2_PAN_ANGLE_DEGREE, SCE_NGS2_PAN_SPEAKER_7_0CH);
 	assert(errorCode >= 0);
 
-	static float levelArray[2];
-
-	errorCode = sceNgs2PanGetVolumeMatrix(&panWork, &params, 1, SCE_NGS2_PAN_MATRIX_FORMAT_2_0CH, levelArray);
+	errorCode = sceNgs2PanGetVolumeMatrix(&panWork, &params, 1, SCE_NGS2_PAN_MATRIX_FORMAT_7_1CH, panLevels);
 	assert(errorCode >= 0);
+}
 
-	sceNgs2RackGetVoiceHandle(_rackHandle, _voiceHandleID, &_voiceHandle);
-	errorCode = sceNgs2VoiceSetMatrixLevels(_voiceHandle, 0, levelArray, 2);
+void SamplerVoice::SetMatrixLevels(float *panLevels)
+{
+	// Is this a 1ch or a 2ch sound.
+	auto bufferChannels = _buffer->_waveformInfo->format.numChannels;
+
+	// Interleave the final levels depending on the number of input channels.
+	float matrixLevels[SCE_NGS2_MAX_VOICE_CHANNELS * 2] = {0};
+	for (auto p=0; p < SCE_NGS2_MAX_VOICE_CHANNELS; p++)
+	{
+		for (auto c=0; c < bufferChannels; c++)
+			matrixLevels[(p * bufferChannels) + c] = panLevels[p]; 
+	}
+
+	auto errorCode = sceNgs2VoiceSetMatrixLevels(_voiceHandle, 0, matrixLevels, SCE_NGS2_MAX_VOICE_CHANNELS * bufferChannels);
 	assert(errorCode >= 0);
-
-	errorCode = sceNgs2VoiceSetPortMatrix( _voiceHandle, 0, 0);
+	errorCode = sceNgs2VoiceSetPortMatrix(_voiceHandle, 0, 0);
 	assert(errorCode >= 0);
 }
 
@@ -190,7 +201,6 @@ void SamplerVoice::SetPitch(float pitch)
 	// the Ngs2 pitch scale of 0, 1, 2.
 	float pitchRatio = powf(2, pitch);
 
-	sceNgs2RackGetVoiceHandle(_rackHandle, _voiceHandleID, &_voiceHandle);
 	auto errorCode = sceNgs2SamplerVoiceSetPitch(_voiceHandle, pitchRatio);
 
 	assert(errorCode >= 0);

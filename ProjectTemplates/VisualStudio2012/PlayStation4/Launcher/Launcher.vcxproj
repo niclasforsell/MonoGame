@@ -55,7 +55,7 @@
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);aot\$(Configuration)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(MONO_PS4)\lib\libmono.a;$(MONO_PS4)\lib\libmonoiolayer.a;$(MONO_PS4)\lib\libmonoruntime.a;$(MONO_PS4)\lib\libmonoutils.a;$(MONO_PS4)\lib\eglib.a;$(SCE_ORBIS_SDK_DIR)\target\lib\libScePosix_stub_weak.a;$(SCE_ORBIS_SDK_DIR)\target\lib\libSceNet_stub_weak.a;$(ProjectDir)\aot\$(Configuration)\libaot.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(MONO_PS4)\lib\libmono.a;$(MONO_PS4)\lib\libmonoiolayer.a;$(MONO_PS4)\lib\libmonoruntime.a;$(MONO_PS4)\lib\libmonoutils.a;$(MONO_PS4)\lib\eglib.a;$(SCE_ORBIS_SDK_DIR)\target\lib\libScePosix_stub_weak.a;$(SCE_ORBIS_SDK_DIR)\target\lib\libSceNet_stub_weak.a;$(SCE_ORBIS_SDK_DIR)\target\lib\libSceSystemService_stub_weak.a;$(ProjectDir)\aot\$(Configuration)\libaot.a;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">
@@ -66,7 +66,7 @@
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);aot\$(Configuration)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(MONO_PS4)\release-lib\libmono.a;$(MONO_PS4)\release-lib\libmonoiolayer.a;$(MONO_PS4)\release-lib\libmonoruntime.a;$(MONO_PS4)\release-lib\libmonoutils.a;$(MONO_PS4)\release-lib\eglib.a;$(SCE_ORBIS_SDK_DIR)\target\lib\libScePosix_stub_weak.a;$(SCE_ORBIS_SDK_DIR)\target\lib\libSceNet_stub_weak.a;$(ProjectDir)\aot\$(Configuration)\libaot.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(MONO_PS4)\release-lib\libmono.a;$(MONO_PS4)\release-lib\libmonoiolayer.a;$(MONO_PS4)\release-lib\libmonoruntime.a;$(MONO_PS4)\release-lib\libmonoutils.a;$(MONO_PS4)\release-lib\eglib.a;$(SCE_ORBIS_SDK_DIR)\target\lib\libScePosix_stub_weak.a;$(SCE_ORBIS_SDK_DIR)\target\lib\libSceNet_stub_weak.a;$(SCE_ORBIS_SDK_DIR)\target\lib\libSceSystemService_stub_weak.a;$(ProjectDir)\aot\$(Configuration)\libaot.a;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
