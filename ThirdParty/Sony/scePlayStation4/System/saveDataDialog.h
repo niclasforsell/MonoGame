@@ -27,6 +27,7 @@ class CS_API SaveDataDialog
 private:
 	 SceSaveDataDialogParam  _openParam;
 	 SceSaveDataDialogCloseParam _closeParam;
+	 SceSaveDataDialogItems _items;
 
 public:
 
@@ -40,6 +41,10 @@ public:
 	//CommonDialogStatus GetStatus();
 
 	CommonDialogStatus UpdateStatus();
+
+	void SetUserId(SceUserServiceUserId userId);
+	SceUserServiceUserId GetUserId();
+
 };
 
 } // namespace System

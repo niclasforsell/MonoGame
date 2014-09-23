@@ -9,6 +9,7 @@ SaveDataDialog::SaveDataDialog()
 {
 	sceSaveDataDialogParamInitialize(&_openParam);
 	memset(&_closeParam, 0, sizeof(_closeParam));
+	memset(&_items, 0, sizeof(_items));
 
 	sceSysmoduleLoadModule(SCE_SYSMODULE_SAVE_DATA_DIALOG);
 	auto error = sceSaveDataDialogInitialize();
@@ -26,6 +27,7 @@ CommonDialogError SaveDataDialog::OpenSystemMsg(SaveDataDialogSysMsg message, ui
 	sceSaveDataDialogParamInitialize(&_openParam);
 	_openParam.dispType = SCE_SAVE_DATA_DIALOG_TYPE_SAVE;
 	_openParam.mode = SCE_SAVE_DATA_DIALOG_MODE_SYSTEM_MSG;
+	_openParam.items = &_items;
 
 	SceSaveDataDialogSystemMessageParam systemMessageParam;
 	memset(&systemMessageParam, 0, sizeof(systemMessageParam));
@@ -56,4 +58,14 @@ CommonDialogStatus SaveDataDialog::UpdateStatus()
 {
 	auto status = sceSaveDataDialogUpdateStatus();
 	return (CommonDialogStatus)status;
+}
+
+void SaveDataDialog::SetUserId(SceUserServiceUserId userId)
+{
+	_items.userId = userId;
+}
+
+SceUserServiceUserId SaveDataDialog::GetUserId()
+{
+	return _items.userId;
 }
