@@ -10,6 +10,7 @@ SaveDataDialog::SaveDataDialog()
 	sceSaveDataDialogParamInitialize(&_openParam);
 	memset(&_closeParam, 0, sizeof(_closeParam));
 
+	sceSysmoduleLoadModule(SCE_SYSMODULE_SAVE_DATA_DIALOG);
 	auto error = sceSaveDataDialogInitialize();
 	assert(error == SCE_OK);
 }
