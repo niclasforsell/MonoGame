@@ -37,7 +37,6 @@ enum class ImeError
 	InvalidHorizontalAlignment = SCE_IME_ERROR_INVALID_HORIZONTAL_ALIGNMENT,
 	InvalidVerticalAlignment = SCE_IME_ERROR_INVALID_VERTICAL_ALIGNMENT,
 	InvalidExtended = SCE_IME_ERROR_INVALID_EXTENDED,
-	InvalidKeyboardType = SCE_IME_ERROR_INVALID_KEYBOARD_TYPE,
 	InvalidWork = SCE_IME_ERROR_INVALID_WORK,
 	InvalidArg = SCE_IME_ERROR_INVALID_ARG,
 	InvalidHandler = SCE_IME_ERROR_INVALID_HANDLER,
@@ -48,6 +47,10 @@ enum class ImeError
 	InvalidReserved = SCE_IME_ERROR_INVALID_RESERVED,
 	InvalidTiming = SCE_IME_ERROR_INVALID_TIMING,
 	InvalidInternal = SCE_IME_ERROR_INTERNAL,
+
+#if SCE_ORBIS_SDK_VERSION >= 0x01750061u // SDK 1.75
+	InvalidKeyboardType = SCE_IME_ERROR_INVALID_KEYBOARD_TYPE,
+#endif
 };
 
 enum class ImeDialogStatus

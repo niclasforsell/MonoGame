@@ -23,13 +23,19 @@ CommonDialogError NpProfileDialog::Terminate()
 	return (CommonDialogError)error;
 }
 
-CommonDialogError NpProfileDialog::Open(NpProfileDialogMode mode, UserServiceUserId userId, UserServiceUserId targetOnlineId, uint64_t userData)
+CommonDialogError NpProfileDialog::Open(NpProfileDialogMode mode, UserServiceUserId userId, const char* targetUserName, uint64_t userData)
 {
+	if (targetUserName == NULL)
+		return CommonDialogError::ParamInvalid;
+
+	SceNpOnlineId targetOnlineId;
+	strcpy(targetOnlineId.data, targetUserName);
+
 	SceNpProfileDialogParam param;
 	sceNpProfileDialogParamInitialize(&param);
 	param.mode = (sceNpProfileDialogMode)mode;
 	param.userId = (SceUserServiceUserId)userId;
-	//param.targetOnlineId = (SceNpOnlineId)targetOnlineId;
+	param.targetOnlineId = targetOnlineId;
 	param.userData = (void*)userData;
 
 	auto error = sceNpProfileDialogOpen(&param);
