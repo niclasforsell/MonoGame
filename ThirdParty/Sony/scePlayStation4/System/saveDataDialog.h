@@ -21,6 +21,14 @@ enum class SaveDataDialogSysMsg
 	NoSpaceContinuable = SCE_SAVE_DATA_DIALOG_SYSMSG_TYPE_NOSPACE_CONTINUABLE,
 };
 
+enum class SaveDataDialogType
+{
+	Invalid = SCE_SAVE_DATA_DIALOG_TYPE_INVALID,
+	Save = SCE_SAVE_DATA_DIALOG_TYPE_SAVE,			
+	Load = SCE_SAVE_DATA_DIALOG_TYPE_LOAD,
+	Delete = SCE_SAVE_DATA_DIALOG_TYPE_DELETE,
+};
+
 
 class CS_API SaveDataDialog
 {	
@@ -28,6 +36,8 @@ private:
 	 SceSaveDataDialogParam  _openParam;
 	 SceSaveDataDialogCloseParam _closeParam;
 	 SceSaveDataDialogItems _items;
+	 SceSaveDataTitleId _titleId;
+	 SceSaveDataDirName _dirName;
 
 public:
 
@@ -38,13 +48,19 @@ public:
 
 	CommonDialogError ForceClose();
 
-	//CommonDialogStatus GetStatus();
-
 	CommonDialogStatus UpdateStatus();
 
 	void SetUserId(SceUserServiceUserId userId);
 	SceUserServiceUserId GetUserId();
 
+	void SetTitleId(const char* titleId);
+	const char* GetTitleId();
+
+	void SetDirectoryName(const char* dirName);
+	const char* GetDirectoryName();
+
+	void SetDisplayType(SaveDataDialogType type);
+	SaveDataDialogType GetDisplayType();
 };
 
 } // namespace System
