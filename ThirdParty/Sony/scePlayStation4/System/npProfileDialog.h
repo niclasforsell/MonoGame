@@ -26,7 +26,7 @@ public:
 
 	static CommonDialogError Terminate();
 
-	static CommonDialogError Open(NpProfileDialogMode mode, UserServiceUserId userId, UserServiceUserId targetOnlineId, uint64_t userData);
+	static CommonDialogError Open(NpProfileDialogMode mode, UserServiceUserId userId, const char* targetUserID, uint64_t userData);
 
 	static CommonDialogError Close();
 
