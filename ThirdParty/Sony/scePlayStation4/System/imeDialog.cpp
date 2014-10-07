@@ -182,6 +182,14 @@ const char* ImeDialog::GetTitle()
 	return _title;
 }
 
+void ImeDialog::SetInputText(const char* text)
+{
+	auto len = MIN(strlen(text), SCE_IME_DIALOG_MAX_TEXT_LENGTH);
+	strncpy(_inputText, text, len);	
+	mbstowcs(_inputTextW, _inputText, len);
+}
+
+
 const char* ImeDialog::GetInputText()
 {
 	wcstombs(_inputText, _inputTextW, wcslen(_inputTextW));

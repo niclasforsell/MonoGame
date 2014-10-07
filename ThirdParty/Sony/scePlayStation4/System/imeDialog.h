@@ -204,6 +204,7 @@ public:
 	void SetTitle(const char *text);
 	const char* GetTitle();
 
+	void SetInputText(const char *text);
 	const char* GetInputText();
 };
 

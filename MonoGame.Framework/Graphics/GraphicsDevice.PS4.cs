@@ -26,6 +26,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformInitialize()
         {
+            if (!(PresentationParameters.BackBufferWidth == 1920 && PresentationParameters.BackBufferHeight == 1080) &&
+                !(PresentationParameters.BackBufferWidth == 1280 && PresentationParameters.BackBufferHeight == 720))
+                throw new NotSupportedException("The back buffer resolution must be 1920x1080 or 1280x720.");
+
             _system.Initialize( PresentationParameters.BackBufferWidth, 
                                 PresentationParameters.BackBufferHeight, 
                                 (TextureFormat)PresentationParameters.BackBufferFormat,
