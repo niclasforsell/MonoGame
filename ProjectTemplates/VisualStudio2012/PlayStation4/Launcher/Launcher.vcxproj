@@ -26,7 +26,7 @@
     <!--LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand-->
     <!--LocalDebuggerCommandArguments></LocalDebuggerCommandArguments-->
     <!--LocalDebuggerTarget></LocalDebuggerTarget-->
-    <!--LocalDebuggerWorkingDirectory>$(ProjectDir)</LocalDebuggerWorkingDirectory-->
+    <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
     <!--LocalRunCommandLine></LocalRunCommandLine-->
   </PropertyGroup>
   <ImportGroup Label="ExtensionSettings">

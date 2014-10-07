@@ -142,12 +142,14 @@
     <ClCompile Include="Media\videoPlayer.cpp">
       <Filter>Media</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\pngReader.cpp" />
     <ClCompile Include="System\imeDialog.cpp">
       <Filter>System</Filter>
-    </ClCompile>    
+    </ClCompile>
     <ClCompile Include="System\saveDataDialog.cpp">
       <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\pngReader.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -366,12 +368,14 @@
     <ClInclude Include="Graphics\videoShaders.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\pngReader.h" />
     <ClInclude Include="System\imeDialog.h">
       <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="System\saveDataDialog.h">
       <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\pngReader.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
