@@ -9,7 +9,7 @@
 
      2. You need to set the C++ Launcher as the "Startup Project".
 
-	 3. You need to set the Debugging "Working Directory" on the C++ Launcher project to $(TargetDir).
+     3. You need to verify that the Debugging "Working Directory" on the C++ Launcher project to $(TargetDir).
 
   Note that this project is dependent on having the PlayStation and Mono.PS4 SDKs 
   installed on your machine.  We have some introductory information on the wiki that 
