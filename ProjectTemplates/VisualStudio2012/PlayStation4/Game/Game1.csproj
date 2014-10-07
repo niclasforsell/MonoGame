@@ -82,7 +82,7 @@
 			AfterTargets="CollectLauncherFiles" 
 			Inputs="@(ContentFiles)" 
 			Outputs="..\Launcher\bin\$(Configuration)\Content\%(RecursiveDir)%(Filename)%(Extension)">
-    <Copy SourceFiles="@(ContentFiles)" DestinationFolder="..\Launcher\bin\$(Configuration)Content\%(RecursiveDir)" />
+    <Copy SourceFiles="@(ContentFiles)" DestinationFolder="..\Launcher\bin\$(Configuration)\Content\%(RecursiveDir)" />
   </Target>
   <Target	Name="CopyPrxFiles" 
 			AfterTargets="CollectLauncherFiles" 
