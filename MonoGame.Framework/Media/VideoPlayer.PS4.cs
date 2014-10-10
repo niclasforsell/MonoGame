@@ -50,6 +50,10 @@ namespace Microsoft.Xna.Framework.Media
             _player = new PS4VideoPlayer(_graphicsDevice._system);
         }
 
+        private void PlatformGetState(ref MediaState result)
+        {
+        }
+
         private Texture2D PlatformGetTexture()
         {
             // GrabFrame will take whatever render target is set and draw the video

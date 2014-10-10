@@ -246,6 +246,26 @@ namespace MonoGame.Tools.Pipeline
 			return result;
 		}
 
+        public void OnTemplateDefined(ContentItemTemplate item)
+        {
+        }
+
+        public Process CreateProcess(string exe, string commands)
+        {
+            var _buildProcess = new Process();
+            if (Environment.OSVersion.Platform != PlatformID.Unix && Environment.OSVersion.Platform != PlatformID.MacOSX)
+            {
+                _buildProcess.StartInfo.FileName = exe;
+                _buildProcess.StartInfo.Arguments = commands;
+            }
+            else
+            {
+                _buildProcess.StartInfo.FileName = "mono";
+                _buildProcess.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
+            }
+            return _buildProcess;
+        }
+
 		#endregion
 
 
