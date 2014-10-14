@@ -520,6 +520,8 @@
     </Compile>
     <Compile Include="Graphics\RenderTarget3D.cs">
       <Platforms>PlayStation4</Platforms>
+    </Compile>
+    <Compile Include="Graphics\RenderTarget3D.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
     <Compile Include="Graphics\RenderTarget3D.DirectX.cs">
