@@ -57,7 +57,7 @@ namespace TwoMGFX
                     break;
 
                 case ElementType.Float2: 
-                case ElementType.Float2x1:                     
+		        case ElementType.Float1x2:
                     param.class_ = EffectObject.D3DXPARAMETER_CLASS.VECTOR;
                     param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
                     param.rows = 1;
@@ -65,7 +65,7 @@ namespace TwoMGFX
                     break;
 
                 case ElementType.Float3:
-                case ElementType.Float3x1:
+		        case ElementType.Float1x3:
                     param.class_ = EffectObject.D3DXPARAMETER_CLASS.VECTOR;
                     param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
                     param.rows = 1;
@@ -73,14 +73,14 @@ namespace TwoMGFX
                     break;
 
 		        case ElementType.Float4:
-                case ElementType.Float4x1:
+		        case ElementType.Float1x4:
                     param.class_ = EffectObject.D3DXPARAMETER_CLASS.VECTOR;
                     param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
                     param.rows = 1;
                     param.columns = 4;
                     break;
              
-		        case ElementType.Float1x2:
+                case ElementType.Float2x1:                     
                     param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
                     param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
                     param.rows = 2;
@@ -97,18 +97,18 @@ namespace TwoMGFX
 		        case ElementType.Float3x2:
                     param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
                     param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
-                    param.rows = 2;
-                    param.columns = 3;
+                    param.rows = 3;
+                    param.columns = 2;
                     break;
 
 		        case ElementType.Float4x2:
                     param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
                     param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
-                    param.rows = 2;
-                    param.columns = 4;
+                    param.rows = 4;
+                    param.columns = 2;
                     break;
 
-		        case ElementType.Float1x3:
+                case ElementType.Float3x1:
                     param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
                     param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
                     param.rows = 3;
@@ -132,11 +132,11 @@ namespace TwoMGFX
 		        case ElementType.Float4x3:
                     param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
                     param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
-                    param.rows = 2;
-                    param.columns = 4;
+                    param.rows = 4;
+                    param.columns = 3;
                     break;
 
-		        case ElementType.Float1x4:
+                case ElementType.Float4x1:
                     param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
                     param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
                     param.rows = 4;
@@ -146,15 +146,15 @@ namespace TwoMGFX
 		        case ElementType.Float2x4:
                     param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
                     param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
-                    param.rows = 4;
-                    param.columns = 3;
+                    param.rows = 2;
+                    param.columns = 4;
                     break;
 
 		        case ElementType.Float3x4:
                     param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
                     param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
-                    param.rows = 4;
-                    param.columns = 3;
+                    param.rows = 3;
+                    param.columns = 4;
                     break;
 
 		        case ElementType.Float4x4:
