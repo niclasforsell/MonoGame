@@ -32,6 +32,8 @@ private:
 	uint32_t _frameIndex;
 	sce::Gnm::RenderTarget *_currentRenderTarget;
 
+	sce::Gnm::Texture *_nullTexture;
+
 	PixelShader *_clearPS;
 	VertexShader *_clearVS;
 	FetchShader *_clearFS;
