@@ -73,6 +73,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif WINDOWS
                 var dc = System.Drawing.Graphics.FromHwnd(IntPtr.Zero).GetHdc();
                 return new DisplayMode(GetDeviceCaps(dc, HORZRES), GetDeviceCaps(dc, VERTRES), GetDeviceCaps(dc, VREFRESH), SurfaceFormat.Color);
+#elif PLAYSTATION4
+                return new DisplayMode(1920, 1080, 60, SurfaceFormat.Color);
 #else
                 return new DisplayMode(800, 600, 60, SurfaceFormat.Color);
 #endif
