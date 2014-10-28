@@ -39,6 +39,7 @@ GraphicsSystem::GraphicsSystem()
 
 	_videoOutHandle = 0;
 	_frameIndex = 0;
+	_nullTexture = NULL;
 
 	_clearPS = new PixelShader(clear_p);
 	_clearVS = new VertexShader(clear_vv);
@@ -299,6 +300,19 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 	{
 		printf("sceVideoOutRegisterBuffers failed: 0x%08X\n", ret);
 		return;
+	}
+
+	// Prepare the null texture.
+	{
+		_nullTexture = new sce::Gnm::Texture();
+		auto textureSizeAlign = _nullTexture->initAs2d(
+			2, 2, 1,
+			Gnm::kDataFormatR8G8B8A8Unorm,
+			Gnm::kTileModeDisplay_LinearAligned,
+			Gnm::kNumSamples1);
+		void *textureData = mem::allocShared(textureSizeAlign);
+		memset(textureData, 0, textureSizeAlign.m_size);
+		_nullTexture->setBaseAddress(textureData);
 	}
 
 	prepareBackBuffer();
@@ -860,7 +874,12 @@ void GraphicsSystem::SetTexture(int slot, Texture* texture)
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
-	sce::Gnm::Texture *tex = texture != NULL ? texture->_texture : NULL;
+	sce::Gnm::Texture *tex;
+	if (texture != NULL)
+		tex = texture->_texture;
+	else
+		tex = _nullTexture;
+
 	gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, tex);
 }
 
@@ -871,7 +890,7 @@ void GraphicsSystem::SetTextureRT(int slot, RenderTarget* target)
 
 	if (target == NULL)
 	{
-		gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, NULL);
+		gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, _nullTexture);
 		return;
 	}
 
