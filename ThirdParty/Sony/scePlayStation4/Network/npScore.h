@@ -211,6 +211,15 @@ public:
 
 	const char* SanitizeComment(const char *comment, CS_OUT NpCommunityError *error);
 
+protected:
+	NpCommunityError RecordScore(	SceNpScoreBoardId boardId, 
+									SceNpScoreValue score, 
+									const char *scoreComment,
+									const uint8_t *gameInfo,
+									int gameInfoLength,
+									uint64_t compareDate,
+									CS_OUT SceNpScoreRankNumber *tmpRank);
+
 };
 
 

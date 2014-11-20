@@ -239,6 +239,35 @@ NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId,
 		return (NpCommunityError)error;
 }
 
+NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId, 
+												SceNpScoreValue score, 
+												const char *scoreComment, 
+												const uint8_t *gameInfo,
+												int gameInfoLength,
+												uint64_t compareDate,
+												CS_OUT SceNpScoreRankNumber *tmpRank)
+{
+	SceRtcTick tick;
+	tick.tick = compareDate;
+
+	SceNpScoreComment comment;
+	memset(&comment, 0, sizeof(comment));
+	strncpy(comment.utf8Comment, scoreComment, SCE_NP_SCORE_COMMENT_MAXLEN);
+
+	SceNpScoreGameInfo info;
+	memset(&info, 0, sizeof(info));
+	if (gameInfo != NULL)
+	{
+		info.infoSize =  MIN(gameInfoLength, SCE_NP_SCORE_GAMEINFO_MAXSIZE);
+		memcpy(&info.data, gameInfo, info.infoSize);
+	}
+	
+
+	auto error = sceNpScoreRecordScore(_requestId, boardId, score, &comment, &info, tmpRank, &tick, NULL);
+	if (error < 0)
+		return (NpCommunityError)error;
+}
+
 NpCommunityError NpScoreRequest::CensorComment(const char *comment)
 {
 	auto error = sceNpScoreCensorComment(_requestId, comment, NULL);
