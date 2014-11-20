@@ -2,6 +2,7 @@
 
 #include "..\allocator.h"
 
+#include <sdk_version.h>
 #include <gnm.h>
 #include <gnmx.h>
 #include <gnmx/shader_parser.h>
@@ -15,7 +16,11 @@ using namespace Graphics;
 PixelShader::PixelShader(const void *data)
 {
 	Gnmx::ShaderInfo shaderInfo;
+#if SCE_ORBIS_SDK_VERSION >= 0x02000071u // SDK Version 2.0
+	Gnmx::parseShader(&shaderInfo, data);
+#else
 	Gnmx::parseShader(&shaderInfo, data, Gnmx::kPixelShader);
+#endif
 
 	_binary = mem::allocShared(shaderInfo.m_gpuShaderCodeSize, Gnm::kAlignmentOfShaderInBytes);
 	auto shaderHeader = mem::alloc(shaderInfo.m_psShader->computeSize(), Gnm::kAlignmentOfBufferInBytes);
