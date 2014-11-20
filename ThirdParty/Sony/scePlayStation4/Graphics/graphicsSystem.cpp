@@ -309,7 +309,12 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 			2, 2, 1,
 			Gnm::kDataFormatR8G8B8A8Unorm,
 			Gnm::kTileModeDisplay_LinearAligned,
+#if SCE_ORBIS_SDK_VERSION >= 0x02000071u // SDK Version 2.0
+			Gnm::kNumFragments1);
+#else
 			Gnm::kNumSamples1);
+#endif
+
 		void *textureData = mem::allocShared(textureSizeAlign);
 		memset(textureData, 0, textureSizeAlign.m_size);
 		_nullTexture->setBaseAddress(textureData);
@@ -896,7 +901,11 @@ void GraphicsSystem::SetTextureRT(int slot, RenderTarget* target)
 
 	gfxc.waitForGraphicsWrites(
 		target->_renderTarget->getBaseAddress256ByteBlocks(), 
-		target->_renderTarget->getSizeInBytes()>>8,
+#if SCE_ORBIS_SDK_VERSION >= 0x02000071u  // SDK Version 2.0
+		target->_renderTarget->getSliceSizeInBytes() >> 8,
+#else
+		target->_renderTarget->getSizeInBytes() >> 8,
+#endif
 		Gnm::kWaitTargetSlotCb0, Gnm::kCacheActionWriteBackAndInvalidateL1andL2, Gnm::kExtendedCacheActionFlushAndInvalidateCbCache,
 		Gnm::kStallCommandBufferParserDisable);
 

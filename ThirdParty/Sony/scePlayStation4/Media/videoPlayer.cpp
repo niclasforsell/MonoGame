@@ -158,12 +158,22 @@ bool VideoPlayer::GrabFrame()
 	// Set texture
 	Gnm::SizeAlign sz;
 
-	sz = lumaTexture.initAs2d(framePitch, frameHeight, 1, Gnm::kDataFormatR8Unorm, Gnm::kTileModeDisplay_LinearAligned, Gnm::kNumSamples1);
+	sz = lumaTexture.initAs2d(framePitch, frameHeight, 1, Gnm::kDataFormatR8Unorm, Gnm::kTileModeDisplay_LinearAligned,
+#if SCE_ORBIS_SDK_VERSION >= 0x02000071u // SDK Version 2.0
+		Gnm::kNumFragments1);
+#else
+		Gnm::kNumSamples1);
+#endif
 	assert(sz.m_size == framePitch * frameHeight);
 	lumaAddress = _videoFrame.pData;
 	lumaTexture.setBaseAddress256ByteBlocks((uint32_t)(reinterpret_cast<uint64_t>(lumaAddress) >> 8));
 
-	sz = chromaTexture.initAs2d(framePitch / 2, frameHeight / 2, 1, Gnm::kDataFormatR8G8Unorm, Gnm::kTileModeDisplay_LinearAligned, Gnm::kNumSamples1);
+	sz = chromaTexture.initAs2d(framePitch / 2, frameHeight / 2, 1, Gnm::kDataFormatR8G8Unorm, Gnm::kTileModeDisplay_LinearAligned, 
+#if SCE_ORBIS_SDK_VERSION >= 0x02000071u // SDK Version 2.0
+		Gnm::kNumFragments1);
+#else
+		Gnm::kNumSamples1);
+#endif		
 	assert(sz.m_size == framePitch * (frameHeight / 2));
 	chromaAddress = (uint8_t*)(_videoFrame.pData) + (framePitch * frameHeight);
 	chromaTexture.setBaseAddress256ByteBlocks((uint32_t)(reinterpret_cast<uint64_t>(chromaAddress) >> 8));
