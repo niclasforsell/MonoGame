@@ -218,25 +218,8 @@ NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId,
 												uint64_t compareDate,
 												CS_OUT SceNpScoreRankNumber *tmpRank)
 {
-	SceRtcTick tick;
-	tick.tick = compareDate;
-
-	SceNpScoreComment comment;
-	memset(&comment, 0, sizeof(comment));
-	strncpy(comment.utf8Comment, scoreComment, SCE_NP_SCORE_COMMENT_MAXLEN);
-
-	SceNpScoreGameInfo info;
-	memset(&info, 0, sizeof(info));
-	if (gameInfo != NULL)
-	{
-		info.infoSize =  MIN(strlen(gameInfo), SCE_NP_SCORE_GAMEINFO_MAXSIZE);
-		memcpy(&info.data, gameInfo, info.infoSize);
-	}
-	
-
-	auto error = sceNpScoreRecordScore(_requestId, boardId, score, &comment, &info, tmpRank, &tick, NULL);
-	if (error < 0)
-		return (NpCommunityError)error;
+	auto length = strlen(gameInfo);
+	return RecordScore(boardId, score, scoreComment, reinterpret_cast<const uint8_t*>(gameInfo), length, compareDate, tmpRank);
 }
 
 NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId, 
@@ -266,6 +249,8 @@ NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId,
 	auto error = sceNpScoreRecordScore(_requestId, boardId, score, &comment, &info, tmpRank, &tick, NULL);
 	if (error < 0)
 		return (NpCommunityError)error;
+	else
+		return NpCommunityError::Ok;
 }
 
 NpCommunityError NpScoreRequest::CensorComment(const char *comment)

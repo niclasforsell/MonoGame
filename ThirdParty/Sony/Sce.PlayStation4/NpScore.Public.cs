@@ -12,9 +12,7 @@ namespace Sce.PlayStation4
             public Network.NpCommunityError RecordScore(uint boardId, long score, string scoreComment, byte[] gameInfo, ulong compareDate, out uint tmpRank)
             {
                 fixed (byte* pGameInfo = gameInfo)
-                {
                     return RecordScore(boardId, score, scoreComment, pGameInfo, gameInfo.Length, compareDate, out tmpRank);
-                }
             }
         }
     }
