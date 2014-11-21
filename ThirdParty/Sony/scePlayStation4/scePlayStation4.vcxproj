@@ -121,6 +121,7 @@
     <ClCompile Include="Media\videoPlayer.cpp" />
     <ClCompile Include="Network\np.cpp" />
     <ClCompile Include="Network\npCommerce.cpp" />
+    <ClCompile Include="Network\npCommerceDialog.cpp" />
     <ClCompile Include="Network\npScore.cpp" />
     <ClCompile Include="Network\titleStorage.cpp" />
     <ClCompile Include="Network\trophySet.cpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="Media\videoPlayer.h" />
     <ClInclude Include="Network\np.h" />
     <ClInclude Include="Network\npCommerce.h" />
+    <ClInclude Include="Network\npCommerceDialog.h" />
     <ClInclude Include="Network\npScore.h" />
     <ClInclude Include="Network\predecls.h" />
     <ClInclude Include="Network\titleStorage.h" />
