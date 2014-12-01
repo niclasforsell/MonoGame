@@ -62,6 +62,7 @@
     <Compile Include="Np.cs" />
     <Compile Include="Np.Public.cs" />
     <Compile Include="NpCommerce.cs" />
+    <Compile Include="NpCommerceDialog.cs" />
     <Compile Include="NpProfileDialog.cs" />
     <Compile Include="NpScore.cs" />
     <Compile Include="NpScore.Public.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="SamplerVoice.cs" />
     <Compile Include="SaveData.cs" />
     <Compile Include="SaveDataDialog.cs" />
+    <Compile Include="SaveDataDirNameSearch.cs" />
     <Compile Include="ScreenShot.cs" />
     <Compile Include="Song.cs" />
     <Compile Include="SoundSystem.cs" />

@@ -33,7 +33,9 @@ enum class SaveDataResult
 	ErrorBroken = SCE_SAVE_DATA_ERROR_BROKEN,
 	ErrorMountInhibit = SCE_SAVE_DATA_ERROR_MOUNT_INHIBIT,
 	ErrorInvalidLoginUser = SCE_SAVE_DATA_ERROR_INVALID_LOGIN_USER,
-	
+	ErrorOperationInhibit = SCE_SAVE_DATA_ERROR_OPERATION_INHIBIT,
+
+	ErrorUserServiceNotInitialized = SCE_USER_SERVICE_ERROR_NOT_INITIALIZED,
 };
 
 CS_FLAGS enum class SaveDataMountMode

@@ -121,6 +121,7 @@
     <ClCompile Include="Media\videoPlayer.cpp" />
     <ClCompile Include="Network\np.cpp" />
     <ClCompile Include="Network\npCommerce.cpp" />
+    <ClCompile Include="Network\npCommerceDialog.cpp" />
     <ClCompile Include="Network\npScore.cpp" />
     <ClCompile Include="Network\titleStorage.cpp" />
     <ClCompile Include="Network\trophySet.cpp" />
@@ -134,6 +135,7 @@
     <ClCompile Include="System\remotePlay.cpp" />
     <ClCompile Include="System\saveData.cpp" />
     <ClCompile Include="System\saveDataDialog.cpp" />
+    <ClCompile Include="System\saveDataDirNameSearch.cpp" />
     <ClCompile Include="System\screenShot.cpp" />
     <ClCompile Include="System\systemService.cpp" />
     <ClCompile Include="System\userService.cpp" />
@@ -188,6 +190,7 @@
     <ClInclude Include="Media\videoPlayer.h" />
     <ClInclude Include="Network\np.h" />
     <ClInclude Include="Network\npCommerce.h" />
+    <ClInclude Include="Network\npCommerceDialog.h" />
     <ClInclude Include="Network\npScore.h" />
     <ClInclude Include="Network\predecls.h" />
     <ClInclude Include="Network\titleStorage.h" />
@@ -202,6 +205,7 @@
     <ClInclude Include="System\remotePlay.h" />
     <ClInclude Include="System\saveData.h" />
     <ClInclude Include="System\saveDataDialog.h" />
+    <ClInclude Include="System\saveDataDirNameSearch.h" />
     <ClInclude Include="System\screenShot.h" />
     <ClInclude Include="System\systemService.h" />
     <ClInclude Include="System\threadPrio.h" />

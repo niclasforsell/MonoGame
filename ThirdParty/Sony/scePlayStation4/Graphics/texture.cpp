@@ -3,6 +3,8 @@
 
 #include "graphicsHelpers.h"
 #include "../allocator.h"
+
+#include <sdk_version.h>
 #include <gnm.h>
 #include <assert.h>
 #include <math.h>
@@ -37,7 +39,11 @@ Texture* Texture::Create2D(TextureFormat format, int32_t width, int32_t height, 
 		width, height, mips,
 		ToDataFormat(format),
 		tileMode,
+#if SCE_ORBIS_SDK_VERSION >= 0x02000071u // SDK Version 2.0
+		Gnm::kNumFragments1);
+#else
 		Gnm::kNumSamples1);
+#endif
 
 	// Allocate the texture data using the alignment returned by initAs2d
 	void *textureData = mem::allocShared(textureSizeAlign);

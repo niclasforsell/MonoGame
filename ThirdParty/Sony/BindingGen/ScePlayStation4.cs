@@ -70,6 +70,7 @@ namespace BindingGen
             options.Headers.Add(@"Media\VideoPlayer.h");
             //options.Headers.Add(@"Network\Np.h");
             options.Headers.Add(@"Network\NpCommerce.h");
+            options.Headers.Add(@"Network\NpCommerceDialog.h");
             options.Headers.Add(@"Network\NpScore.h");
             options.Headers.Add(@"Network\TitleStorage.h");
             options.Headers.Add(@"Network\TrophySet.h");
@@ -78,6 +79,7 @@ namespace BindingGen
             options.Headers.Add(@"System\SystemService.h");
             options.Headers.Add(@"System\UserService.h");
             options.Headers.Add(@"System\SaveData.h");
+            options.Headers.Add(@"System\SaveDataDirNameSearch.h");
             //options.Headers.Add(@"System\CommonDialog.h");
             options.Headers.Add(@"System\NpProfileDialog.h");
             options.Headers.Add(@"System\WebBrowserDialog.h");
