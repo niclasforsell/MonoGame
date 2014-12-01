@@ -191,6 +191,14 @@ class CS_API NpScoreRequest
 
 	NpScoreRequest();
 
+	CS_IGNORE NpCommunityError RecordScore(	SceNpScoreBoardId boardId, 
+									SceNpScoreValue score, 
+									const char *scoreComment,
+									const uint8_t *gameInfo,
+									int gameInfoLength,
+									SceRtcTick *compareDate,
+									SceNpScoreRankNumber *tmpRank);
+
 public:
 
 	~NpScoreRequest();
@@ -220,6 +228,12 @@ protected:
 									int gameInfoLength,
 									uint64_t compareDate,
 									CS_OUT SceNpScoreRankNumber *tmpRank);
+
+	NpCommunityError RecordScore(SceNpScoreBoardId boardId,
+								 SceNpScoreValue score,
+								 const char* scoreComment,
+								 const uint8_t* gameInfo,
+								 int gameInfoLength);
 
 };
 

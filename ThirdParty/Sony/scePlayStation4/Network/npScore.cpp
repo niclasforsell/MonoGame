@@ -239,6 +239,26 @@ NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId,
 {
 	SceRtcTick tick;
 	tick.tick = compareDate;
+	return RecordScore(boardId, score, scoreComment, gameInfo, gameInfoLength, &tick, tmpRank);
+}
+
+NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId, 
+												SceNpScoreValue score, 
+												const char *scoreComment, 
+												const uint8_t *gameInfo,
+												int gameInfoLength)
+{
+	return RecordScore(boardId, score, scoreComment, gameInfo, gameInfoLength, reinterpret_cast<SceRtcTick*>(NULL), reinterpret_cast<SceNpScoreRankNumber*>(NULL));
+}
+
+NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId, 
+												SceNpScoreValue score, 
+												const char *scoreComment, 
+												const uint8_t *gameInfo,
+												int gameInfoLength,
+												SceRtcTick* compareDate,
+												CS_OUT SceNpScoreRankNumber *tmpRank)
+{
 
 	SceNpScoreComment comment;
 	memset(&comment, 0, sizeof(comment));
@@ -253,7 +273,7 @@ NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId,
 	}
 	
 
-	auto error = sceNpScoreRecordScore(_requestId, boardId, score, &comment, &info, tmpRank, &tick, NULL);
+	auto error = sceNpScoreRecordScore(_requestId, boardId, score, &comment, &info, tmpRank, compareDate, NULL);
 	if (error < 0)
 		return (NpCommunityError)error;
 	else

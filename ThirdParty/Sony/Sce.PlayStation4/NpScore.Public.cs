@@ -22,10 +22,16 @@ namespace Sce.PlayStation4
 
         public unsafe partial class NpScoreRequest : IDisposable
         {
-            public Network.NpCommunityError RecordScore(uint boardId, long score, string scoreComment, byte[] gameInfo, ulong compareDate, out uint tmpRank)
+            public NpCommunityError RecordScore(uint boardId, long score, string scoreComment, byte[] gameInfo, ulong compareDate, out uint tmpRank)
             {
                 fixed (byte* pGameInfo = gameInfo)
-                    return RecordScore(boardId, score, scoreComment, pGameInfo, gameInfo.Length, compareDate, out tmpRank);
+                    return RecordScore(boardId, score, scoreComment, pGameInfo, gameInfo == null ? 0 : gameInfo.Length, compareDate, out tmpRank);
+            }
+
+            public NpCommunityError RecordScore(uint boardId, long score, string scoreComment, byte[] gameInfo)
+            {
+                fixed (byte* pGameInfo = gameInfo)
+                    return RecordScore(boardId, score, scoreComment, pGameInfo, gameInfo == null ? 0 : gameInfo.Length);
             }
         }
     }
