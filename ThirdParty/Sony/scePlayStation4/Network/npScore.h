@@ -181,6 +181,7 @@ public:
 	uint64_t GetRecordDateAtIndex();
 	const char* GetCommentAtIndex();
 	const char* GetGameInfoIndex();
+	uint8_t* GetBinaryGameInfoIndex(void);
 };
 
 class CS_API NpScoreRequest

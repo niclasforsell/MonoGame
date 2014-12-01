@@ -149,6 +149,13 @@ const char* NpScoreRankings::GetGameInfoIndex()
 	return NULL;
 }
 
+uint8_t* NpScoreRankings::GetBinaryGameInfoIndex(void)
+{
+	if(_gameInfo)
+		return _gameInfo[_index].data;
+	return NULL;
+}
+
 
 
 
