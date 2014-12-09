@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "TextureTools.h"
-#include <texture_tool.h>
+#include <texture_tool/image.h>
+#include <texture_tool/filter.h>
+#include <texture_tool/mipped_image.h>
 
 namespace sce { namespace PlayStation4 { namespace Tools {
 
