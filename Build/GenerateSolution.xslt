@@ -28,34 +28,7 @@
         <xsl:with-param name="name" select="current()/Name" />
         <xsl:with-param name="guid" select="current()/Guid" />
         <xsl:with-param name="path" select="current()/Path" />
-      </xsl:call-template>
-    </xsl:for-each>
-    <xsl:for-each select="/Input/Projects/ExternalProject/Project[not(@Guid=preceding::Project/@Guid)]">
-      <xsl:call-template name="project-definition">
-        <xsl:with-param name="type" select="current()/Type" />
-        <xsl:with-param name="name" select="current()/Name" />
-        <xsl:with-param name="guid" select="current()/Guid" />
-        <xsl:with-param name="path" select="current()/Path" />
-      </xsl:call-template>
-    </xsl:for-each>
-    <xsl:for-each select="/Input/Projects/ExternalProject
-                          /Platform[@Type=/Input/Generation/Platform]
-                          /Project[not(@Guid=preceding::Project/@Guid)]">
-      <xsl:call-template name="project-definition">
-        <xsl:with-param name="type" select="current()/Type" />
-        <xsl:with-param name="name" select="current()/Name" />
-        <xsl:with-param name="guid" select="current()/Guid" />
-        <xsl:with-param name="path" select="current()/Path" />
-      </xsl:call-template>
-    </xsl:for-each>
-    <xsl:for-each select="/Input/Projects/ExternalProject
-                          /Platform[@Type=/Input/Generation/Platform]
-                          /RelatedProject[not(@Guid=preceding::RelatedProject/@Guid)]">
-      <xsl:call-template name="project-definition">
-        <xsl:with-param name="type" select="current()/Type" />
-        <xsl:with-param name="name" select="current()/Name" />
-        <xsl:with-param name="guid" select="current()/Guid" />
-        <xsl:with-param name="path" select="current()/Path" />
+        <xsl:with-param name="deps" select="current()/PostProject" />
       </xsl:call-template>
     </xsl:for-each>
     <xsl:choose>
@@ -102,30 +75,7 @@
 </xsl:text>
       </xsl:otherwise>
     </xsl:choose>
-    
     <xsl:for-each select="/Input/Projects/Project">
-      <xsl:call-template name="project-configuration">
-        <xsl:with-param name="guid" select="current()/Guid" />
-        <xsl:with-param name="root" select="current()" />
-      </xsl:call-template>
-    </xsl:for-each>
-    <xsl:for-each select="/Input/Projects/ExternalProject/Project[not(@Guid=preceding::Project/@Guid)]">
-      <xsl:call-template name="project-configuration">
-        <xsl:with-param name="guid" select="current()/Guid" />
-        <xsl:with-param name="root" select="current()" />
-      </xsl:call-template>
-    </xsl:for-each>
-    <xsl:for-each select="/Input/Projects/ExternalProject
-                          /Platform[@Type=/Input/Generation/Platform]
-                          /Project[not(@Guid=preceding::Project/@Guid)]">
-      <xsl:call-template name="project-configuration">
-        <xsl:with-param name="guid" select="current()/Guid" />
-        <xsl:with-param name="root" select="current()" />
-      </xsl:call-template>
-    </xsl:for-each>
-    <xsl:for-each select="/Input/Projects/ExternalProject
-                          /Platform[@Type=/Input/Generation/Platform]
-                          /RelatedProject[not(@Guid=preceding::RelatedProject/@Guid)]">
       <xsl:call-template name="project-configuration">
         <xsl:with-param name="guid" select="current()/Guid" />
         <xsl:with-param name="root" select="current()" />
@@ -141,6 +91,7 @@ EndGlobal
     <xsl:param name="type" />
     <xsl:param name="path" />
     <xsl:param name="guid" />
+    <xsl:param name="deps" />
     <xsl:text>Project("{</xsl:text>
     <xsl:choose>
       <xsl:when test="$type = 'Content'">
@@ -162,7 +113,7 @@ EndGlobal
     <xsl:value-of select="$guid" />
     <xsl:text>}"
 </xsl:text>
-    <xsl:for-each select="PostProject">
+    <xsl:for-each select="$deps">
 		<xsl:text>	ProjectSection(ProjectDependencies) = postProject
 		{</xsl:text><xsl:value-of select="current()/@Guid" /><xsl:text>} = {</xsl:text><xsl:value-of select="current()/@Guid" /><xsl:text>}
 	EndProjectSection
