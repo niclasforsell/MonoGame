@@ -226,13 +226,13 @@ namespace TwoMGFX
                     mparam.rows = param.rows;
                     mparam.columns = param.columns;
 
-                    var size = (int)(((param.rows-1) * 16) + (param.columns * 4));
+                    var size = (int)(param.columns * param.rows * 4);
                     var data = new byte[size];
 
                     if (elem.DefaultValue != null)
                         Array.Copy(elem.DefaultValue, defaultOffset, data, 0, size);
 
-                    defaultOffset += (int)param.rows * 16;
+                    defaultOffset += size;
                     mparam.data = data;
                     param.member_handles[i] = mparam;
                 }
