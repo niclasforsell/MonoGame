@@ -14,6 +14,8 @@
     <AotOutputPath>$(ProjectDir)..\Launcher\bin\$(Configuration)</AotOutputPath>
     <AotIntermediateOutputPath>$(ProjectDir)..\Launcher\aot\$(Configuration)</AotIntermediateOutputPath>
     <AotMachineName>$(MONO_PS4_BUILDER)</AotMachineName>
+    <MonoGamePlatform>PlayStation4</MonoGamePlatform>
+    <MonoGameContentBuilderExe>$(MSBuildExtensionsPath)\MonoGame.PS4\v3.0\Tools\MGCB.exe</MonoGameContentBuilderExe>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|ORBIS' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -42,9 +44,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Content\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="$(MSBuildProgramFiles32)\MonoGame.PS4\v3.0\Assemblies\PlayStation4\scePlayStation4.prx">
       <Link>scePlayStation4.prx</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -62,8 +61,12 @@
   <ItemGroup>
     <Content Include="ReadMe.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <MonoGameContentReference Include="Content\Content.mgcb" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame.PS4\v3.0\Mono.PS4.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\MonoGame.PS4\v3.0\MonoGame.Content.Builder.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
