@@ -1,0 +1,15 @@
+
+#----------------------------- Global Properties ----------------------------#
+
+/outputDir:bin/PlayStation4
+/intermediateDir:obj/PlayStation4
+/platform:PlayStation4
+/config:
+/profile:Reach
+/compress:False
+
+#-------------------------------- References --------------------------------#
+
+
+#---------------------------------- Content ---------------------------------#
+
