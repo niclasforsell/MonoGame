@@ -50,6 +50,8 @@ public:
 
 	CommonDialogStatus UpdateStatus();
 
+	//CommonDialogError GetResult(CS_OUT ImeDialogEndStatus* result);
+
 	void SetUserId(SceUserServiceUserId userId);
 	SceUserServiceUserId GetUserId();
 

@@ -81,12 +81,10 @@ SaveDataResult SaveData::Mount(	uint64_t blocks,
 	memset(&mountResult, 0, sizeof(mountResult));
 
 	auto result = sceSaveDataMount(&mount, &mountResult);
-	if (result >= SCE_OK)
-	{
-		memcpy(&_mountPoint, &mountResult.mountPoint, sizeof(_mountPoint));
-		requiredBlocks = mountResult.requiredBlocks;
-		progress = mountResult.progress;
-	}
+
+	memcpy(&_mountPoint, &mountResult.mountPoint, sizeof(_mountPoint));
+	requiredBlocks = mountResult.requiredBlocks;
+	progress = mountResult.progress;
 
 	return (SaveDataResult)result;
 }

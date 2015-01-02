@@ -70,7 +70,7 @@
       Path="ThirdParty\Sony\Sce.PlayStation4\Sce.PlayStation4.csproj">
 		<PostProject Guid="73E143CF-7BB5-4EAA-B952-F9DBCEA7FB76" />
     </Project>
-    <RelatedProject
+    <Project
       Name="scePlayStation4"
 	  Type="Cpp"
       Guid="73E143CF-7BB5-4EAA-B952-F9DBCEA7FB76"
@@ -78,8 +78,8 @@
 		<PostProject Guid="008B1B4E-EEB0-44ED-885E-C8C1EB956739" />
         <ConfigurationMapping Old="Debug" New="Debug|ORBIS" />
         <ConfigurationMapping Old="Release" New="Release|ORBIS" />
-    </RelatedProject>
-    <RelatedProject
+    </Project>
+    <Project
       Name="BindingGen"
       Guid="008B1B4E-EEB0-44ED-885E-C8C1EB956739"
       Path="ThirdParty\Sony\BindingGen\BindingGen.csproj" />

@@ -18,6 +18,7 @@ SaveDataDialog::SaveDataDialog()
 	_items.dirName = &_dirName;
 
 	_openParam.items = &_items;
+	_openParam.dispType = SCE_SAVE_DATA_DIALOG_TYPE_SAVE;
 
 	sceSysmoduleLoadModule(SCE_SYSMODULE_SAVE_DATA_DIALOG);
 	auto error = sceSaveDataDialogInitialize();
