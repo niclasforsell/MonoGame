@@ -116,10 +116,10 @@ namespace Microsoft.Xna.Framework.Graphics
             var target1 = _currentRenderTargetBindings[1].RenderTarget as RenderTarget2D;
             var target2 = _currentRenderTargetBindings[2].RenderTarget as RenderTarget2D;
             var target3 = _currentRenderTargetBindings[3].RenderTarget as RenderTarget2D;
-            _system.SetRenderTargets(target0._target,
-                                    target1 != null ? target1._target : null,
-                                    target2 != null ? target2._target : null,
-                                    target3 != null ? target3._target : null);
+            _system.SetRenderTargets(target0._texture as RenderTarget,
+                                    target1 != null ? target1._texture as RenderTarget : null,
+                                    target2 != null ? target2._texture as RenderTarget : null,
+                                    target3 != null ? target3._texture as RenderTarget : null);
 
             return target0;
         }

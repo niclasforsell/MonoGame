@@ -49,7 +49,6 @@ namespace BindingGen
             options.Headers.Add(@"Audio\AudioBuffer.h");
             options.Headers.Add(@"Audio\SamplerVoice.h");
             options.Headers.Add(@"Audio\SoundSystem.h");
-            options.Headers.Add(@"Graphics\Texture.h");
             options.Headers.Add(@"Graphics\RenderTarget.h");
             options.Headers.Add(@"Graphics\GraphicsSystem.h");
             //options.Headers.Add(@"Graphics\TextureFormat.h");
