@@ -36,13 +36,13 @@ namespace {
 	const char* humanSize(double size)
 	{
 		const int kMaxSuffix = 4;
-		const char* suffixes[kMaxSuffix] = { "B ", "KB", "MB", "GB" };
+		const char* suffixes[kMaxSuffix] = { "B", "KB", "MB", "GB" };
 		auto mag = 0;
 		while (size >= 1024.0 && ++mag < kMaxSuffix)
 			size /= 1024.0;
 
 		memset(buffer, 0, kMaxHumanSizeBuffer);
-		snprintf(buffer, kMaxHumanSizeBuffer, "%3.2f %s", size, suffixes[mag]);
+		snprintf(buffer, kMaxHumanSizeBuffer, "%3.2f%s", size, suffixes[mag]);
 
 		return buffer;
 	}
@@ -140,10 +140,10 @@ void Allocator::mapMemory(uint64_t* system, uint32_t* systemSize, uint64_t* gpuS
 	assert(system && systemSize && gpuShared && gpuSharedSize);
 
 	// Setup the onion and garlic memory pools.
-	const uint32_t	systemPoolSize	   = 1024 * 1024 * 2048;
-	const uint32_t	sharedGpuPoolSize  = 1024 * 1024 * 1024;
-	const uint32_t  systemAlignment		= 2 * 1024 * 1024;
-	const uint32_t  shaderGpuAlignment	= 2 * 1024 * 1024;
+	const size_t	systemPoolSize		= 1024 * 1024 * (size_t)2048;
+	const size_t	sharedGpuPoolSize	= 1024 * 1024 * (size_t)1024;
+	const size_t	systemAlignment		= 2 * 1024 * 1024;
+	const size_t	shaderGpuAlignment	= 2 * 1024 * 1024;
 
 	off_t systemPoolOffset;		// TODO: store these value to be able to free them later.
 	off_t sharedGpuPoolOffset;
@@ -220,8 +220,8 @@ void Allocator::mapMemory(uint64_t* system, uint32_t* systemSize, uint64_t* gpuS
 
 #ifndef NDEBUG
 	fprintf(stderr,"Total Direct Memory         : %s\n", humanSize(SCE_KERNEL_MAIN_DMEM_SIZE));
-	fprintf(stderr,"Allocator System/Onion Size : %s (0x%p - 0x%p)\n", humanSize(systemPoolSize), (uint64_t)systemPoolPtr, (uint64_t)systemPoolPtr + systemPoolSize);
-	fprintf(stderr,"Allocator Video/Garlic Size : %s (0x%p - 0x%p)\n", humanSize(sharedGpuPoolSize), (uint64_t)sharedGpuPoolPtr, (uint64_t)sharedGpuPoolPtr + sharedGpuPoolSize);
+	fprintf(stderr,"Allocator System/Onion Size : %s (0x%p - 0x%p)\n", humanSize(systemPoolSize), (void*)systemPoolPtr, (void*)((size_t)systemPoolPtr + systemPoolSize));
+	fprintf(stderr,"Allocator Video/Garlic Size : %s (0x%p - 0x%p)\n", humanSize(sharedGpuPoolSize), (void*)sharedGpuPoolPtr, (void*)((size_t)sharedGpuPoolPtr + sharedGpuPoolSize));
 #endif
 }
 
@@ -267,10 +267,10 @@ Region* RegionAllocator::findUnusedRegion()
 	auto newRegions = (Region*)realloc(m_allRegions, sizeof(Region) * newSize);
 	if (newRegions != 0)
 	{
-		printf("Resizing region memory %d -> %d.\n", m_numRegions, newSize);
+		printf("Resizing region memory %iu -> %lu.\n", m_numRegions, newSize);
 
 		// Initialize memory for new regions
-		auto oldRegionSize = sizeof(Region) * m_numRegions;
+		//auto oldRegionSize = sizeof(Region) * m_numRegions;
 		auto newRegionSize = sizeof(Region) * (newSize - m_numRegions);
 		memset(newRegions + m_numRegions, 0, newRegionSize);
 
@@ -537,7 +537,7 @@ void RegionAllocator::releaseRegion(uint64_t start, uint64_t type)
 		}
 	}
 
-	fprintf(stderr, "Pointer 0x%p was not allocated through the allocator!\n", start);
+	fprintf(stderr, "Pointer 0x%p was not allocated through the allocator!\n", (void*)start);
 	assert(!"Pointer not allocator with this allocator");
 }
 
@@ -586,6 +586,14 @@ void* Allocator::allocate(size_t size, size_t align, SceKernelMemoryType type)
 #if MEMORY_LOGGING
 		printf("System alloc - %s used.\n", humanSize(m_onionAllocator.getMemoryUsage()));
 #endif
+
+		if (ret == NULL)
+		{
+			printf("ONION ALLOCATION OF SIZE %s FAILED.\n", humanSize(size));
+			printf("Onion TotalMemUsage: %s\n", humanSize(m_onionAllocator.getMemoryUsage()));
+			printf("Garlic TotalMemUsage: %s\n", humanSize(m_garlicAllocator.getMemoryUsage()));
+		}
+
 		return ret;
 
 	case SCE_KERNEL_WC_GARLIC:
@@ -593,6 +601,14 @@ void* Allocator::allocate(size_t size, size_t align, SceKernelMemoryType type)
 #if MEMORY_LOGGING
 		printf("Shared alloc - %s used.\n", humanSize(m_garlicAllocator.getMemoryUsage()));
 #endif
+
+		if (ret == NULL)
+		{
+			printf("GARLIC ALLOCATION OF SIZE %s FAILED.\n", humanSize(size));
+			printf("Onion TotalMemUsage: %s\n", humanSize(m_onionAllocator.getMemoryUsage()));
+			printf("Garlic TotalMemUsage: %s\n", humanSize(m_garlicAllocator.getMemoryUsage()));
+		}
+
 		return ret;
 
 	default:
