@@ -879,40 +879,24 @@ void GraphicsSystem::SetTexture(int slot, Texture* texture)
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
-	sce::Gnm::Texture *tex;
-	if (texture != NULL)
-		tex = texture->_texture;
-	else
-		tex = _nullTexture;
-
-	gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, tex);
-}
-
-void GraphicsSystem::SetTextureRT(int slot, RenderTarget* target)
-{
-	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
-	Gnmx::GfxContext &gfxc = backBuffer->context;
-
-	if (target == NULL)
+	if (texture == NULL)
 	{
 		gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, _nullTexture);
 		return;
 	}
 
-	gfxc.waitForGraphicsWrites(
-		target->_renderTarget->getBaseAddress256ByteBlocks(), 
-#if SCE_ORBIS_SDK_VERSION >= 0x02000071u  // SDK Version 2.0
-		target->_renderTarget->getSliceSizeInBytes() >> 8,
-#else
-		target->_renderTarget->getSizeInBytes() >> 8,
-#endif
-		Gnm::kWaitTargetSlotCb0, Gnm::kCacheActionWriteBackAndInvalidateL1andL2, Gnm::kExtendedCacheActionFlushAndInvalidateCbCache,
-		Gnm::kStallCommandBufferParserDisable);
+	if (texture->_isTarget)
+	{
+		auto target = (RenderTarget*)texture;
 
-	// TODO: Why were we doing this?
-	//_effectDirty = true;
+		gfxc.waitForGraphicsWrites(
+			target->_renderTarget->getBaseAddress256ByteBlocks(), 
+			target->_renderTarget->getSizeInBytes()>>8,
+			Gnm::kWaitTargetSlotCb0, Gnm::kCacheActionWriteBackAndInvalidateL1andL2, Gnm::kExtendedCacheActionFlushAndInvalidateCbCache,
+			Gnm::kStallCommandBufferParserDisable);
+	}
 
-	gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, target->_texture);
+	gfxc.setTextures(Gnm::kShaderStagePs, slot, 1, texture->_texture);
 }
 
 void GraphicsSystem::CreateRasterizerState(	CullMode cullMode,

@@ -122,8 +122,21 @@ Texture* Texture::CreateCube(TextureFormat format, int32_t width, int32_t height
 	return result;
 }
 
+Texture::Texture()
+{ 
+	_isTarget = false; 
+	_ownsTexture = true; 
+}
+
+Texture::Texture( const Texture & )
+{
+}
+
 Texture::~Texture()
 {
+	if (!_ownsTexture)
+		return;
+
 	mem::freeShared(_texture->getBaseAddress());
 	delete _texture;
 }
@@ -177,10 +190,19 @@ void Texture::GetData(uint32_t mipLevel, uint8_t* data, uint32_t offset, uint32_
 	auto pixelBits = _texture->getDataFormat().getBitsPerElement();
 
 	uint64_t levelOffset, levelSize;
-	GpuAddress::computeTextureSurfaceOffsetAndSize(&levelOffset, &levelSize, _texture, mipLevel, 0);
+	unsigned char* baseAddr;
 
-	auto baseAddr = (unsigned char*)_texture->getBaseAddress();
-	baseAddr += levelOffset;
+	if (_isTarget)	
+	{
+		auto target = (RenderTarget*)this;
+		baseAddr = target->GetDataDetiled(&levelOffset, &levelSize, mipLevel);
+	}
+	else
+	{
+		GpuAddress::computeTextureSurfaceOffsetAndSize(&levelOffset, &levelSize, _texture, mipLevel, 0);
+		baseAddr = (unsigned char*)_texture->getBaseAddress();
+		baseAddr += levelOffset;
+	}
 
 	if (offset == 0 && length == levelSize)
 		memcpy(data, baseAddr, length);

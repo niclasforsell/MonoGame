@@ -53,11 +53,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 if ((_dirty & mask) == 0)
                     continue;
 
-                var rt2D = _textures[i] as RenderTarget2D;
                 var tex2D = _textures[i] as Texture2D;
-                if (rt2D != null)
-                    device._system.SetTextureRT(i, rt2D._target);
-                else if (tex2D != null)
+                if (tex2D != null)
                     device._system.SetTexture(i, tex2D._texture);
                 else
                     device._system.SetTexture(i, null);

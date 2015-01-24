@@ -8,14 +8,17 @@ namespace Graphics {
 class CS_API Texture
 {
 	friend class GraphicsSystem;
+	friend class RenderTarget;
 
 private:
 
 	sce::Gnm::Texture *_texture;
+	bool _ownsTexture;
+	bool _isTarget;
 
-	// No default or copy constructors.
-	Texture() { }
-	Texture( const Texture & ) { }
+	// No public default or copy constructors.
+	Texture();
+	Texture( const Texture & );
 
 public:
 
