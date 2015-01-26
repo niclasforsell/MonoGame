@@ -14,6 +14,7 @@ RenderTarget* RenderTarget::Create(TextureFormat format_, int32_t width, int32_t
 	auto renderTarget = new sce::Gnm::RenderTarget();
 	auto result = new RenderTarget();
 	result->_renderTarget = renderTarget;
+	result->_isTarget = true;
 
 	Gnm::TileMode tileMode;
 	auto format = ToDataFormat(format_);
@@ -33,7 +34,6 @@ RenderTarget* RenderTarget::Create(TextureFormat format_, int32_t width, int32_t
 	result->_texture = new sce::Gnm::Texture();
 	result->_texture->initFromRenderTarget(renderTarget, isCubemap);
 	result->_texture->setResourceMemoryType(sce::Gnm::kResourceMemoryTypeRO);
-	result->_ownsTexture = true;
 
 	result->_depthTarget = NULL;
 	result->_hasStencil = depthFormat_ == DepthFormat_Depth24Stencil8;
@@ -98,6 +98,7 @@ RenderTarget* RenderTarget::CreateFromTexture2D(Texture* texture, DepthFormat de
 	result->_renderTarget = renderTarget;
 	result->_texture = colorTex;
 	result->_ownsTexture = false;
+	result->_isTarget = true;
 
 	auto ret = renderTarget->initFromTexture(colorTex, 0);
 	assert(ret == GpuAddress::kStatusSuccess);
@@ -139,8 +140,20 @@ RenderTarget* RenderTarget::CreateFromTexture2D(Texture* texture, DepthFormat de
 	return result;
 }
 
+RenderTarget::RenderTarget()
+{
+	_detileTemp = nullptr;
+}
+
+RenderTarget::RenderTarget(const RenderTarget & ) 
+{
+}
+
 RenderTarget::~RenderTarget()
 {
+	if (_detileTemp != nullptr)
+		mem::free(_detileTemp);
+
 	if (_depthTarget)
 	{
 		mem::freeShared(_depthTarget->getStencilReadAddress());
@@ -148,18 +161,15 @@ RenderTarget::~RenderTarget()
 		delete _depthTarget;
 	}
 
-	if (_ownsTexture)
-	{
-		mem::freeShared(_renderTarget->getBaseAddress());
-		delete _texture;
-	}
-
 	delete _renderTarget;
 }
 
-/*
-void GraphicsSystem::GetRenderTargetData(RenderTarget *target, unsigned char *data, uint32_t bytes)
+unsigned char* RenderTarget::GetDataDetiled(uint64_t *levelOffset, uint64_t *levelSize, uint32_t mipLevel)
 {
+	assert(mipLevel == 0);
+
+	// TODO: We really should be doing this!
+	/*
 	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	Gnmx::GfxContext &gfxc = backBuffer->context;
 
@@ -168,13 +178,13 @@ void GraphicsSystem::GetRenderTargetData(RenderTarget *target, unsigned char *da
 		target->_renderTarget->getSizeInBytes()>>8,
 		Gnm::kWaitTargetSlotCb0, Gnm::kCacheActionWriteBackAndInvalidateL1andL2, Gnm::kExtendedCacheActionFlushAndInvalidateCbCache,
 		Gnm::kStallCommandBufferParserEnable);
+	*/
 
-	// TODO: This blows!
 	GpuAddress::TilingParameters tilingParameters;
-	tilingParameters.m_tileMode = target->_renderTarget->getTileMode();
-	tilingParameters.m_elemFormat = target->_renderTarget->getDataFormat();
-	tilingParameters.m_linearWidth = target->_renderTarget->getWidth();
-	tilingParameters.m_linearHeight = target->_renderTarget->getHeight();
+	tilingParameters.m_tileMode = _renderTarget->getTileMode();
+	tilingParameters.m_elemFormat = _renderTarget->getDataFormat();
+	tilingParameters.m_linearWidth = _renderTarget->getWidth();
+	tilingParameters.m_linearHeight = _renderTarget->getHeight();
 	tilingParameters.m_linearDepth = 1;
 	tilingParameters.m_numElementsPerPixel = 1;
 	tilingParameters.m_baseTiledPitch = 0;
@@ -183,6 +193,15 @@ void GraphicsSystem::GetRenderTargetData(RenderTarget *target, unsigned char *da
 	tilingParameters.m_surfaceFlags.m_value = 0;
 	tilingParameters.m_surfaceFlags.m_prt = 1;
 
-	GpuAddress::detileSurface(data, target->_texture->getBaseAddress(), &tilingParameters);
+	auto size = GpuAddress::computeUntiledSurfaceSize(&tilingParameters);
+
+	if (_detileTemp == nullptr)
+		_detileTemp = mem::alloc(size.m_size, size.m_align);
+
+	GpuAddress::detileSurface(_detileTemp, _renderTarget->getBaseAddress(), &tilingParameters);
+
+	*levelOffset = 0;
+	*levelSize = size.m_size;
+
+	return (unsigned char*)_detileTemp;
 }
-*/

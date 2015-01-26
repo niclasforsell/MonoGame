@@ -71,7 +71,6 @@ public:
     void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount);
 
 	void SetTexture(int slot, Texture* texture);
-	void SetTextureRT(int slot, RenderTarget* target);
 	void SetSamplerState(int slot, uint32_t desc0, uint32_t desc1, uint32_t desc2, uint32_t desc3);
 
 	void SetViewport(int left, int top, int width, int height, float minDepth, float maxDepth);

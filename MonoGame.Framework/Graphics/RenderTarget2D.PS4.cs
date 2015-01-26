@@ -12,30 +12,17 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RenderTarget2D
     {
-        internal PS4RenderTarget _target;
-
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount,
             RenderTargetUsage usage, bool shared)
         {
-            _target = PS4RenderTarget.Create2D((PS4TextureFormat)preferredFormat, width, height, (PS4DepthFormat)preferredDepthFormat);
+            _texture = PS4RenderTarget.Create2D((PS4TextureFormat)preferredFormat, width, height, (PS4DepthFormat)preferredDepthFormat);
         }
 
         private void PlatformGraphicsDeviceResetting()
         {
             // Don't think this will happen on PS4.
             throw new NotImplementedException();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && _target != null)
-            {
-                _target.Dispose();
-                _target = null;
-            }
-
-            base.Dispose(disposing);
         }
     }
 }
