@@ -853,7 +853,7 @@ void GraphicsSystem::CreateSamplerState(	TextureFilter filter,
     }
 
 	auto fixedMaxMip = Gnmx::convertF32ToU4_8((float)maxMipLevel);
-	sampler.setLodRange(0, fixedMaxMip);
+	sampler.setLodRange(fixedMaxMip, 0xFFF);
 
 	auto a = Gnmx::convertF32ToS6_8((float)mipMapLevelOfDetailBias);
 	auto b = Gnmx::convertF32ToS2_4((float)mipMapLevelOfDetailBias);
