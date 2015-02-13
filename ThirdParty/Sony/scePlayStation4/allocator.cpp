@@ -30,7 +30,6 @@ namespace {
 	const uint64_t kInitialGarlicRegions = 3072;
 	const uint64_t kRegionTableGrowthFactor = 2;
 
-#ifndef NDEBUG
 	const int kMaxHumanSizeBuffer = 16;
 	char buffer[kMaxHumanSizeBuffer];
 	const char* humanSize(double size)
@@ -46,7 +45,6 @@ namespace {
 
 		return buffer;
 	}
-#endif
 }
 
 struct Region
