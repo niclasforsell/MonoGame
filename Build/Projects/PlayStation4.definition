@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="PlayStation4">
+
+  <Platform Type="PlayStation4">
+
+    <Project
+      Name="scePlayStation4"
+	  Type="Cpp"
+      Guid="73E143CF-7BB5-4EAA-B952-F9DBCEA7FB76"
+      Path="ThirdParty\Sony\scePlayStation4\scePlayStation4.vcxproj">
+		<PostProject Guid="008B1B4E-EEB0-44ED-885E-C8C1EB956739" />
+        <ConfigurationMapping Old="Debug" New="Debug|ORBIS" />
+        <ConfigurationMapping Old="Release" New="Release|ORBIS" />
+    </Project>
+
+    <Project
+      Name="BindingGen"
+      Guid="008B1B4E-EEB0-44ED-885E-C8C1EB956739"
+      Path="ThirdParty\Sony\BindingGen\BindingGen.csproj" />
+
+  </Platform>
+  
+</ExternalProject>

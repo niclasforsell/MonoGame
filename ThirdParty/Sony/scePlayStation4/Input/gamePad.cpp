@@ -23,9 +23,6 @@ namespace {
 	float scaleStickValue(uint8_t value)
 	{
 		auto scaledValue = (float)((int32_t)value * 2 - 255) * ByteToFloatConvert;
-		if ((fabsf(scaledValue) < 0.06666667f))
-			scaledValue = 0.0f;
-
 		return scaledValue;
 	}
 

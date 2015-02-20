@@ -5,8 +5,8 @@
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
-    <Reference Include="monotouch" />
-    <Reference Include="OpenTK" />
+    <Reference Include="Xamarin.iOS" />
+    <Reference Include="OpenTK-1.0" />
   </Platform>
 
   <Platform Type="Linux">
@@ -70,19 +70,7 @@
       Path="ThirdParty\Sony\Sce.PlayStation4\Sce.PlayStation4.csproj">
 		<PostProject Guid="73E143CF-7BB5-4EAA-B952-F9DBCEA7FB76" />
     </Project>
-    <Project
-      Name="scePlayStation4"
-	  Type="Cpp"
-      Guid="73E143CF-7BB5-4EAA-B952-F9DBCEA7FB76"
-      Path="ThirdParty\Sony\scePlayStation4\scePlayStation4.vcxproj">
-		<PostProject Guid="008B1B4E-EEB0-44ED-885E-C8C1EB956739" />
-        <ConfigurationMapping Old="Debug" New="Debug|ORBIS" />
-        <ConfigurationMapping Old="Release" New="Release|ORBIS" />
-    </Project>
-    <Project
-      Name="BindingGen"
-      Guid="008B1B4E-EEB0-44ED-885E-C8C1EB956739"
-      Path="ThirdParty\Sony\BindingGen\BindingGen.csproj" />
+
   </Platform>
   
   <Platform Type="Windows">

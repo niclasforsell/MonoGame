@@ -53,11 +53,9 @@ namespace Microsoft.Xna.Framework.Input
                 PacketNumber = state.PacketNumber,
                 Buttons = new GamePadButtons((Buttons)state.Buttons),
                 DPad = new GamePadDPad((Buttons)state.Buttons),
-                ThumbSticks = new GamePadThumbSticks
-                {
-                    Left = new Vector2(state.LeftStickX, state.LeftStickY),
-                    Right = new Vector2(state.RightStickX, state.RightStickY),
-                },
+                ThumbSticks = new GamePadThumbSticks(   new Vector2(state.LeftStickX, state.LeftStickY),
+                                                        new Vector2(state.RightStickX, state.RightStickY),
+                                                        deadZoneMode),
                 Triggers = new GamePadTriggers(state.LeftTrigger, state.RightTrigger),
                 Orientation = new Quaternion
                 {

@@ -49,6 +49,8 @@ struct Media::SongState
 
 	std::atomic<float> startSeconds;
 	std::atomic<float> fadeInSeconds;
+	std::atomic<float> volume;
+	std::atomic<float> position;
 
 	std::atomic<bool> isPaused;
 	std::atomic<bool> isRunning;
@@ -136,6 +138,8 @@ void* decodeMain(void* arg)
 			printf("ERROR: MusicPlayer decode failed: 0x%08X\n", ret);
 			goto term;
 		}
+
+		state->position = state->decoder->getElapsedSeconds();
 	}
 
 	printf("Exiting decode loop.\n");
@@ -188,12 +192,15 @@ void* outputMain(void* arg)
 	scePthreadBarrierWait(&state->barrier);
 
 	auto fadeEnabled = state->fadeInSeconds > 0.0f;
-	auto audioOut = state->outputStream->getOutput();
-	auto fullVolume = audioOut->getVolume();
+	auto audioOut = state->outputStream->getOutput();	
 	auto startFade = state->startSeconds.load();
 	auto finishFade = state->startSeconds + state->fadeInSeconds;
+	
+	float stateVolume = state->volume;
 	if (fadeEnabled)
 		audioOut->setVolume(0.0f);
+	else
+		audioOut->setVolume(stateVolume);
 
 	while(state->isRunning)
 	{
@@ -202,6 +209,8 @@ void* outputMain(void* arg)
 
 		if (state->inputStream->isEmpty() && state->outputStream->isEmpty())
 			break;
+		
+		stateVolume = state->volume;
 
 		if (fadeEnabled)
 		{
@@ -209,16 +218,22 @@ void* outputMain(void* arg)
 			if (pos >= startFade && pos <= finishFade)
 			{
 				auto amount = (pos - startFade) / state->fadeInSeconds;
-				audioOut->setVolume(amount * fullVolume);
+				audioOut->setVolume(amount * stateVolume);
 			}
 
 			if (pos > finishFade)
 			{
 				fadeEnabled = false;
-				audioOut->setVolume(fullVolume);
+				audioOut->setVolume(stateVolume);
 			}
 		}
-
+		else
+		{
+			// Note that the value of state->volume can be changed at any time
+			// by the user. We must set this even it even if no fade is occuring.
+			audioOut->setVolume(stateVolume);
+		}
+		
 		auto ret = state->outputStream->output();
 		if (ret < 0)
 		{
@@ -391,34 +406,25 @@ void Song::Stop()
 
 float Song::GetVolume()
 {
-	if (_state == NULL)
-		return 1.0f;
-
-	if (_state->outputStream == NULL)
-		return 1.0f;
-
-	return _state->outputStream->getOutput()->getVolume();
+	assert(_state != NULL);			
+	
+	return _state->volume;	
 }
 
 void Song::SetVolume(float value)
 {
-	if (_state == NULL)
-		return;
-
 	assert(value >= 0.0f || value <= 1.0f);
-
-	if (_state->outputStream == NULL)
-		return;
-
-	_state->outputStream->getOutput()->setVolume(value);
+	assert(_state != NULL);
+	
+	_state->volume = value;	
 }
 
 float Song::GetPosition()
-{
-	if (_state == NULL || _state->decoder == NULL || _state->outputStream == NULL)
+{	
+	if (_state == NULL)
 		return 0.0f;
 
-	return _state->decoder->getElapsedSeconds();
+	return _state->position;
 }
 
 void Song::RegisterFinishedHandler(SongFinishedHandler handler)
@@ -426,6 +432,7 @@ void Song::RegisterFinishedHandler(SongFinishedHandler handler)
 	if (_state == NULL)
 		return;
 
+	// JCF: This is not thread safe!
 	assert(_state->onSongFinished == NULL);
 	_state->onSongFinished = handler;
 }
