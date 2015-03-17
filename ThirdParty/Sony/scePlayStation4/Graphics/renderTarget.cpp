@@ -5,6 +5,7 @@
 #include "..\allocator.h"
 #include <assert.h>
 #include <gnm.h>
+#include <scebase.h>
 
 using namespace Graphics;
 
@@ -193,7 +194,16 @@ unsigned char* RenderTarget::GetDataDetiled(uint64_t *levelOffset, uint64_t *lev
 	tilingParameters.m_surfaceFlags.m_value = 0;
 	tilingParameters.m_surfaceFlags.m_prt = 1;
 
+#if SCE_ORBIS_SDK_VERSION >= 0x02000131u // SDK Version 2.0
+	uint64_t surfaceSize64 = 0;
+	Gnm::AlignmentType surfaceAlign;
+	auto status = GpuAddress::computeUntiledSurfaceSize(&surfaceSize64, &surfaceAlign, &tilingParameters);
+	SCE_GNM_ASSERT(status == GpuAddress::kStatusSuccess);
+	SCE_GNM_VALIDATE(surfaceSize64 < 0xFFFFFFFFULL, "surface size is >=4GB and will be clamped to 32 bits; use the 64-bit variant instead.");
+	Gnm::SizeAlign size(static_cast<uint32_t>(surfaceSize64), surfaceAlign);
+#else
 	auto size = GpuAddress::computeUntiledSurfaceSize(&tilingParameters);
+#endif
 
 	if (_detileTemp == nullptr)
 		_detileTemp = mem::alloc(size.m_size, size.m_align);
