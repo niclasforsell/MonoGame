@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework
             while (true)
             {
                 // Update the active state.
-                _platform.IsActive = !SystemService.IsInBackgroundExecution;
+                _platform.IsActive = !SystemService.IsInBackgroundExecution && !SystemService.IsSystemUIOverlaid;
 
                 Game.Tick();
 
