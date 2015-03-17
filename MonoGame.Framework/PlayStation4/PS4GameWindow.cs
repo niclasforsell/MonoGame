@@ -3,15 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 using Sce.PlayStation4.System;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
+
 
 namespace Microsoft.Xna.Framework
 {
@@ -72,16 +65,6 @@ namespace Microsoft.Xna.Framework
         {
             _platform = platform;
             Game = platform.Game;
-        }
-
-        private void OnActivated(object sender, EventArgs eventArgs)
-        {
-            _platform.IsActive = true;
-        }
-
-        private void OnDeactivate(object sender, EventArgs eventArgs)
-        {
-            _platform.IsActive = false;
         }
 
         internal void Initialize(int width, int height)
