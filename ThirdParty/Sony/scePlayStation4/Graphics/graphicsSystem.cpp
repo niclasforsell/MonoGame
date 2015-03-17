@@ -893,7 +893,11 @@ void GraphicsSystem::SetTexture(int slot, Texture* texture)
 
 		gfxc.waitForGraphicsWrites(
 			target->_renderTarget->getBaseAddress256ByteBlocks(), 
-			target->_renderTarget->getSizeInBytes()>>8,
+#if SCE_ORBIS_SDK_VERSION >= 0x02000131u // SDK Version 2.0
+			target->_renderTarget->getSliceSizeInBytes() >> 8,
+#else
+			target->_renderTarget->getSizeInBytes() >> 8,
+#endif
 			Gnm::kWaitTargetSlotCb0, Gnm::kCacheActionWriteBackAndInvalidateL1andL2, Gnm::kExtendedCacheActionFlushAndInvalidateCbCache,
 			Gnm::kStallCommandBufferParserDisable);
 	}
