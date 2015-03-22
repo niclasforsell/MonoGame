@@ -62,7 +62,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libSceShaderBinary.lib;libSceGpuAddress.lib;libSceTextureTool.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libSceShaderBinary.lib;libSceGpuAddress.lib;libSceTextureTool.lib;libSceGnm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SCE_ORBIS_SDK_DIR)\host_tools\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -75,7 +75,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libSceShaderBinary.lib;libSceGpuAddress.lib;libSceTextureTool.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libSceShaderBinary.lib;libSceGpuAddress.lib;libSceTextureTool.lib;libSceGnm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SCE_ORBIS_SDK_DIR)\host_tools\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
