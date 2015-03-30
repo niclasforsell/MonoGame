@@ -373,27 +373,47 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         private static void CompressGnf(TextureContent content, bool generateMipmaps)
         {
-            var face = content.Faces[0][0];
-            var pixelData = face.GetPixelData();
+            // Use our stock mipmap generation.
+            if (generateMipmaps)
+                content.GenerateMipmaps(false);
 
-            // Test the alpha channel to figure out if we have alpha.
+            // TODO: We should support cube/volume textures here too!
+            var face = content.Faces[0];
+
             var containsFracAlpha = false;
-            for (var x = 3; x < pixelData.Length; x += 4)
             {
-                if (pixelData[x] != 0xFF)
+                var pixelData = face[0].GetPixelData();
+
+                // Test the alpha channel of the first level to 
+                // figure out if we have alpha.
+                for (var x = 3; x < pixelData.Length; x += 4)
                 {
-                    if (pixelData[x] != 0x0)
-                        containsFracAlpha = true;
+                    if (pixelData[x] != 0xFF)
+                    {
+                        if (pixelData[x] != 0x0)
+                        {
+                            containsFracAlpha = true;
+                            break;
+                        }
+                    }
                 }
             }
 
+            // Pick the correct format based on the type of alpha it uses.
             var outputFormat = containsFracAlpha ? SurfaceFormat.PlayStation4_BC3Unorm : SurfaceFormat.PlayStation4_BC1Unorm;
 
-            var compressed = sce.PlayStation4.Tools.TextureTools.CompressImage2D(face.Width, face.Height, containsFracAlpha, generateMipmaps, pixelData);
-            var compressedFace = new BcBitmapContent(face.Width, face.Height, outputFormat);
-            compressedFace.SetPixelData(compressed);
-            content.Faces[0].Clear();
-            content.Faces[0].Add(compressedFace);
-        } 
+            var width = content.Faces[0][0].Width;
+            var height = content.Faces[0][0].Height;
+            var mips = content.Faces[0].Count;
+
+            for (var i = 0; i < face.Count; i++)
+            {
+                var mip = face[i];
+                var compressed = sce.PlayStation4.Tools.TextureTools.CompressImage2D(width, height, mips, i, containsFracAlpha, mip.GetPixelData());
+                var compressedFace = new BcBitmapContent(mip.Width, mip.Height, outputFormat);
+                compressedFace.SetPixelData(compressed);
+                face[i] = compressedFace;
+            }
+        }
     }
 }

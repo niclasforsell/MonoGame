@@ -8,24 +8,42 @@ namespace sce { namespace PlayStation4 { namespace Tools {
 
 using namespace sce::TextureTool;
 
-array<Byte>^ TextureTools::CompressImage2D(int width, int height, bool fracAlpha, bool generateMipmaps, array<Byte>^ data)
+int Max(int a, int b)
 {
-	Image image(width, height, 4, Image::Plane::kTypeNormal);
+	return a > b ? a : b;
+}
 
+array<Byte>^ TextureTools::CompressImage2D(int width, int height, int mips, int level, bool fracAlpha, array<Byte>^ levelData)
+{
 	auto dataFormat = fracAlpha ? Gnm::kDataFormatBc3Unorm : Gnm::kDataFormatBc1Unorm;
 	auto tileMode = Gnm::kTileModeThin_1dThin;
-	Gnm::Texture texture;
+	uint32_t padFlags = mips > 1 ? GnmTextureGen::kPadToPow2 : 0;
 
-	pin_ptr<uint8_t> dataHandle = &data[data->GetLowerBound(0)];
+	// We figure out the exact surface size needed at runtime by creating
+	// the texture description then getting the current mip level size.
+	uint64_t surfaceSize;
+	{
+		sce::Gnm::Texture texture;
+		texture.initAs2d(width, height, mips, dataFormat, tileMode, Gnm::kNumFragments1);
+		GpuAddress::computeTextureSurfaceOffsetAndSize(nullptr, &surfaceSize, &texture, level, 0);
+	}
+
+	// Figure out the size for the current mip level.
+	width = Max(1, width >> level);
+	height = Max(1, height >> level);
+
+	// Fill the image with the incoming mip level data.
+	Image image(width, height, 4, Image::Plane::kTypeNormal);
+	pin_ptr<uint8_t> dataHandle = &levelData[levelData->GetLowerBound(0)];
 	auto offset = 0;
 	for (auto y = 0; y < height; y++)
 	{
 		for (auto x = 0; x < width; x++)
 		{
-			auto r = data[offset + 0];
-			auto g = data[offset + 1];
-			auto b = data[offset + 2];
-			auto a = data[offset + 3];
+			auto r = levelData[offset + 0];
+			auto g = levelData[offset + 1];
+			auto b = levelData[offset + 2];
+			auto a = levelData[offset + 3];
 
 			image.setPixel(x, y, Image::Channel::kChannelRed,   r / 255.0f);
 			image.setPixel(x, y, Image::Channel::kChannelGreen, g / 255.0f);
@@ -36,15 +54,12 @@ array<Byte>^ TextureTools::CompressImage2D(int width, int height, bool fracAlpha
 		}
 	}
 
-	// Copy to an output image and optionally generate high quality mipmaps
-	MippedImage outputImage(image, sce::TextureTool::Filters::LanczosFilter(), generateMipmaps ? -1 : 1);
-	auto sizeAlign = outputImage.initTexture(texture, dataFormat, tileMode);
+	// Get the compressed, tiled, and padded surface.
+	auto surface = gcnew array<Byte>(surfaceSize);
+	pin_ptr<uint8_t> pinned = &surface[surface->GetLowerBound(0)];
+	image.fillSurface(pinned, surfaceSize, tileMode, dataFormat, 0, padFlags);
 
-	auto output = gcnew array<Byte>(sizeAlign.m_size);
-	pin_ptr<uint8_t> outHandle = &output[output->GetLowerBound(0)];
-	image.fillSurface(outHandle, sizeAlign.m_size, tileMode, dataFormat);
-
-	return output;
+	return surface;
 }
 
 }}}
