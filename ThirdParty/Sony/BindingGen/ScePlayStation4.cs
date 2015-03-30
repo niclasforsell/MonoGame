@@ -73,6 +73,7 @@ namespace BindingGen
             options.Headers.Add(@"Network\NpScore.h");
             options.Headers.Add(@"Network\TitleStorage.h");
             options.Headers.Add(@"Network\TrophySet.h");
+            options.Headers.Add(@"System\AppContent.h");
             options.Headers.Add(@"System\PlayGo.h");
             options.Headers.Add(@"System\RemotePlay.h");
             options.Headers.Add(@"System\SystemService.h");

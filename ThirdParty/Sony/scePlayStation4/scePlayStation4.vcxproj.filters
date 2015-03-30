@@ -153,6 +153,9 @@
     </ClCompile>
     <ClCompile Include="Network\npCommerceDialog.cpp" />
     <ClCompile Include="System\saveDataDirNameSearch.cpp" />
+    <ClCompile Include="System\appContent.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -381,5 +384,8 @@
     </ClInclude>
     <ClInclude Include="Network\npCommerceDialog.h" />
     <ClInclude Include="System\saveDataDirNameSearch.h" />
+    <ClInclude Include="System\appContent.h">
+      <Filter>System</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
