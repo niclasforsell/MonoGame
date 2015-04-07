@@ -5,7 +5,7 @@
 #include <shader/compiler.h>
 #include <shader/binary.h>
 #include <shader/shader_parser.h>
-
+#include <../include/sdk_version.h>
 
 using namespace System::Text;
 
@@ -86,8 +86,8 @@ bool ShaderCompiler::Compile(String^ filePath, String^ code, String^ entryPoint,
 		// abstract syntax tree of the shader source.
 		options.sdbCache = 2;
 
-		// Add extra debug instrumentation.
-		options.addInstrumentation = 1;
+		// Add debug information.
+		options.generateDebugInfo = 1;
 
 		// Reduce optimization levels.
 		options.optimizationLevel = 0;
