@@ -36,6 +36,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AppContent.cs" />
     <Compile Include="AudioBuffer.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="CommonDialog.cs" />
