@@ -30,6 +30,7 @@ protected:
 	unsigned int _voiceHandleID;
 	float _pitch;
 	float _pan;
+	bool _padPort;
 	float _volume;
 	bool _looped;
 	AudioBuffer *_buffer;
