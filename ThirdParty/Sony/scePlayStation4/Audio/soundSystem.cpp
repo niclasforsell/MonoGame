@@ -215,7 +215,11 @@ void SoundSystem::SubmitPlaybackEvent(SamplerVoice* voiceHandle, AudioBuffer *bu
 		if (portHandle == -1 && _masteringPadVoiceHandle[portHandle] != 0)
 			errorCode = sceNgs2VoicePatch(handle, 0, _masteringVoiceHandle, 0);
 		else
+		{
 			errorCode = sceNgs2VoicePatch(handle, 0, _masteringPadVoiceHandle[portHandle], 0);
+			voiceHandle->_padPort = true;
+			voiceHandle->SetMatrixLevels(nullptr);
+		}
 
 		assert(errorCode >= 0);
 	}
