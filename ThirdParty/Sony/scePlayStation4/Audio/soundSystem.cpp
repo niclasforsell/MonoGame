@@ -6,16 +6,17 @@
 
 #include <ngs2.h>
 #include <libsysmodule.h>
-#include <sulpha.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <queue>
 
-using namespace Audio;
-
 #if _DEBUG
+#include <sulpha.h>
 //#define SOUND_LOGGING 1
 #endif
+
+using namespace Audio;
+
 
 SoundSystem* SoundSystem::GetInstance()
 {
@@ -84,9 +85,9 @@ void SoundSystem::Initialize()
 
 #ifdef _DEBUG
 
+	errorCode = sceSysmoduleLoadModule( SCE_SYSMODULE_SULPHA );
+	if (errorCode == SCE_OK)
 	{
-		errorCode = sceSysmoduleLoadModule( SCE_SYSMODULE_SULPHA );
-		assert(errorCode == 0);
 		SceSulphaConfig config;
 		sceSulphaGetDefaultConfig(&config);
 		size_t size;
