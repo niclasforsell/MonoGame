@@ -225,7 +225,7 @@ void SoundSystem::SubmitPlaybackEvent(SamplerVoice* voiceHandle, AudioBuffer *bu
 	assert(errorCode >= 0);
 }
 
-SamplerVoice* SoundSystem::CreateVoice(AudioBuffer* buffer)
+void SoundSystem::InitVoice(SamplerVoice* voice)
 {
 	auto ids = ((std::queue<unsigned int>*)_freeVoiceIDs);
 
@@ -233,7 +233,7 @@ SamplerVoice* SoundSystem::CreateVoice(AudioBuffer* buffer)
 	{
 		printf("WARNING: Couldn't find a free voice ID to use.\n");
 		assert(!"SoundSystem::CreateVoice - Ran out of voices!");
-		return NULL;
+		return;
 	}
 
 	SceNgs2Handle voiceHandle;
@@ -249,17 +249,21 @@ SamplerVoice* SoundSystem::CreateVoice(AudioBuffer* buffer)
 	errorCode = sceNgs2RackGetVoiceHandle(_samplerRackHandle, nextID, &voiceHandle);
 	assert(errorCode >= 0);
 
+	auto buffer = voice->_buffer;
+
 	auto waveformInfo = buffer->_waveformInfo;
 
 	errorCode = sceNgs2SamplerVoiceSetup(voiceHandle, &waveformInfo->format, 0);
 
 	assert(errorCode >= 0);
 	errorCode = sceNgs2SamplerVoiceAddWaveformBlocks(voiceHandle, buffer->_waveformData, waveformInfo->aBlock, waveformInfo->numBlocks, 0);
-	
-	return new SamplerVoice(nextID, _samplerRackHandle, voiceHandle, buffer);
+
+	voice->_voiceHandleID = nextID;
+	voice->_voiceHandle = voiceHandle;
+	voice->_rackHandle = _samplerRackHandle;
 }
 
-void SoundSystem::DestroyVoice(SamplerVoice* voice)
+void SoundSystem::FreeVoice(SamplerVoice* voice)
 {
 	if (voice->GetState() != SoundState::Stopped)
 		SubmitPlaybackEvent(voice, NULL, PlaybackEvent::StopImmediate);

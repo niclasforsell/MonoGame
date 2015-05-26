@@ -14,7 +14,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int size, bool mipMap,
             SurfaceFormat format, bool renderTarget)
         {
-            _texture = PS4Texture.CreateCube((PS4TextureFormat)format, size, size, mipMap ? _levelCount : 1);
+            _texture = new PS4Texture();
+            _texture.InitCube((PS4TextureFormat)format, size, size, mipMap ? _levelCount : 1);
         }
 
         private void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data)

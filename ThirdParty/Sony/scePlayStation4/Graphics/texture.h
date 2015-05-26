@@ -16,17 +16,17 @@ private:
 	bool _ownsTexture;
 	bool _isTarget;
 
-	// No public default or copy constructors.
-	Texture();
-	Texture( const Texture & );
+	// No public copy constructors.
+	Texture( const Texture & ) { }
 
 public:
 
-	static Texture* Create2D(TextureFormat format, int32_t width, int32_t height, int32_t mips);
-	static Texture* Create3D(TextureFormat format, int32_t width, int32_t height, int32_t depth, int32_t mips);
-	static Texture* CreateCube(TextureFormat format, int32_t width, int32_t height, int32_t mips);
-
+	Texture();
 	virtual ~Texture();
+
+	void Init2D(TextureFormat format, int32_t width, int32_t height, int32_t mips);
+	void Init3D(TextureFormat format, int32_t width, int32_t height, int32_t depth, int32_t mips);
+	void InitCube(TextureFormat format, int32_t width, int32_t height, int32_t mips);
 
 	void SetData(uint32_t mipLevel, uint8_t* data, uint32_t offset, uint32_t length);
 	void GetData(uint32_t mipLevel, uint8_t* data, uint32_t offset, uint32_t length);

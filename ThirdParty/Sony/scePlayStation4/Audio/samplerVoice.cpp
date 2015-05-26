@@ -7,16 +7,19 @@
 
 using namespace Audio;
 
-SamplerVoice::SamplerVoice(unsigned int id, SceNgs2Handle rackHandle, SceNgs2Handle voiceHandle, AudioBuffer* buffer) :
-	_rackHandle(rackHandle),
-	_voiceHandle(voiceHandle),
-	_voiceHandleID(id),
+SamplerVoice::SamplerVoice(AudioBuffer *buffer) :
 	_pitch(0.0f),
 	_pan(0.0f),
 	_volume(1.0f),
 	_looped(false),
 	_buffer(buffer)
 {
+	SoundSystem::GetInstance()->InitVoice(this);
+}
+
+SamplerVoice::~SamplerVoice(void)
+{
+	SoundSystem::GetInstance()->FreeVoice(this);
 }
 
 SoundState SamplerVoice::GetState()
@@ -209,9 +212,4 @@ void SamplerVoice::SetPitch(float pitch)
 float SamplerVoice::GetPitch()
 {
     return _pitch;
-}
-
-SamplerVoice::~SamplerVoice(void)
-{
-	SoundSystem::GetInstance()->DestroyVoice(this);
 }

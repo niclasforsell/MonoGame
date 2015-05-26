@@ -21,9 +21,6 @@ class CS_API SamplerVoice
 
 protected:
 
-	SamplerVoice(unsigned int id, SceNgs2Handle rackHandle, SceNgs2Handle voiceHandle, AudioBuffer *buffer);
-	~SamplerVoice(void);
-
 	SceNgs2Handle _rackHandle;
 
 	SceNgs2Handle _voiceHandle;
@@ -39,6 +36,9 @@ protected:
 	void SetMatrixLevels(float *panLevels);
 
 public:
+
+	SamplerVoice(AudioBuffer *buffer);
+	virtual ~SamplerVoice();
 
 	void SetFade(float fadeinTime, float fadeOutTime);
 

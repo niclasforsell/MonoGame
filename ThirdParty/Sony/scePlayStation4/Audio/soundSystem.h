@@ -45,8 +45,8 @@ public:
 
 	const unsigned int MAX_VOICES = 1024;
 
-	CS_IGNORE void DestroyVoice(SamplerVoice* voice);
-	SamplerVoice* CreateVoice(AudioBuffer* buffer);
+	CS_IGNORE void InitVoice(SamplerVoice* voice);
+	CS_IGNORE void FreeVoice(SamplerVoice* voice);
 
 	static SoundSystem* GetInstance();
 

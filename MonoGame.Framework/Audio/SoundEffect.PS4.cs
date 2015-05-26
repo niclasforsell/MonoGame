@@ -2,12 +2,11 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using Microsoft.Xna.Framework.Audio;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using AudioBuffer = Sce.PlayStation4.Audio.AudioBuffer;
-using SoundSystem = Sce.PlayStation4.Audio.SoundSystem;
+using SamplerVoice = Sce.PlayStation4.Audio.SamplerVoice;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -23,7 +22,8 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 var handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
                 var addr = (IntPtr)(handle.AddrOfPinnedObject().ToInt64());
-                _buffer = AudioBuffer.FromRIFF((void*)addr, (uint)buffer.Length);
+                _buffer = new AudioBuffer();
+                _buffer.InitRIFF((void*)addr, (uint)buffer.Length);
                 handle.Free();
             }
         }
@@ -57,7 +57,8 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 var handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
                 var addr = (IntPtr)(handle.AddrOfPinnedObject().ToInt64() + offset);
-                _buffer = AudioBuffer.FromPCM((void*)addr, (uint)count, sampleRate, (int)channels);
+                _buffer = new AudioBuffer();
+                _buffer.InitPCM((void*)addr, (uint)count, sampleRate, (int)channels);
                 handle.Free();
             }
         }
@@ -69,7 +70,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
-            inst._voice = SoundSystem.Instance.CreateVoice(_buffer);
+            inst._voice = new SamplerVoice(_buffer);
             inst._buffer = _buffer;
             inst._voice.Looped = inst.IsLooped;
             inst._controllerPort = -1;
