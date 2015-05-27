@@ -13,7 +13,7 @@ private:
 	static const uint32_t kDisplayBufferCount				= 2;
 	static const bool kHtileEnabled							= true;
 	
-	const uint32_t kCueRingEntries							= 16;
+	const uint32_t kCueRingEntries							= 64;
 	const uint32_t kDcbSizeInBytes							= 8 * 1024 * 1024;
 	const uint32_t kCcbSizeInBytes							= 4 * 1024 * 1024;
 
@@ -52,8 +52,6 @@ private:
 	void _discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize);
 
 	void _applyBuffers(DisplayBuffer *backBuffer, int baseVertex);
-
-
 
 public:
 

@@ -25,7 +25,7 @@
 #include <gnmx.h>
 #include <assert.h>
 #include <scebase.h>
-
+#include <new>
 
 using namespace sce;
 using namespace sce::Gnmx;
@@ -47,6 +47,10 @@ GraphicsSystem::GraphicsSystem()
 
 	_videoPS = new PixelShader(video_p_pssl_sb);
 	_videoVS = new VertexShader(video_vv_pssl_sb);
+
+	_displayBuffers = NULL;
+	_eopEventQueue = NULL;
+	_currentRenderTarget = NULL;
 }
 
 GraphicsSystem::~GraphicsSystem()
@@ -94,6 +98,9 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 
 	for(uint32_t i=0; i<kDisplayBufferCount; ++i)
 	{
+		// Make sure all the classes get constructed.
+		new (&_displayBuffers[i]) DisplayBuffer;
+	
 		// Allocate the shadow copy of the CP ram
 		_displayBuffers[i].cpRamShadow = malloc(
 			Gnmx::ConstantUpdateEngine::computeCpRamShadowSize());
@@ -265,24 +272,13 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		}
 
 		_displayBuffers[i].state[0] = kDisplayBufferIdle;
-
-		// Initialize the free and discard buffer counts.
-		_displayBuffers[i].freeBufferCount = 0;
-		_displayBuffers[i].discardBufferCount = 0;
-		
-		_displayBuffers[i].currentVB = NULL;
-		_displayBuffers[i].currentVBDirty = false;
-		_displayBuffers[i].currentVBOffset = 0;
-
-		_displayBuffers[i].currentIB = NULL;
-		_displayBuffers[i].currentIBDirty = false;
 	}
 
 	// Initialization the VideoOut buffer descriptor
 	SceVideoOutBufferAttribute videoOutBufferAttribute;
 	sceVideoOutSetBufferAttribute(
 		&videoOutBufferAttribute,
-		SCE_VIDEO_OUT_PIXEL_FORMAT_A8R8G8B8_SRGB,
+		SCE_VIDEO_OUT_PIXEL_FORMAT_A8R8G8B8_SRGB, // SCE_VIDEO_OUT_PIXEL_FORMAT_B8_G8_R8_A8_SRGB
 		SCE_VIDEO_OUT_TILING_MODE_TILE,
 		SCE_VIDEO_OUT_ASPECT_RATIO_16_9,
 		_displayBuffers[0].renderTarget.getWidth(),
@@ -476,14 +472,6 @@ void GraphicsSystem::_discardBuffer(VertexBuffer *buffer)
 {
 	_discardBuffer(buffer->_bufferData, buffer->_actualSize, buffer->_requiredSize);
 
-	// Reset the base address.
-	auto offset = 0;
-	for (auto i=0; i < buffer->_bufferCount; i++)
-	{
-		auto format = buffer->_buffers[i].getDataFormat();
-		buffer->_buffers[i].setBaseAddress(buffer->_bufferData + offset);
-		offset += format.getBytesPerElement();
-	}
 
 	// TODO: Should we clear the buffer to zeros?  Maybe we
 	// should clear it to 0xd34db33f in debug modes to ensure
@@ -526,6 +514,9 @@ void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint
 		backBuffer->discardBufferCount++;
 	}
 
+	buffer = nullptr;
+	actualSize = 0;
+
 	// Search for the best fit free buffer.
 	BufferInfo *bestBuffer = NULL;
 	auto current = backBuffer->freeBuffers;
@@ -535,13 +526,8 @@ void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint
 		// If we have a match return it immediately.
 		if (current->bufferSize == requiredSize)
 		{
-			buffer = current->buffer;
-			actualSize = requiredSize;
-
-			// Fill the hole with the last entry.
-			if (--backBuffer->freeBufferCount > 0)	
-				*current = *(end-1);
-			return;
+			bestBuffer = current;
+			break;
 		}
 
 		// Is it big enough at all?
@@ -578,16 +564,23 @@ void GraphicsSystem::_applyBuffers(DisplayBuffer *backBuffer, int baseVertex)
 	if (backBuffer->currentVBDirty || backBuffer->currentVBOffset != baseVertex)
 	{
 		auto currentVB = backBuffer->currentVB;
-		auto bufferCount = currentVB->_bufferCount;
-		auto buffers = currentVB->_buffers;
-		auto bufferData = currentVB->_bufferData + (baseVertex * buffers[0].getStride());
 
+		auto vertexStride = currentVB->_stride;
+		auto vertexCount = (currentVB->_requiredSize / vertexStride) - baseVertex;
+
+		auto bufferCount = currentVB->_bufferCount;
+		auto bufferData = currentVB->_bufferData + (baseVertex * vertexStride);
+		auto bufferEnd = currentVB->_bufferData + currentVB->_requiredSize;
+		auto bufferFormat = currentVB->_format;
+
+
+		Gnm::Buffer buffers[16];
 		auto offset = 0;
 		for (auto i=0; i < bufferCount; i++)
 		{
-			auto format = buffers[i].getDataFormat();
-			buffers[i].setBaseAddress(bufferData + offset);
-			offset += format.getBytesPerElement();
+			buffers[i].initAsVertexBuffer(bufferData + offset, bufferFormat[i], vertexStride, vertexCount);
+			buffers[i].setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+			offset += bufferFormat[i].getBytesPerElement();
 		}
 
 		gfxc.setVertexBuffers(sce::Gnm::ShaderStage::kShaderStageVs, 0, bufferCount, buffers);
@@ -725,22 +718,23 @@ void GraphicsSystem::prepareBackBuffer()
 	gfxc.reset();
 	gfxc.initializeDefaultHardwareState();
 
-	// Make sure we are using DirectX style pixel centering.
-	gfxc.setVertexQuantization(	sce::Gnm::kVertexQuantizationMode16_8, 
-								sce::Gnm::kVertexQuantizationRoundModeRoundToEven, 
-								sce::Gnm::kVertexQuantizationCenterAtZero);
-
 	// The waitUntilSafeForRendering stalls the GPU until the scan-out
 	// operations on the current display buffer have been completed.
 	// This command is not blocking for the CPU.
 	gfxc.waitUntilSafeForRendering(_videoOutHandle, _backBufferIndex);
+
+	// Make sure we are using DirectX style pixel centering.
+	gfxc.setVertexQuantization(	sce::Gnm::kVertexQuantizationMode16_8, 
+								sce::Gnm::kVertexQuantizationRoundModeRoundToEven, 
+								sce::Gnm::kVertexQuantizationCenterAtZero);
 
 	// Setup the viewport to match the entire screen.
 	// The z-scale and z-offset values are used to specify the transformation
 	// from clip-space to screen-space
 
 	_applyRenderTargets(	&backBuffer->renderTarget, NULL, NULL, NULL,
-						backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL);
+							backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL);
+	
 	
 	// Move all the previously discarded buffers to 
 	// the end of the free buffer list.

@@ -14,8 +14,9 @@ struct BufferInfo
 const int MAX_DISCARD_BUFFERS = 1000;
 
 
-struct DisplayBuffer
+class DisplayBuffer
 {
+public:
 	sce::Gnmx::GfxContext			context;
 	void							*cpRamShadow;
 	void							*cueHeap;
@@ -38,6 +39,28 @@ struct DisplayBuffer
 
 	BufferInfo discardBuffers[MAX_DISCARD_BUFFERS];
 	uint32_t discardBufferCount;
+	DisplayBuffer()
+		: context(),
+		  cueHeap(NULL),
+		  dcbBuffer(NULL),
+		  ccbBuffer(NULL),
+		  renderTarget(),
+		  hasDepthTarget(false),
+		  depthTarget(),
+		  state(NULL),
+		  currentVB(NULL),
+		  currentVBDirty(false),
+		  currentVBOffset(0),
+		  currentIB(NULL),
+		  currentIBDirty(false),
+		  freeBufferCount(0),
+		  discardBufferCount(0),
+		  delelteBufferCount(0)
+	{
+		memset(freeBuffers, 0, sizeof(freeBuffers));
+		memset(discardBuffers, 0, sizeof(discardBuffers));
+		memset(delelteBuffers, 0, sizeof(delelteBuffers));		
+	}
 };
 
 } // namespace Graphics
