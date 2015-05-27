@@ -12,21 +12,26 @@ using namespace sce::Gnm;
 using namespace Graphics;
 
 
-VertexBuffer::VertexBuffer(int32_t *elements, int32_t elementCount, int32_t vertexStride, int32_t vertexCount)
+VertexBuffer::VertexBuffer(GraphicsSystem *system, int32_t *elements, int32_t elementCount, int32_t vertexStride, int32_t vertexCount)
 {
-	_actualSize = _requiredSize = vertexStride * vertexCount;
-	_bufferData = mem::allocShared<uint8_t>(_actualSize, Gnm::kAlignmentOfBufferInBytes);
+	assert(system != nullptr);
+	assert(elementCount > 0);
+	assert(elementCount < 16);
+	assert(vertexStride > 0);
+	assert(vertexCount > 0);
 
+	_system = system;
+	_stride = vertexStride;
+	_actualSize = _requiredSize = vertexStride * vertexCount;
+
+	_bufferData = mem::allocShared<uint8_t>(_actualSize, Gnm::kAlignmentOfBufferInBytes);
 	_bufferCount = elementCount;
-	_buffers = mem::alloc_array<Gnm::Buffer>(_bufferCount);
-	
-	auto offset = 0;
+
+	_format = mem::alloc_array<Gnm::DataFormat>(_bufferCount);
 	for (auto i=0; i < _bufferCount; i++)
 	{
 		auto format = GetFormat((VertexElement)elements[i]);
-		_buffers[i].initAsVertexBuffer((uint8_t*)_bufferData + offset, format, vertexStride, vertexCount);
-		_buffers[i].setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
-		offset += format.getBytesPerElement();
+		_format[i] = format;
 	}
 
 	// TODO: Should we clear the buffer to zeros?  Maybe we
@@ -73,11 +78,11 @@ sce::Gnm::DataFormat VertexBuffer::GetFormat(VertexElement element)
 	};
 }
 
-void VertexBuffer::SetData(GraphicsSystem *system, int32_t offsetInBytes, unsigned char *data, int32_t bytes, bool discard)
+void VertexBuffer::SetData(int32_t offsetInBytes, unsigned char *data, int32_t bytes, bool discard)
 {
 	// Are we discarding this buffer for another?
 	if (discard)
-		system->_discardBuffer(this);
+		_system->_discardBuffer(this);
 
 	assert(_actualSize >= _requiredSize);
 	assert(offsetInBytes + bytes <= _requiredSize);

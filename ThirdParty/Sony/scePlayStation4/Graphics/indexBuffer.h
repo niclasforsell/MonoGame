@@ -12,6 +12,8 @@ class CS_API IndexBuffer
 
 private:
 
+	GraphicsSystem *_system;
+
 	uint8_t *_bufferData;
 	uint32_t _requiredSize;
 	uint32_t _actualSize;
@@ -25,10 +27,10 @@ private:
 
 
 public:
-	IndexBuffer(IndexElement type, int32_t indexCount);
+	IndexBuffer(GraphicsSystem *system, IndexElement type, int32_t indexCount);
 	virtual ~IndexBuffer();
 
-	virtual void SetData(GraphicsSystem *system, int32_t offsetInBytes, uint8_t *data, int32_t bytes, bool discard);
+	virtual void SetData(int32_t offsetInBytes, uint8_t *data, int32_t bytes, bool discard);
 
 };
 
