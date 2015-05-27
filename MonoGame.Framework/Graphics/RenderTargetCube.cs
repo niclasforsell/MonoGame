@@ -177,10 +177,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 _depthStencilView = new DepthStencilView(graphicsDevice._d3dDevice, depthBuffer, depthStencilViewDescription);
             }
 #elif PLAYSTATION4
-            _target = PS4RenderTarget.CreateCube((PS4TextureFormat)preferredFormat, size, size, (PS4DepthFormat)preferredDepthFormat);
+            var texture = new PS4RenderTarget(graphicsDevice._system);
+            texture.InitCube((PS4TextureFormat)preferredFormat, size, size, (PS4DepthFormat)preferredDepthFormat);
+            _target = texture;
 #else
             throw new NotImplementedException();
-#endif            
+#endif
         }
 
         protected override void Dispose(bool disposing)

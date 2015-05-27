@@ -12,16 +12,19 @@ class CS_API Texture
 
 private:
 
+	GraphicsSystem *_system;
+
 	sce::Gnm::Texture *_texture;
 	bool _ownsTexture;
 	bool _isTarget;
 
 	// No public copy constructors.
+	Texture() { }
 	Texture( const Texture & ) { }
 
 public:
 
-	Texture();
+	Texture(GraphicsSystem *system);
 	virtual ~Texture();
 
 	void Init2D(TextureFormat format, int32_t width, int32_t height, int32_t mips);

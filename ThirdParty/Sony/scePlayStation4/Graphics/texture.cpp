@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "renderTarget.h"
 
+#include "graphicsSystem.h"
 #include "graphicsHelpers.h"
 #include "../allocator.h"
 
@@ -12,8 +13,11 @@
 using namespace Graphics;
 
 
-Texture::Texture()
+Texture::Texture(GraphicsSystem *system)
 { 
+	assert(system != nullptr);
+
+	_system = system;
 	_texture = nullptr;
 	_isTarget = false; 
 	_ownsTexture = true; 

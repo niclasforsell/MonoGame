@@ -1,6 +1,7 @@
 #include "renderTarget.h"
 #include "texture.h"
 
+#include "graphicsSystem.h"
 #include "graphicsHelpers.h"
 #include "..\allocator.h"
 #include <assert.h>
@@ -10,12 +11,33 @@
 using namespace Graphics;
 
 
-RenderTarget* RenderTarget::Create(TextureFormat format_, int32_t width, int32_t height, int32_t slices, DepthFormat depthFormat_, bool isCubemap)
+RenderTarget::RenderTarget(GraphicsSystem *system)
+	: Texture(system)
+{
+	_detileTemp = nullptr;
+}
+
+RenderTarget::~RenderTarget()
+{
+	if (_detileTemp != nullptr)
+		mem::free(_detileTemp);
+
+	if (_depthTarget)
+	{
+		_system->_safeDeleteBuffer(_depthTarget->getStencilReadAddress());
+		_system->_safeDeleteBuffer(_depthTarget->getZReadAddress());
+		delete _depthTarget;
+	}
+
+	delete _renderTarget;
+}
+
+
+void RenderTarget::Init(TextureFormat format_, int32_t width, int32_t height, int32_t slices, DepthFormat depthFormat_, bool isCubemap)
 {
 	auto renderTarget = new sce::Gnm::RenderTarget();
-	auto result = new RenderTarget();
-	result->_renderTarget = renderTarget;
-	result->_isTarget = true;
+	_renderTarget = renderTarget;
+	_isTarget = true;
 
 	Gnm::TileMode tileMode;
 	auto format = ToDataFormat(format_);
@@ -32,18 +54,18 @@ RenderTarget* RenderTarget::Create(TextureFormat format_, int32_t width, int32_t
 	void *rtData = mem::allocShared(renTargetSizeAlign);
 	renderTarget->setAddresses(rtData, 0, 0);;
 
-	result->_texture = new sce::Gnm::Texture();
-	result->_texture->initFromRenderTarget(renderTarget, isCubemap);
-	result->_texture->setResourceMemoryType(sce::Gnm::kResourceMemoryTypeRO);
+	_texture = new sce::Gnm::Texture();
+	_texture->initFromRenderTarget(renderTarget, isCubemap);
+	_texture->setResourceMemoryType(sce::Gnm::kResourceMemoryTypeRO);
 
-	result->_depthTarget = NULL;
-	result->_hasStencil = depthFormat_ == DepthFormat_Depth24Stencil8;
+	_depthTarget = NULL;
+	_hasStencil = depthFormat_ == DepthFormat_Depth24Stencil8;
 	if (depthFormat_ == DepthFormat_None)
-		return result;
+		return;
 
-	result->_depthTarget = new sce::Gnm::DepthRenderTarget();
+	_depthTarget = new sce::Gnm::DepthRenderTarget();
 
-	auto kStencilFormat = result->_hasStencil ? Gnm::kStencil8 : Gnm::kStencilInvalid;
+	auto kStencilFormat = _hasStencil ? Gnm::kStencil8 : Gnm::kStencilInvalid;
 	auto depthFormat = ToDataFormat(depthFormat_);
 	Gnm::TileMode depthTileMode;
 	GpuAddress::computeSurfaceTileMode(&depthTileMode, GpuAddress::kSurfaceTypeDepthOnlyTarget, depthFormat, 1);
@@ -51,7 +73,7 @@ RenderTarget* RenderTarget::Create(TextureFormat format_, int32_t width, int32_t
 	// Initialize the depth buffer descriptor
 	Gnm::SizeAlign stencilSizeAlign;
 	Gnm::SizeAlign htileSizeAlign;
-	auto depthTargetSizeAlign = result->_depthTarget->init(
+	auto depthTargetSizeAlign = _depthTarget->init(
 		width,
 		height,
 		depthFormat.getZFormat(),
@@ -68,50 +90,47 @@ RenderTarget* RenderTarget::Create(TextureFormat format_, int32_t width, int32_t
 
 	// Allocate the depth buffer
 	void *depthMemory = mem::allocShared(depthTargetSizeAlign);
-	result->_depthTarget->setAddresses(depthMemory, stencilMemory);
-
-	return result;
+	_depthTarget->setAddresses(depthMemory, stencilMemory);
 }
 
-RenderTarget* RenderTarget::Create2D(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat)
+void RenderTarget::Init2D(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat)
 {
-	return RenderTarget::Create(format, width, height, 1, depthFormat, false);
+	Init(format, width, height, 1, depthFormat, false);
 }
 
-RenderTarget* RenderTarget::Create3D(TextureFormat format, int32_t width, int32_t height, int32_t slices, DepthFormat depthFormat)
+void RenderTarget::Init3D(TextureFormat format, int32_t width, int32_t height, int32_t slices, DepthFormat depthFormat)
 {
-    return RenderTarget::Create(format, width, height, slices, depthFormat, false);
+    Init(format, width, height, slices, depthFormat, false);
 }
 
-RenderTarget* RenderTarget::CreateCube(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat)
+void RenderTarget::InitCube(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat)
 {
-    return RenderTarget::Create(format, width, height, 1, depthFormat, true);
+    Init(format, width, height, 1, depthFormat, true);
 }
 
-RenderTarget* RenderTarget::CreateFromTexture2D(Texture* texture, DepthFormat depthFormat_)
+void RenderTarget::InitFromTexture2D(Texture* texture, DepthFormat depthFormat_)
 {
 	auto colorTex = texture->GetInternalData();
 	auto colorWidth = colorTex->getWidth();
 	auto colorHeight = colorTex->getHeight();
 
 	auto renderTarget = new sce::Gnm::RenderTarget();
-	auto result = new RenderTarget();
-	result->_renderTarget = renderTarget;
-	result->_texture = colorTex;
-	result->_ownsTexture = false;
-	result->_isTarget = true;
+	_renderTarget = renderTarget;
+	_texture = colorTex;
+	_ownsTexture = false;
+	_isTarget = true;
 
 	auto ret = renderTarget->initFromTexture(colorTex, 0);
 	assert(ret == GpuAddress::kStatusSuccess);
 
-	result->_depthTarget = NULL;
-	result->_hasStencil = depthFormat_ == DepthFormat_Depth24Stencil8;
+	_depthTarget = NULL;
+	_hasStencil = depthFormat_ == DepthFormat_Depth24Stencil8;
 	if (depthFormat_ == DepthFormat_None)
-		return result;
+		return;
 
-	result->_depthTarget = new sce::Gnm::DepthRenderTarget();
+	_depthTarget = new sce::Gnm::DepthRenderTarget();
 
-	auto kStencilFormat = result->_hasStencil ? Gnm::kStencil8 : Gnm::kStencilInvalid;
+	auto kStencilFormat = _hasStencil ? Gnm::kStencil8 : Gnm::kStencilInvalid;
 	auto depthFormat = ToDataFormat(depthFormat_);
 	Gnm::TileMode depthTileMode;
 	GpuAddress::computeSurfaceTileMode(&depthTileMode, GpuAddress::kSurfaceTypeDepthOnlyTarget, depthFormat, 1);
@@ -119,7 +138,7 @@ RenderTarget* RenderTarget::CreateFromTexture2D(Texture* texture, DepthFormat de
 	// Initialize the depth buffer descriptor
 	Gnm::SizeAlign stencilSizeAlign;
 	Gnm::SizeAlign htileSizeAlign;
-	auto depthTargetSizeAlign = result->_depthTarget->init(
+	auto depthTargetSizeAlign = _depthTarget->init(
 		colorWidth,
 		colorHeight,
 		depthFormat.getZFormat(),
@@ -136,33 +155,7 @@ RenderTarget* RenderTarget::CreateFromTexture2D(Texture* texture, DepthFormat de
 
 	// Allocate the depth buffer
 	void *depthMemory = mem::allocShared(depthTargetSizeAlign);
-	result->_depthTarget->setAddresses(depthMemory, stencilMemory);
-
-	return result;
-}
-
-RenderTarget::RenderTarget()
-{
-	_detileTemp = nullptr;
-}
-
-RenderTarget::RenderTarget(const RenderTarget & ) 
-{
-}
-
-RenderTarget::~RenderTarget()
-{
-	if (_detileTemp != nullptr)
-		mem::free(_detileTemp);
-
-	if (_depthTarget)
-	{
-		mem::freeShared(_depthTarget->getStencilReadAddress());
-		mem::freeShared(_depthTarget->getZReadAddress());
-		delete _depthTarget;
-	}
-
-	delete _renderTarget;
+	_depthTarget->setAddresses(depthMemory, stencilMemory);
 }
 
 unsigned char* RenderTarget::GetDataDetiled(uint64_t *levelOffset, uint64_t *levelSize, uint32_t mipLevel)

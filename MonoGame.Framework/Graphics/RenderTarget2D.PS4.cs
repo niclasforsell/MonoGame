@@ -16,7 +16,9 @@ namespace Microsoft.Xna.Framework.Graphics
             SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount,
             RenderTargetUsage usage, bool shared)
         {
-            _texture = PS4RenderTarget.Create2D((PS4TextureFormat)preferredFormat, width, height, (PS4DepthFormat)preferredDepthFormat);
+            var texture = new PS4RenderTarget(graphicsDevice._system);
+            texture.Init2D((PS4TextureFormat)preferredFormat, width, height, (PS4DepthFormat)preferredDepthFormat);
+            _texture = texture;
         }
 
         private void PlatformGraphicsDeviceResetting()
