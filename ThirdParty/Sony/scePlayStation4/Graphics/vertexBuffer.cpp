@@ -42,8 +42,8 @@ VertexBuffer::VertexBuffer(GraphicsSystem *system, int32_t *elements, int32_t el
 
 VertexBuffer::~VertexBuffer()
 {
-	mem::free(_buffers);
-	mem::freeShared(_bufferData);
+	mem::free(_format);
+	_system->_safeDeleteBuffer(_bufferData);
 }
 
 sce::Gnm::DataFormat VertexBuffer::GetFormat(VertexElement element)

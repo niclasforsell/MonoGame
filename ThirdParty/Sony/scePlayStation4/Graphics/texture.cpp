@@ -28,7 +28,7 @@ Texture::~Texture()
 	if (!_ownsTexture)
 		return;
 
-	mem::freeShared(_texture->getBaseAddress());
+	_system->_safeDeleteBuffer(_texture->getBaseAddress());
 	delete _texture;
 }
 

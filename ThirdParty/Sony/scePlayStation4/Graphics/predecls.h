@@ -4,6 +4,7 @@
 // Include all pre-declarations used from header files.
 
 struct _SceKernelEqueue;
+struct	pthread_mutex;
 
 namespace sce {
 

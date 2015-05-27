@@ -30,7 +30,7 @@ IndexBuffer::IndexBuffer(GraphicsSystem *system, IndexElement type, int32_t inde
 
 IndexBuffer::~IndexBuffer()
 {
-	mem::freeShared(_bufferData);
+	_system->_safeDeleteBuffer(_bufferData);
 }
 
 void IndexBuffer::SetData(int32_t offsetInBytes, uint8_t *data, int32_t bytes, bool discard)

@@ -39,6 +39,10 @@ public:
 
 	BufferInfo discardBuffers[MAX_DISCARD_BUFFERS];
 	uint32_t discardBufferCount;
+
+	void* delelteBuffers[MAX_DISCARD_BUFFERS];
+	uint32_t delelteBufferCount;
+
 	DisplayBuffer()
 		: context(),
 		  cueHeap(NULL),
