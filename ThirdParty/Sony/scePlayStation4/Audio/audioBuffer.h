@@ -11,13 +11,14 @@ class CS_API AudioBuffer
 	friend class SamplerVoice;
 
 public:
-	static AudioBuffer* FromPCM(void* data, size_t dataSize, int sampleRate, int numChannels);
-	static AudioBuffer* FromRIFF(void* data, size_t dataSize);
 
-	~AudioBuffer(void);
+	AudioBuffer();
+	virtual ~AudioBuffer();
+
+	void InitPCM(void* data, size_t dataSize, int sampleRate, int numChannels);
+	void InitRIFF(void* data, size_t dataSize);
 
 private:
-	AudioBuffer() { }
 	AudioBuffer(const AudioBuffer&);
 
 	void *_waveformData;

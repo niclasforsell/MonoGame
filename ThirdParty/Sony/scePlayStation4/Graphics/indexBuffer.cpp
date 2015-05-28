@@ -12,8 +12,10 @@ using namespace sce::Gnm;
 using namespace Graphics;
 
 
-IndexBuffer::IndexBuffer(IndexElement type, int32_t indexCount)
+IndexBuffer::IndexBuffer(GraphicsSystem *system, IndexElement type, int32_t indexCount)
 {
+	_system = system;
+
 	_indexSize = type == IndexElement_SixteenBits ? Gnm::kIndexSize16 : Gnm::kIndexSize32;
 	_indexCount = indexCount;
 
@@ -28,16 +30,30 @@ IndexBuffer::IndexBuffer(IndexElement type, int32_t indexCount)
 
 IndexBuffer::~IndexBuffer()
 {
-	mem::freeShared(_bufferData);
+	_system->_safeDeleteBuffer(_bufferData);
 }
 
-void IndexBuffer::SetData(GraphicsSystem *system, int32_t offsetInBytes, uint8_t *data, int32_t bytes, bool discard)
+void IndexBuffer::SetData(int32_t offsetInBytes, uint8_t *data, int32_t bytes, bool discard)
 {
+	// Check inputs.
+	assert(offsetInBytes >= 0);
+	assert(offsetInBytes < _requiredSize);
+	assert(data != nullptr);
+	assert(bytes > 0);
+	assert(bytes <= _requiredSize);
+	assert(offsetInBytes + bytes <= _requiredSize);
+
 	// Are we discarding this buffer for another?
 	if (discard)
-		system->_discardBuffer(this);
+		_system->_discardBuffer(this);
 
+	// Make sure the new buffer is big enough.
 	assert(_actualSize >= _requiredSize);
-	assert(offsetInBytes + bytes <= _requiredSize);
-	memcpy(_bufferData + offsetInBytes, data, bytes);
+
+	auto ebuffer = _bufferData + _requiredSize;
+	auto sdest = _bufferData + offsetInBytes;
+	auto edest = sdest + bytes;
+	assert(edest <= ebuffer);
+
+	memcpy(sdest, data, bytes);
 }

@@ -17,7 +17,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
         {
-            _target = PS4RenderTarget.Create3D((PS4TextureFormat)preferredFormat, width, height, Depth, (PS4DepthFormat)preferredDepthFormat);
+            var texture = new PS4RenderTarget(graphicsDevice._system);
+            texture.Init3D((PS4TextureFormat)preferredFormat, width, height, Depth, (PS4DepthFormat)preferredDepthFormat);
+            _target = texture;
         }
 
         protected override void Dispose(bool disposing)

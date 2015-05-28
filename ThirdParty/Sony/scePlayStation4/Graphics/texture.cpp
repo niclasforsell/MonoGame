@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "renderTarget.h"
 
+#include "graphicsSystem.h"
 #include "graphicsHelpers.h"
 #include "../allocator.h"
 
@@ -11,14 +12,33 @@
 
 using namespace Graphics;
 
-Texture* Texture::Create2D(TextureFormat format, int32_t width, int32_t height, int32_t mips)
+
+Texture::Texture(GraphicsSystem *system)
+{ 
+	assert(system != nullptr);
+
+	_system = system;
+	_texture = nullptr;
+	_isTarget = false; 
+	_ownsTexture = true; 
+}
+
+Texture::~Texture()
+{
+	if (!_ownsTexture)
+		return;
+
+	_system->_safeDeleteBuffer(_texture->getBaseAddress());
+	delete _texture;
+}
+
+void Texture::Init2D(TextureFormat format, int32_t width, int32_t height, int32_t mips)
 {
 	assert(mips >= 1);
+	assert(_texture == nullptr);
 
 	auto texture = new sce::Gnm::Texture();
-	auto result = new Texture();
-	result->_texture = texture;
-
+	_texture = texture;
 
 	// BCn compressed textures come through the pipeline as
 	// tiled data, otherwise use linear for flexibility.
@@ -48,17 +68,15 @@ Texture* Texture::Create2D(TextureFormat format, int32_t width, int32_t height, 
 	// Allocate the texture data using the alignment returned by initAs2d
 	void *textureData = mem::allocShared(textureSizeAlign);
 	texture->setBaseAddress(textureData);
-
-	return result;
 }
 
-Texture* Texture::Create3D(TextureFormat format, int32_t width, int32_t height, int32_t depth, int32_t mips)
+void Texture::Init3D(TextureFormat format, int32_t width, int32_t height, int32_t depth, int32_t mips)
 {
 	assert(mips >= 1);
+	assert(_texture == nullptr);
 
 	auto texture = new sce::Gnm::Texture();
-	auto result = new Texture();
-	result->_texture = texture;
+	_texture = texture;
 
 	// BCn compressed textures come through the pipeline as
 	// tiled data, otherwise use linear for flexibility.
@@ -83,17 +101,15 @@ Texture* Texture::Create3D(TextureFormat format, int32_t width, int32_t height, 
 	// Allocate the texture data using the alignment returned by initAs3d
 	void *textureData = mem::allocShared(textureSizeAlign);
 	texture->setBaseAddress(textureData);
-
-	return result;
 }
 
-Texture* Texture::CreateCube(TextureFormat format, int32_t width, int32_t height, int32_t mips)
+void Texture::InitCube(TextureFormat format, int32_t width, int32_t height, int32_t mips)
 {
 	assert(mips >= 1);
+	assert(_texture == nullptr);
 
 	auto texture = new sce::Gnm::Texture();
-	auto result = new Texture();
-	result->_texture = texture;
+	_texture = texture;
 
 	// BCn compressed textures come through the pipeline as
 	// tiled data, otherwise use linear for flexibility.
@@ -118,27 +134,6 @@ Texture* Texture::CreateCube(TextureFormat format, int32_t width, int32_t height
 	// Allocate the texture data using the alignment returned by initAsCubemap
 	void *textureData = mem::allocShared(textureSizeAlign);
 	texture->setBaseAddress(textureData);
-
-	return result;
-}
-
-Texture::Texture()
-{ 
-	_isTarget = false; 
-	_ownsTexture = true; 
-}
-
-Texture::Texture( const Texture & )
-{
-}
-
-Texture::~Texture()
-{
-	if (!_ownsTexture)
-		return;
-
-	mem::freeShared(_texture->getBaseAddress());
-	delete _texture;
 }
 
 void Texture::SetData(uint32_t mipLevel, uint8_t* data, uint32_t offset, uint32_t length)
