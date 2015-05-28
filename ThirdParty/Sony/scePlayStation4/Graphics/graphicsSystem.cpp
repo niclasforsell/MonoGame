@@ -102,6 +102,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		// Make sure all the classes get constructed.
 		new (&_displayBuffers[i]) DisplayBuffer;
 	
+#if SCE_ORBIS_SDK_VERSION < 0x02508051u
 		// Allocate the shadow copy of the CP ram
 		_displayBuffers[i].cpRamShadow = malloc(
 			Gnmx::ConstantUpdateEngine::computeCpRamShadowSize());
@@ -111,6 +112,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 			printf("Cannot allocate the CP ram shadow memory\n");
 			return;
 		}
+#endif
 
 		// Allocate the CUE heap memory
 		_displayBuffers[i].cueHeap = mem::allocShared(
@@ -147,7 +149,9 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 
 		// Initialize the current display context
 		_displayBuffers[i].context.init(
+#if SCE_ORBIS_SDK_VERSION < 0x02508051u
 			_displayBuffers[i].cpRamShadow,
+#endif
 			_displayBuffers[i].cueHeap,
 			kCueRingEntries,
 			_displayBuffers[i].dcbBuffer,

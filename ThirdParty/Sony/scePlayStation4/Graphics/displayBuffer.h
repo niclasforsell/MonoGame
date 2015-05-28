@@ -2,6 +2,7 @@
 
 #include <gnm.h>
 #include <gnmx.h>
+#include <sdk_version.h>
 
 namespace Graphics {
 
@@ -18,7 +19,9 @@ class DisplayBuffer
 {
 public:
 	sce::Gnmx::GfxContext			context;
+#if SCE_ORBIS_SDK_VERSION < 0x02508051u
 	void							*cpRamShadow;
+#endif
 	void							*cueHeap;
 	void							*dcbBuffer;
 	void							*ccbBuffer;
@@ -45,6 +48,9 @@ public:
 
 	DisplayBuffer()
 		: context(),
+#if SCE_ORBIS_SDK_VERSION < 0x02508051u
+		  cpRamShadow(NULL),
+#endif
 		  cueHeap(NULL),
 		  dcbBuffer(NULL),
 		  ccbBuffer(NULL),
