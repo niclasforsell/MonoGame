@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unsafe
             {
                 fixed (int* ptr = psElements)
-                    _buffer = new Sce.PlayStation4.Graphics.VertexBuffer(ptr, psElements.Length, VertexDeclaration.VertexStride, VertexCount);
+                    _buffer = new Sce.PlayStation4.Graphics.VertexBuffer(GraphicsDevice._system, ptr, psElements.Length, VertexDeclaration.VertexStride, VertexCount);
             }
         }
 
@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             unsafe
             {
-                _buffer.SetData(GraphicsDevice._system, offsetInBytes, (byte*)dataPtr, dataBytes, discard);
+                _buffer.SetData(offsetInBytes, (byte*)dataPtr, dataBytes, discard);
             }
 
             dataHandle.Free();

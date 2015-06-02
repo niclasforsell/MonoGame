@@ -4,6 +4,7 @@
 // Include all pre-declarations used from header files.
 
 struct _SceKernelEqueue;
+struct	pthread_mutex;
 
 namespace sce {
 
@@ -35,6 +36,6 @@ class VertexBuffer;
 class IndexBuffer;
 class GraphicsSystem;
 
-struct DisplayBuffer;
+class DisplayBuffer;
 
 }

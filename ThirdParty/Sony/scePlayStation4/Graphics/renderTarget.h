@@ -21,21 +21,23 @@ private:
 	bool _hasStencil;
 
 	// No public default or copy constructors.
-	RenderTarget();
-	RenderTarget( const RenderTarget & );
+	RenderTarget() { }
+	RenderTarget( const RenderTarget & ) { }
 
-	static RenderTarget* Create(TextureFormat format, int32_t width, int32_t height, int32_t slices, DepthFormat depthFormat, bool isCubemap);
+	void Init(TextureFormat format, int32_t width, int32_t height, int32_t slices, DepthFormat depthFormat, bool isCubemap);
 
 public:
-	static RenderTarget* Create2D(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat);
-	static RenderTarget* Create3D(TextureFormat format, int32_t width, int32_t height, int32_t slices, DepthFormat depthFormat);
-	static RenderTarget* CreateCube(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat);
 
-	static RenderTarget* CreateFromTexture2D(Texture* texture, DepthFormat depthFormat);
+	RenderTarget(GraphicsSystem *system);
+	virtual ~RenderTarget();
+
+	void Init2D(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat);
+	void Init3D(TextureFormat format, int32_t width, int32_t height, int32_t slices, DepthFormat depthFormat);
+	void InitCube(TextureFormat format, int32_t width, int32_t height, DepthFormat depthFormat);
+
+	void InitFromTexture2D(Texture* texture, DepthFormat depthFormat);
 
 	CS_IGNORE unsigned char* GetDataDetiled(uint64_t *levelOffset, uint64_t *levelSize, uint32_t mipLevel);
-
-	virtual ~RenderTarget();
 
 };
 

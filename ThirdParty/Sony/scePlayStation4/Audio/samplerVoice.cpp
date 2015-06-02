@@ -7,16 +7,20 @@
 
 using namespace Audio;
 
-SamplerVoice::SamplerVoice(unsigned int id, SceNgs2Handle rackHandle, SceNgs2Handle voiceHandle, AudioBuffer* buffer) :
-	_rackHandle(rackHandle),
-	_voiceHandle(voiceHandle),
-	_voiceHandleID(id),
+SamplerVoice::SamplerVoice(AudioBuffer *buffer) :
 	_pitch(0.0f),
 	_pan(0.0f),
+	_padPort(false),
 	_volume(1.0f),
 	_looped(false),
 	_buffer(buffer)
 {
+	SoundSystem::GetInstance()->InitVoice(this);
+}
+
+SamplerVoice::~SamplerVoice(void)
+{
+	SoundSystem::GetInstance()->FreeVoice(this);
 }
 
 SoundState SamplerVoice::GetState()
@@ -173,13 +177,21 @@ void SamplerVoice::SetMatrixLevels(float *panLevels)
 {
 	// Is this a 1ch or a 2ch sound.
 	auto bufferChannels = _buffer->_waveformInfo->format.numChannels;
-
-	// Interleave the final levels depending on the number of input channels.
 	float matrixLevels[SCE_NGS2_MAX_VOICE_CHANNELS * 2] = {0};
-	for (auto p=0; p < SCE_NGS2_MAX_VOICE_CHANNELS; p++)
+
+	if (_padPort)
 	{
-		for (auto c=0; c < bufferChannels; c++)
-			matrixLevels[(p * bufferChannels) + c] = panLevels[p]; 
+		for (auto p=0; p < SCE_NGS2_MAX_VOICE_CHANNELS * 2; p++)
+			matrixLevels[p] = 1.0f;
+	}
+	else
+	{
+		// Interleave the final levels depending on the number of input channels.
+		for (auto p=0; p < SCE_NGS2_MAX_VOICE_CHANNELS; p++)
+		{
+			for (auto c=0; c < bufferChannels; c++)
+				matrixLevels[(p * bufferChannels) + c] = panLevels[p]; 
+		}
 	}
 
 	auto errorCode = sceNgs2VoiceSetMatrixLevels(_voiceHandle, 0, matrixLevels, SCE_NGS2_MAX_VOICE_CHANNELS * bufferChannels);
@@ -209,9 +221,4 @@ void SamplerVoice::SetPitch(float pitch)
 float SamplerVoice::GetPitch()
 {
     return _pitch;
-}
-
-SamplerVoice::~SamplerVoice(void)
-{
-	SoundSystem::GetInstance()->DestroyVoice(this);
 }

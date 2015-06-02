@@ -19,7 +19,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (type != SurfaceType.Texture)
                 return;
 
-            _texture = PS4Texture.Create2D((PS4TextureFormat)format, width, height, (mipmap ? _levelCount : 1));
+            _texture = new PS4Texture(GraphicsDevice._system);
+            _texture.Init2D((PS4TextureFormat)format, width, height, (mipmap ? _levelCount : 1));
         }
 
         protected void PlatformSetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)

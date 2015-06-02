@@ -13,7 +13,7 @@ private:
 	static const uint32_t kDisplayBufferCount				= 2;
 	static const bool kHtileEnabled							= true;
 	
-	const uint32_t kCueRingEntries							= 16;
+	const uint32_t kCueRingEntries							= 64;
 	const uint32_t kDcbSizeInBytes							= 8 * 1024 * 1024;
 	const uint32_t kCcbSizeInBytes							= 4 * 1024 * 1024;
 
@@ -41,6 +41,8 @@ private:
 	PixelShader *_videoPS;
 	VertexShader *_videoVS;
 
+	pthread_mutex *_frameLock;
+
 	void prepareBackBuffer();
 
 	void _applyRenderTargets(sce::Gnm::RenderTarget *render0,
@@ -49,11 +51,9 @@ private:
 							sce::Gnm::RenderTarget *render3,
 							sce::Gnm::DepthRenderTarget *depthTarget);
 
-	void _discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize);
+	void _discardBuffer(DisplayBuffer *backBuffer, uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize);
 
 	void _applyBuffers(DisplayBuffer *backBuffer, int baseVertex);
-
-
 
 public:
 
@@ -81,6 +81,7 @@ public:
 
 	void CS_IGNORE _discardBuffer(VertexBuffer *buffer);
 	void CS_IGNORE _discardBuffer(IndexBuffer *buffer);
+	void CS_IGNORE _safeDeleteBuffer(void *buffer);
 
 	void SetVertexShader(VertexShader *shader, FetchShader *fetch);
 	void SetPixelShader(PixelShader *shader);

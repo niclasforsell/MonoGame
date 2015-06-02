@@ -25,7 +25,7 @@
 #include <gnmx.h>
 #include <assert.h>
 #include <scebase.h>
-
+#include <new>
 
 using namespace sce;
 using namespace sce::Gnmx;
@@ -47,6 +47,11 @@ GraphicsSystem::GraphicsSystem()
 
 	_videoPS = new PixelShader(video_p_pssl_sb);
 	_videoVS = new VertexShader(video_vv_pssl_sb);
+
+	_displayBuffers = NULL;
+	_eopEventQueue = NULL;
+	_currentRenderTarget = NULL;
+	_frameLock = NULL;
 }
 
 GraphicsSystem::~GraphicsSystem()
@@ -94,6 +99,10 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 
 	for(uint32_t i=0; i<kDisplayBufferCount; ++i)
 	{
+		// Make sure all the classes get constructed.
+		new (&_displayBuffers[i]) DisplayBuffer;
+	
+#if SCE_ORBIS_SDK_VERSION < 0x02508051u
 		// Allocate the shadow copy of the CP ram
 		_displayBuffers[i].cpRamShadow = malloc(
 			Gnmx::ConstantUpdateEngine::computeCpRamShadowSize());
@@ -103,6 +112,7 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 			printf("Cannot allocate the CP ram shadow memory\n");
 			return;
 		}
+#endif
 
 		// Allocate the CUE heap memory
 		_displayBuffers[i].cueHeap = mem::allocShared(
@@ -139,7 +149,9 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 
 		// Initialize the current display context
 		_displayBuffers[i].context.init(
+#if SCE_ORBIS_SDK_VERSION < 0x02508051u
 			_displayBuffers[i].cpRamShadow,
+#endif
 			_displayBuffers[i].cueHeap,
 			kCueRingEntries,
 			_displayBuffers[i].dcbBuffer,
@@ -265,24 +277,13 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		}
 
 		_displayBuffers[i].state[0] = kDisplayBufferIdle;
-
-		// Initialize the free and discard buffer counts.
-		_displayBuffers[i].freeBufferCount = 0;
-		_displayBuffers[i].discardBufferCount = 0;
-		
-		_displayBuffers[i].currentVB = NULL;
-		_displayBuffers[i].currentVBDirty = false;
-		_displayBuffers[i].currentVBOffset = 0;
-
-		_displayBuffers[i].currentIB = NULL;
-		_displayBuffers[i].currentIBDirty = false;
 	}
 
 	// Initialization the VideoOut buffer descriptor
 	SceVideoOutBufferAttribute videoOutBufferAttribute;
 	sceVideoOutSetBufferAttribute(
 		&videoOutBufferAttribute,
-		SCE_VIDEO_OUT_PIXEL_FORMAT_A8R8G8B8_SRGB,
+		SCE_VIDEO_OUT_PIXEL_FORMAT_A8R8G8B8_SRGB, // SCE_VIDEO_OUT_PIXEL_FORMAT_B8_G8_R8_A8_SRGB
 		SCE_VIDEO_OUT_TILING_MODE_TILE,
 		SCE_VIDEO_OUT_ASPECT_RATIO_16_9,
 		_displayBuffers[0].renderTarget.getWidth(),
@@ -301,6 +302,8 @@ void GraphicsSystem::Initialize(int backbufferWidth, int backbufferHeight, Textu
 		printf("sceVideoOutRegisterBuffers failed: 0x%08X\n", ret);
 		return;
 	}
+
+	scePthreadMutexInit(&_frameLock, NULL, NULL);
 
 	// Prepare the null texture.
 	{
@@ -474,16 +477,10 @@ void GraphicsSystem::SetIndexBuffer(IndexBuffer *buffer)
 
 void GraphicsSystem::_discardBuffer(VertexBuffer *buffer)
 {
-	_discardBuffer(buffer->_bufferData, buffer->_actualSize, buffer->_requiredSize);
+	scePthreadMutexLock(&_frameLock);
 
-	// Reset the base address.
-	auto offset = 0;
-	for (auto i=0; i < buffer->_bufferCount; i++)
-	{
-		auto format = buffer->_buffers[i].getDataFormat();
-		buffer->_buffers[i].setBaseAddress(buffer->_bufferData + offset);
-		offset += format.getBytesPerElement();
-	}
+	auto backBuffer = &_displayBuffers[_backBufferIndex];
+	_discardBuffer(backBuffer, buffer->_bufferData, buffer->_actualSize, buffer->_requiredSize);
 
 	// TODO: Should we clear the buffer to zeros?  Maybe we
 	// should clear it to 0xd34db33f in debug modes to ensure
@@ -491,13 +488,17 @@ void GraphicsSystem::_discardBuffer(VertexBuffer *buffer)
 	//memset(buffer->_bufferData, 0xd34db33f, buffer->_actualSize);
 
 	// If this is the current VB then update the command buffer.
-	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	backBuffer->currentVBDirty |= backBuffer->currentVB == buffer;
+
+	scePthreadMutexUnlock(&_frameLock);
 }
 
 void GraphicsSystem::_discardBuffer(IndexBuffer *buffer)
 {
-	_discardBuffer(buffer->_bufferData, buffer->_actualSize, buffer->_requiredSize);
+	scePthreadMutexLock(&_frameLock);
+
+	auto *backBuffer = &_displayBuffers[_backBufferIndex];
+	_discardBuffer(backBuffer, buffer->_bufferData, buffer->_actualSize, buffer->_requiredSize);
 
 	// TODO: Should we clear the buffer to zeros?  Maybe we
 	// should clear it to 0xd34db33f in debug modes to ensure
@@ -507,14 +508,13 @@ void GraphicsSystem::_discardBuffer(IndexBuffer *buffer)
 	// If this is the current IB then update the command buffer
 	// to point at the new index data... the size and count should
 	// both still be valid.
-	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
 	backBuffer->currentIBDirty |= backBuffer->currentIB == buffer;
+
+	scePthreadMutexUnlock(&_frameLock);
 }
 
-void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize)
+void GraphicsSystem::_discardBuffer(DisplayBuffer *backBuffer, uint8_t *&buffer, uint32_t &actualSize, uint32_t requiredSize)
 {
-	DisplayBuffer *backBuffer = &_displayBuffers[_backBufferIndex];
-
 	// If we were passed an existing buffer then store it
 	// until the start of the next frame.
 	if (buffer != NULL)
@@ -526,6 +526,9 @@ void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint
 		backBuffer->discardBufferCount++;
 	}
 
+	buffer = nullptr;
+	actualSize = 0;
+
 	// Search for the best fit free buffer.
 	BufferInfo *bestBuffer = NULL;
 	auto current = backBuffer->freeBuffers;
@@ -535,13 +538,8 @@ void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint
 		// If we have a match return it immediately.
 		if (current->bufferSize == requiredSize)
 		{
-			buffer = current->buffer;
-			actualSize = requiredSize;
-
-			// Fill the hole with the last entry.
-			if (--backBuffer->freeBufferCount > 0)	
-				*current = *(end-1);
-			return;
+			bestBuffer = current;
+			break;
 		}
 
 		// Is it big enough at all?
@@ -571,6 +569,19 @@ void GraphicsSystem::_discardBuffer(uint8_t *&buffer, uint32_t &actualSize, uint
 		*bestBuffer = *(end-1);
 }
 
+void GraphicsSystem::_safeDeleteBuffer(void *buffer)
+{
+	assert(buffer != nullptr);
+
+	scePthreadMutexLock(&_frameLock);
+	
+	auto backBuffer = &_displayBuffers[_backBufferIndex];
+	assert(backBuffer->delelteBufferCount + 1 < MAX_DISCARD_BUFFERS);
+	backBuffer->delelteBuffers[backBuffer->delelteBufferCount++] = buffer;
+
+	scePthreadMutexUnlock(&_frameLock);
+}
+
 void GraphicsSystem::_applyBuffers(DisplayBuffer *backBuffer, int baseVertex)
 {
 	auto &gfxc = backBuffer->context;
@@ -578,16 +589,23 @@ void GraphicsSystem::_applyBuffers(DisplayBuffer *backBuffer, int baseVertex)
 	if (backBuffer->currentVBDirty || backBuffer->currentVBOffset != baseVertex)
 	{
 		auto currentVB = backBuffer->currentVB;
-		auto bufferCount = currentVB->_bufferCount;
-		auto buffers = currentVB->_buffers;
-		auto bufferData = currentVB->_bufferData + (baseVertex * buffers[0].getStride());
 
+		auto vertexStride = currentVB->_stride;
+		auto vertexCount = (currentVB->_requiredSize / vertexStride) - baseVertex;
+
+		auto bufferCount = currentVB->_bufferCount;
+		auto bufferData = currentVB->_bufferData + (baseVertex * vertexStride);
+		auto bufferEnd = currentVB->_bufferData + currentVB->_requiredSize;
+		auto bufferFormat = currentVB->_format;
+
+
+		Gnm::Buffer buffers[16];
 		auto offset = 0;
 		for (auto i=0; i < bufferCount; i++)
 		{
-			auto format = buffers[i].getDataFormat();
-			buffers[i].setBaseAddress(bufferData + offset);
-			offset += format.getBytesPerElement();
+			buffers[i].initAsVertexBuffer(bufferData + offset, bufferFormat[i], vertexStride, vertexCount);
+			buffers[i].setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+			offset += bufferFormat[i].getBytesPerElement();
 		}
 
 		gfxc.setVertexBuffers(sce::Gnm::ShaderStage::kShaderStageVs, 0, bufferCount, buffers);
@@ -673,7 +691,9 @@ void GraphicsSystem::Present()
 	}
 
 	// Update the display chain pointers
+	scePthreadMutexLock(&_frameLock);
 	_backBufferIndex = (_backBufferIndex + 1) % kDisplayBufferCount;
+	scePthreadMutexUnlock(&_frameLock);
 
 	// Prepare the backbuffer for the next frame.
 	prepareBackBuffer();
@@ -725,38 +745,49 @@ void GraphicsSystem::prepareBackBuffer()
 	gfxc.reset();
 	gfxc.initializeDefaultHardwareState();
 
-	// Make sure we are using DirectX style pixel centering.
-	gfxc.setVertexQuantization(	sce::Gnm::kVertexQuantizationMode16_8, 
-								sce::Gnm::kVertexQuantizationRoundModeRoundToEven, 
-								sce::Gnm::kVertexQuantizationCenterAtZero);
-
 	// The waitUntilSafeForRendering stalls the GPU until the scan-out
 	// operations on the current display buffer have been completed.
 	// This command is not blocking for the CPU.
 	gfxc.waitUntilSafeForRendering(_videoOutHandle, _backBufferIndex);
+
+	// Make sure we are using DirectX style pixel centering.
+	gfxc.setVertexQuantization(	sce::Gnm::kVertexQuantizationMode16_8, 
+								sce::Gnm::kVertexQuantizationRoundModeRoundToEven, 
+								sce::Gnm::kVertexQuantizationCenterAtZero);
 
 	// Setup the viewport to match the entire screen.
 	// The z-scale and z-offset values are used to specify the transformation
 	// from clip-space to screen-space
 
 	_applyRenderTargets(	&backBuffer->renderTarget, NULL, NULL, NULL,
-						backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL);
+							backBuffer->hasDepthTarget ? &backBuffer->depthTarget : NULL);
 	
-	// Move all the previously discarded buffers to 
-	// the end of the free buffer list.
-	assert(backBuffer->freeBufferCount + backBuffer->discardBufferCount < MAX_DISCARD_BUFFERS);
-	memcpy(	backBuffer->freeBuffers + backBuffer->freeBufferCount, 
-			backBuffer->discardBuffers, 
-			sizeof(BufferInfo) * backBuffer->discardBufferCount);
-	backBuffer->freeBufferCount += backBuffer->discardBufferCount;
-	backBuffer->discardBufferCount = 0;
+	// Be sure no discarding or deleting occurs while we're
+	// preparing for this new frame.
+	scePthreadMutexLock(&_frameLock);
+	{
+		// Move all the previously discarded buffers to 
+		// the end of the free buffer list.
+		assert(backBuffer->freeBufferCount + backBuffer->discardBufferCount < MAX_DISCARD_BUFFERS);
+		memcpy(	backBuffer->freeBuffers + backBuffer->freeBufferCount, 
+				backBuffer->discardBuffers, 
+				sizeof(BufferInfo) * backBuffer->discardBufferCount);
+		backBuffer->freeBufferCount += backBuffer->discardBufferCount;	
+		backBuffer->discardBufferCount = 0;
+	
+		// Delete any buffers from this frame.
+		for (auto i=0; i < backBuffer->delelteBufferCount; i++)
+			mem::freeShared(backBuffer->delelteBuffers[i]);
+		backBuffer->delelteBufferCount = 0;
 
-	// Clear the current VB/IB.
-	backBuffer->currentVB = NULL;
-	backBuffer->currentVBOffset = 0;
-	backBuffer->currentVBDirty = false;
-	backBuffer->currentIB = NULL;
-	backBuffer->currentIBDirty = false;
+		// Clear the current VB/IB.
+		backBuffer->currentVB = NULL;
+		backBuffer->currentVBOffset = 0;
+		backBuffer->currentVBDirty = false;
+		backBuffer->currentIB = NULL;
+		backBuffer->currentIBDirty = false;
+	}
+	scePthreadMutexUnlock(&_frameLock);
 
 	// We always use the vertex and pixel shader stages.
 	gfxc.setActiveShaderStages(Gnm::kActiveShaderStagesVsPs);
