@@ -23,8 +23,6 @@ private:
 
 	bool _initialized;
 
-	unsigned int _currentVoiceHandle;
-
 	SceNgs2Handle _systemHandle;			// NGS2 system handle
 	SceNgs2Handle _masteringRackHandle;	// Mastering rack handle
 	SceNgs2Handle _samplerRackHandle;		// Sample rack handle

@@ -47,6 +47,7 @@ SoundState SamplerVoice::GetState()
 
 	//Unknown state
 	assert(false);
+	return SoundState::Stopped;
 }
 
 bool SamplerVoice::GetLooped()
