@@ -595,7 +595,6 @@ void GraphicsSystem::_applyBuffers(DisplayBuffer *backBuffer, int baseVertex)
 
 		auto bufferCount = currentVB->_bufferCount;
 		auto bufferData = currentVB->_bufferData + (baseVertex * vertexStride);
-		auto bufferEnd = currentVB->_bufferData + currentVB->_requiredSize;
 		auto bufferFormat = currentVB->_format;
 
 

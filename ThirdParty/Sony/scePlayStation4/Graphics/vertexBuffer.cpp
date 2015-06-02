@@ -89,3 +89,23 @@ void VertexBuffer::SetData(int32_t offsetInBytes, unsigned char *data, int32_t b
 
 	memcpy(_bufferData + offsetInBytes, data, bytes);
 }
+
+void VertexBuffer::GetData(int32_t offsetInBytes, unsigned char *data, int32_t dataCount, int32_t dataStride, int32_t vertexStride)
+{
+	assert(offsetInBytes >= 0);
+	assert(offsetInBytes < _requiredSize);
+	assert(data != nullptr);
+	assert(dataStride > 0);
+	assert(vertexStride > 0);
+	assert(offsetInBytes + (dataCount * dataStride) <= _requiredSize);
+
+	// We can either be copying a solid block of data or we
+	// could be copying a single element of the vertex.
+	if (dataStride == vertexStride)
+		memcpy(data, _bufferData + offsetInBytes, dataStride * dataCount);
+	else
+	{
+		for (auto i=0; i < dataCount; i++)
+			memcpy(data + (i * dataStride), _bufferData + offsetInBytes + (i * vertexStride), dataStride);
+	}
+}

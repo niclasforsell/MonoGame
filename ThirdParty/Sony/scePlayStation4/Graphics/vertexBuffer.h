@@ -31,6 +31,7 @@ public:
 	virtual ~VertexBuffer();
 
 	virtual void SetData(int32_t offsetInBytes, unsigned char *data, int32_t bytes, bool discard);
+	virtual void GetData(int32_t offsetInBytes, unsigned char *data, int32_t dataCount, int32_t dataStride, int32_t vertexStride);
 
 };
 
