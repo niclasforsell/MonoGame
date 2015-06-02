@@ -35,7 +35,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
-            throw new NotImplementedException();
+            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            var startBytes = startIndex * elementSizeInBytes;
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+
+            unsafe
+            {
+                _buffer.GetData(offsetInBytes, (byte*)dataPtr, elementCount, elementSizeInBytes, vertexStride);
+            }
+
+            dataHandle.Free();
         }
 
         private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options, int bufferSize, int elementSizeInBytes) where T : struct

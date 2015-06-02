@@ -31,6 +31,7 @@ public:
 	virtual ~IndexBuffer();
 
 	virtual void SetData(int32_t offsetInBytes, uint8_t *data, int32_t bytes, bool discard);
+	virtual void GetData(int32_t offsetInBytes, uint8_t *data, int32_t bytes);
 
 };
 

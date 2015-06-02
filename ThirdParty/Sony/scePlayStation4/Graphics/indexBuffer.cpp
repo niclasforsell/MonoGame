@@ -57,3 +57,15 @@ void IndexBuffer::SetData(int32_t offsetInBytes, uint8_t *data, int32_t bytes, b
 
 	memcpy(sdest, data, bytes);
 }
+
+void IndexBuffer::GetData(int32_t offsetInBytes, uint8_t *data, int32_t bytes)
+{
+	assert(offsetInBytes >= 0);
+	assert(offsetInBytes < _requiredSize);
+	assert(data != nullptr);
+	assert(bytes > 0);
+	assert(bytes <= _requiredSize);
+	assert(offsetInBytes + bytes <= _requiredSize);
+
+	memcpy(data, _bufferData + offsetInBytes, bytes);
+}
