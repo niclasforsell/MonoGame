@@ -1,8 +1,8 @@
 #pragma once
 
 #include "predecls.h"
-#include "np.h"
 
+#include <np.h>
 #include <sceerror.h>
 
 namespace Network {
@@ -118,6 +118,8 @@ enum class NpCommunityError
 	ServerErrorUnspecified = SCE_NP_COMMUNITY_SERVER_ERROR_UNSPECIFIED,
 };
 
+enum class NpResult;
+
 
 class NpScore;
 class NpScoreRequest;
@@ -208,6 +210,15 @@ public:
 	NpCommunityError GetRankingsByRange(	SceNpScoreBoardId boardId, 
 											SceNpScoreRankNumber startSerialRank, 
 											NpScoreRankings *results);
+
+	NpCommunityError GetFriendsRanking(	SceNpScoreBoardId boardId,
+										bool includeSelf,
+										NpScoreRankings* results);
+
+	NpCommunityError GetMyRankings(	NpScoreTitleContext* context,
+									SceNpScoreBoardId boardId,
+									UserServiceUserId userId,
+									NpScoreRankings* results);
 
 	NpCommunityError RecordScore(	SceNpScoreBoardId boardId, 
 									SceNpScoreValue score, 

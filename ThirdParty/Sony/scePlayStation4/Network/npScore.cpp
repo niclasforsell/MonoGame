@@ -1,10 +1,12 @@
 #include "npScore.h"
+#include "np.h"
 
 #include "../allocator.h"
 
 #include <libsysmodule.h>
 #include <memory.h>
 #include <assert.h>
+#include <algorithm>
 
 
 using namespace Network;
@@ -53,7 +55,7 @@ int32_t NpScoreRankings::GetIndex()
 void NpScoreRankings::SetIndex(int32_t index)
 {
 	assert(index >= 0);
-	assert(index < _arrayNum);
+	assert(index <= _arrayNum);
 	_index = index;
 }
 
@@ -214,6 +216,101 @@ NpCommunityError NpScoreRequest::GetRankingsByRange(	SceNpScoreBoardId boardId,
 	results->_index = 0;
 	results->_first = startSerialRank;
 	results->_last = startSerialRank + error;
+
+	return NpCommunityError::Ok;
+}
+
+NpCommunityError NpScoreRequest::GetFriendsRanking(SceNpScoreBoardId boardId,
+												   bool includeSelf,
+												   NpScoreRankings* results)
+{
+	assert(results != NULL);
+
+	auto error = sceNpScoreGetFriendsRanking(	_requestId, 
+												boardId, 
+												includeSelf,
+												results->_rank,
+												results->_arrayNum * sizeof(SceNpScoreRankData),
+												results->_comment,
+												results->_arrayNum * sizeof(SceNpScoreComment),
+												results->_gameInfo,
+												results->_arrayNum * sizeof(SceNpScoreGameInfo),
+												results->_arrayNum,
+												&results->_lastSortDate,
+												&results->_totalPlayers,												
+												NULL);
+	if (error < 0)
+		return (NpCommunityError)error;
+
+	results->_index = 0;
+	results->_first = 1;
+	results->_last = error + 1;
+
+	return NpCommunityError::Ok;
+}
+
+NpCommunityError NpScoreRequest::GetMyRankings(	NpScoreTitleContext* context,
+												SceNpScoreBoardId boardId, 
+												UserServiceUserId userId,
+												NpScoreRankings *results)
+{
+	assert(results != NULL);
+
+	int error;
+
+	auto myIdRequest = Create(context, (NpCommunityError*)(&error));
+	if(error != (int)NpCommunityError::Ok)
+		return (NpCommunityError)error;
+
+	SceNpScorePlayerRankData rankData;
+	SceNpId id;
+	error = sceNpGetNpId(userId, &id);
+	if(error != (int)NpResult::Ok)
+	{
+		return (NpCommunityError) error;
+	}
+
+	error = sceNpScoreGetRankingByNpId(	myIdRequest->_requestId, 
+															boardId, 
+															&id, 
+															sizeof(SceNpId),
+															&rankData,
+															sizeof(SceNpScorePlayerRankData),
+															NULL,
+															0,
+															NULL,
+															0,
+															1,
+															NULL,
+															NULL,
+															NULL);
+
+	delete myIdRequest;
+
+	if(error < 0)
+		return (NpCommunityError)error;
+
+	int startRank = std::max(1, (int)(rankData.rankData.rank - (results->_arrayNum + 1) / 2));
+
+	error = sceNpScoreGetRankingByRange(	_requestId, 
+												boardId, 
+												startRank,
+												results->_rank,
+												results->_arrayNum * sizeof(SceNpScoreRankData),
+												results->_comment,
+												results->_arrayNum * sizeof(SceNpScoreComment),
+												results->_gameInfo,
+												results->_arrayNum * sizeof(SceNpScoreGameInfo),
+												results->_arrayNum,
+												&results->_lastSortDate,
+												&results->_totalPlayers,												
+												NULL);
+	if (error < 0)
+		return (NpCommunityError)error;
+
+	results->_index = 0;
+	results->_first = startRank;
+	results->_last = startRank + error;
 
 	return NpCommunityError::Ok;
 }
