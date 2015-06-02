@@ -4,14 +4,13 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Sce.PlayStation4.Graphics;
-
+using PSVertexBuffer = Sce.PlayStation4.Graphics.VertexBuffer;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class VertexBuffer
     {
-        internal Sce.PlayStation4.Graphics.VertexBuffer _buffer;
+        internal PSVertexBuffer _buffer;
 
         private void PlatformConstruct()
         {
@@ -24,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unsafe
             {
                 fixed (int* ptr = psElements)
-                    _buffer = new Sce.PlayStation4.Graphics.VertexBuffer(GraphicsDevice._system, ptr, psElements.Length, VertexDeclaration.VertexStride, VertexCount);
+                    _buffer = new PSVertexBuffer(GraphicsDevice._system, ptr, psElements.Length, VertexDeclaration.VertexStride, VertexCount);
             }
         }
 
