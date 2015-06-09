@@ -1,8 +1,8 @@
 #pragma once
 
 #include "predecls.h"
-#include "np.h"
 
+#include <np.h>
 #include <sceerror.h>
 
 namespace Network {
@@ -118,6 +118,8 @@ enum class NpCommunityError
 	ServerErrorUnspecified = SCE_NP_COMMUNITY_SERVER_ERROR_UNSPECIFIED,
 };
 
+enum class NpResult;
+
 
 class NpScore;
 class NpScoreRequest;
@@ -181,6 +183,7 @@ public:
 	uint64_t GetRecordDateAtIndex();
 	const char* GetCommentAtIndex();
 	const char* GetGameInfoIndex();
+	uint8_t* GetBinaryGameInfoIndex(void);
 };
 
 class CS_API NpScoreRequest
@@ -189,6 +192,14 @@ class CS_API NpScoreRequest
 	char _sanitizedComment[255];
 
 	NpScoreRequest();
+
+	CS_IGNORE NpCommunityError RecordScore(	SceNpScoreBoardId boardId, 
+									SceNpScoreValue score, 
+									const char *scoreComment,
+									const uint8_t *gameInfo,
+									int gameInfoLength,
+									SceRtcTick *compareDate,
+									SceNpScoreRankNumber *tmpRank);
 
 public:
 
@@ -200,6 +211,15 @@ public:
 											SceNpScoreRankNumber startSerialRank, 
 											NpScoreRankings *results);
 
+	NpCommunityError GetFriendsRanking(	SceNpScoreBoardId boardId,
+										bool includeSelf,
+										NpScoreRankings* results);
+
+	NpCommunityError GetMyRankings(	NpScoreTitleContext* context,
+									SceNpScoreBoardId boardId,
+									UserServiceUserId userId,
+									NpScoreRankings* results);
+
 	NpCommunityError RecordScore(	SceNpScoreBoardId boardId, 
 									SceNpScoreValue score, 
 									const char *scoreComment,
@@ -210,6 +230,21 @@ public:
 	NpCommunityError CensorComment(const char *comment);
 
 	const char* SanitizeComment(const char *comment, CS_OUT NpCommunityError *error);
+
+protected:
+	NpCommunityError RecordScore(	SceNpScoreBoardId boardId, 
+									SceNpScoreValue score, 
+									const char *scoreComment,
+									const uint8_t *gameInfo,
+									int gameInfoLength,
+									uint64_t compareDate,
+									CS_OUT SceNpScoreRankNumber *tmpRank);
+
+	NpCommunityError RecordScore(SceNpScoreBoardId boardId,
+								 SceNpScoreValue score,
+								 const char* scoreComment,
+								 const uint8_t* gameInfo,
+								 int gameInfoLength);
 
 };
 
