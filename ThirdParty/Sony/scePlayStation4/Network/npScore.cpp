@@ -252,43 +252,34 @@ NpCommunityError NpScoreRequest::GetFriendsRanking(SceNpScoreBoardId boardId,
 	return NpCommunityError::Ok;
 }
 
-NpCommunityError NpScoreRequest::GetMyRankings(	NpScoreTitleContext* context,
-												SceNpScoreBoardId boardId, 
+NpCommunityError NpScoreRequest::GetMyRankings(	SceNpScoreBoardId boardId, 
 												UserServiceUserId userId,
 												NpScoreRankings *results)
 {
 	assert(results != NULL);
-
-	int error;
-
-	auto myIdRequest = Create(context, (NpCommunityError*)(&error));
-	if(error != (int)NpCommunityError::Ok)
-		return (NpCommunityError)error;
-
+	
 	SceNpScorePlayerRankData rankData;
 	SceNpId id;
-	error = sceNpGetNpId(userId, &id);
+	auto error = sceNpGetNpId(userId, &id);
 	if(error != (int)NpResult::Ok)
 	{
 		return (NpCommunityError) error;
 	}
 
-	error = sceNpScoreGetRankingByNpId(	myIdRequest->_requestId, 
-															boardId, 
-															&id, 
-															sizeof(SceNpId),
-															&rankData,
-															sizeof(SceNpScorePlayerRankData),
-															NULL,
-															0,
-															NULL,
-															0,
-															1,
-															NULL,
-															NULL,
-															NULL);
-
-	delete myIdRequest;
+	error = sceNpScoreGetRankingByNpId(	_requestId, 
+										boardId, 
+										&id, 
+										sizeof(SceNpId),
+										&rankData,
+										sizeof(SceNpScorePlayerRankData),
+										NULL,
+										0,
+										NULL,
+										0,
+										1,
+										NULL,
+										NULL,
+										NULL);
 
 	if(error < 0)
 		return (NpCommunityError)error;

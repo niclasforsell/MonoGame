@@ -215,8 +215,7 @@ public:
 										bool includeSelf,
 										NpScoreRankings* results);
 
-	NpCommunityError GetMyRankings(	NpScoreTitleContext* context,
-									SceNpScoreBoardId boardId,
+	NpCommunityError GetMyRankings(	SceNpScoreBoardId boardId,
 									UserServiceUserId userId,
 									NpScoreRankings* results);
 
