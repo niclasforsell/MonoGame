@@ -38,6 +38,7 @@ NpScoreRankings::NpScoreRankings(size_t arrayNum, bool needRanks, bool needComme
 	_first = 0;
 	_last = 0;
 	_index = 0;
+	_count = 0;
 }
 
 NpScoreRankings::~NpScoreRankings()
@@ -55,14 +56,14 @@ int32_t NpScoreRankings::GetIndex()
 void NpScoreRankings::SetIndex(int32_t index)
 {
 	assert(index >= 0);
-	assert(index <= _arrayNum);
+	assert(index < _count);
 	_index = index;
 }
 
 
-size_t NpScoreRankings::GetArrayNum()
+int32_t NpScoreRankings::GetNumResults()
 {
-	return _arrayNum;
+	return _count;
 }
 
 
@@ -216,6 +217,7 @@ NpCommunityError NpScoreRequest::GetRankingsByRange(	SceNpScoreBoardId boardId,
 	results->_index = 0;
 	results->_first = startSerialRank;
 	results->_last = startSerialRank + error;
+	results->_count = error;
 
 	return NpCommunityError::Ok;
 }
@@ -245,6 +247,7 @@ NpCommunityError NpScoreRequest::GetFriendsRanking(SceNpScoreBoardId boardId,
 	results->_index = 0;
 	results->_first = 1;
 	results->_last = error + 1;
+	results->_count = error;
 
 	return NpCommunityError::Ok;
 }
@@ -311,6 +314,7 @@ NpCommunityError NpScoreRequest::GetMyRankings(	NpScoreTitleContext* context,
 	results->_index = 0;
 	results->_first = startRank;
 	results->_last = startRank + error;
+	results->_count = error;
 
 	return NpCommunityError::Ok;
 }
@@ -322,7 +326,7 @@ NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId,
 												uint64_t compareDate,
 												CS_OUT SceNpScoreRankNumber *tmpRank)
 {
-	auto length = strlen(gameInfo);
+	auto length = gameInfo ? strlen(gameInfo) : 0;
 	return RecordScore(boardId, score, scoreComment, reinterpret_cast<const uint8_t*>(gameInfo), length, compareDate, tmpRank);
 }
 
@@ -336,7 +340,7 @@ NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId,
 {
 	SceRtcTick tick;
 	tick.tick = compareDate;
-	return RecordScore(boardId, score, scoreComment, gameInfo, gameInfoLength, &tick, tmpRank);
+	return RecordScore(boardId, score, scoreComment, gameInfo, gameInfoLength, compareDate == 0 ? nullptr : &tick, tmpRank);
 }
 
 NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId, 
@@ -359,7 +363,8 @@ NpCommunityError NpScoreRequest::RecordScore(	SceNpScoreBoardId boardId,
 
 	SceNpScoreComment comment;
 	memset(&comment, 0, sizeof(comment));
-	strncpy(comment.utf8Comment, scoreComment, SCE_NP_SCORE_COMMENT_MAXLEN);
+	if (scoreComment != NULL)
+		strncpy(comment.utf8Comment, scoreComment, SCE_NP_SCORE_COMMENT_MAXLEN);
 
 	SceNpScoreGameInfo info;
 	memset(&info, 0, sizeof(info));
