@@ -192,6 +192,8 @@ void ImeDialog::SetInputText(const char* text)
 
 const char* ImeDialog::GetInputText()
 {
-	wcstombs(_inputText, _inputTextW, wcslen(_inputTextW));
+	auto len = wcstombs(_inputText, _inputTextW, wcslen(_inputTextW));
+	if (len < ((size_t)-1))
+		_inputText[len] = 0;
 	return _inputText;
 }
