@@ -22,12 +22,7 @@ enum class NpCommerceDialogResult : int32_t
 	Purchased = SCE_NP_COMMERCE_DIALOG_RESULT_PURCHASED,
 };
 
-CS_FLAGS enum class NpPlusFeature : uint64_t
-{
-	RealtimeMultiplay = SCE_NP_PLUS_FEATURE_REALTIME_MULTIPLAY,
-	AsyncMultiplay = SCE_NP_PLUS_FEATURE_ASYNC_MULTIPLAY,
-};
-
+enum class NpPlusFeature;
 
 class CS_API NpCommerceDialog
 {

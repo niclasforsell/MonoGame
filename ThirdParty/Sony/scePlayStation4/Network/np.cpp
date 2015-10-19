@@ -21,3 +21,36 @@ NpResult Np::_SetNpTitleId(const char* titleId, const uint8_t* titleSecret)
 	return (NpResult)sceNpSetNpTitleId(&id, &secret);
 }
 
+NpResult Np::_NotifyPlusFeature(UserServiceUserId userId, NpPlusFeature features)
+{
+	SceNpNotifyPlusFeatureParameter param;
+	memset(&param, 0, sizeof(SceNpNotifyPlusFeatureParameter));
+
+	param.userId = userId;
+	param.features = (uint64_t)features;
+	param.size = sizeof(SceNpNotifyPlusFeatureParameter);
+
+	return (NpResult)sceNpNotifyPlusFeature(&param);
+}
+
+NpResult Np::_CheckPlus(UserServiceUserId userId, NpPlusFeature features, bool *authorised)
+{
+	SceNpCheckPlusParameter param;
+	memset(&param, 0, sizeof(SceNpCheckPlusParameter));
+
+	param.userId = userId;
+	param.features = (uint64_t)features;
+	param.size = sizeof(SceNpCheckPlusParameter);
+
+	SceNpCheckPlusResult checkResult;
+	memset(&checkResult, 0, sizeof(SceNpCheckPlusResult));
+	
+	int reqId = sceNpCreateRequest();
+
+	NpResult result = (NpResult)sceNpCheckPlus(reqId, &param, &checkResult);
+	(*authorised) = checkResult.authorized;
+
+	sceNpDeleteRequest(reqId);
+	return result;
+}
+

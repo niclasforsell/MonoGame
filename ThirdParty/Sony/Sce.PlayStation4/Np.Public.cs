@@ -28,5 +28,35 @@ namespace Sce.PlayStation4.Network
             if (result != NpResult.Ok)
                 throw new Exception(result.ToString());
         }
+
+        /// <summary>
+        /// To be used by multiplayer games whilst the PS Plus feature is in use.
+        /// For Realtime multiplayer, it needs to be called at least once per second - each frame is ok.
+        /// </summary>
+        public static void NotifyPlusFeature(int userId, NpPlusFeature feature)
+        {
+            var result = _NotifyPlusFeature(userId, feature);
+            if (result != NpResult.Ok)
+                throw new Exception(result.ToString());
+        }
+
+        /// <summary>
+        /// Checks if the user is entitled to use PS Plus feature.
+        /// WARNING: Only Async mode supported and may block for some time.
+        /// </summary>
+        public static bool CheckPlus(int userId, NpPlusFeature features)
+        {
+            bool checkResult;
+            NpResult result;
+            unsafe
+            {
+                result = _CheckPlus(userId, features, &checkResult);
+            }
+
+            if (result != NpResult.Ok)
+                throw new Exception(result.ToString());
+
+            return checkResult;
+        }
     }
 }

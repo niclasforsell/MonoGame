@@ -3,6 +3,7 @@
 #include "predecls.h"
 #include <scebase.h>
 #include <np.h>
+#include <np/np_common.h>
 
 namespace Network {
 
@@ -33,12 +34,23 @@ enum class NpResult
 	UtilErrorNotMatch = SCE_NP_UTIL_ERROR_NOT_MATCH
 };
 
+
+CS_FLAGS enum class NpPlusFeature : uint64_t
+{
+	RealtimeMultiplay = SCE_NP_PLUS_FEATURE_REALTIME_MULTIPLAY,
+	AsyncMultiplay = SCE_NP_PLUS_FEATURE_ASYNC_MULTIPLAY,
+};
+
 class CS_API Np
 {
 	Np();
 
 public:
 	static NpResult _SetNpTitleId(const char* titleId, const uint8_t* titleSecret);
+
+	static NpResult _NotifyPlusFeature(UserServiceUserId userId, NpPlusFeature features);
+
+	static NpResult _CheckPlus(UserServiceUserId userId, NpPlusFeature features, bool *authorised);
 };
 
 } // namespace Network
