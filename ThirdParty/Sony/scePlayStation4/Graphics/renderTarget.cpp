@@ -24,7 +24,9 @@ RenderTarget::~RenderTarget()
 
 	if (_depthTarget)
 	{
-		_system->_safeDeleteBuffer(_depthTarget->getStencilReadAddress());
+		if (_hasStencil)
+			_system->_safeDeleteBuffer(_depthTarget->getStencilReadAddress());
+
 		_system->_safeDeleteBuffer(_depthTarget->getZReadAddress());
 		delete _depthTarget;
 	}
