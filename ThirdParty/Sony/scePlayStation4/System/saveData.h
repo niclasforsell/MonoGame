@@ -121,7 +121,10 @@ public:
 									CS_OUT uint64_t *freeBlocks);
 
 	SaveDataResult LoadIcon(void *buffer, size_t bufferSize, CS_OUT size_t *dataSize);
-	SaveDataResult SaveIcon(void *buffer, size_t bufferSize, size_t dataSize);
+
+protected:
+
+	SaveDataResult _SaveIcon(void *buffer, size_t bufferSize);
 
 };
 
