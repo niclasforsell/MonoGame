@@ -120,10 +120,9 @@ public:
 	SaveDataResult GetMountInfo(	CS_OUT uint64_t *blocks,
 									CS_OUT uint64_t *freeBlocks);
 
-	SaveDataResult LoadIcon(void *buffer, size_t bufferSize, CS_OUT size_t *dataSize);
-
 protected:
 
+	SaveDataResult _LoadIcon(void *buffer, size_t bufferSize, CS_OUT size_t *dataSize);
 	SaveDataResult _SaveIcon(void *buffer, size_t bufferSize);
 
 };

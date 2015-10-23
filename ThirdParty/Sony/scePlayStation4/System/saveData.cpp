@@ -197,7 +197,7 @@ void SaveData::SetMTime(time_t mtime)
 	assert(result == SCE_OK);
 }
 
-SaveDataResult SaveData::LoadIcon(void *buffer, size_t bufferSize, CS_OUT size_t *dataSize)
+SaveDataResult SaveData::_LoadIcon(void *buffer, size_t bufferSize, CS_OUT size_t *dataSize)
 {
 	SceSaveDataIcon icon;
 	memset(&icon, 0, sizeof(icon));

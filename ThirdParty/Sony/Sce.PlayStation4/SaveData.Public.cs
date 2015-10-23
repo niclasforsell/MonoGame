@@ -6,6 +6,23 @@ namespace Sce.PlayStation4.System
     public partial class SaveData
     {
         /// <summary>
+        /// Load the save game icon into the specified buffer and return the data size.
+        /// </summary>
+        public unsafe SaveDataResult LoadIcon(byte[] buffer, out int dataSize)
+        {
+            SaveDataResult err;
+
+            fixed (void* ptr = buffer)
+            {
+                ulong size = 0;
+                err = _LoadIcon(ptr, (ulong)buffer.Length, out size);
+                dataSize = (int)size;
+            }
+
+            return err;
+        }
+
+        /// <summary>
         /// Set the save data icon from a buffer containing a png image.
         /// </summary>
         public unsafe SaveDataResult SaveIcon(byte[] buffer)
