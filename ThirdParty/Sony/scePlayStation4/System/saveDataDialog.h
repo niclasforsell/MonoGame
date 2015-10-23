@@ -29,6 +29,13 @@ enum class SaveDataDialogType
 	Delete = SCE_SAVE_DATA_DIALOG_TYPE_DELETE,
 };
 
+enum class SaveDataDialogButtonId
+{
+	Invalid = SCE_SAVE_DATA_DIALOG_BUTTON_ID_INVALID,
+	Ok = SCE_SAVE_DATA_DIALOG_BUTTON_ID_OK,			
+	Yes = SCE_SAVE_DATA_DIALOG_BUTTON_ID_YES,
+	No = SCE_SAVE_DATA_DIALOG_BUTTON_ID_NO,
+};
 
 class CS_API SaveDataDialog
 {	
@@ -50,7 +57,7 @@ public:
 
 	CommonDialogStatus UpdateStatus();
 
-	//CommonDialogError GetResult(CS_OUT ImeDialogEndStatus* result);
+	CommonDialogError GetResult(CS_OUT CommonDialogResult *result, CS_OUT SaveDataDialogButtonId *buttonId);
 
 	void SetUserId(SceUserServiceUserId userId);
 	SceUserServiceUserId GetUserId();

@@ -58,6 +58,18 @@ CommonDialogStatus SaveDataDialog::UpdateStatus()
 	return (CommonDialogStatus)status;
 }
 
+CommonDialogError SaveDataDialog::GetResult(CS_OUT CommonDialogResult *result, CS_OUT SaveDataDialogButtonId *buttonId)
+{
+	SceSaveDataDialogResult sdr;
+	memset(&sdr, 0, sizeof(sdr));
+	auto error = sceSaveDataDialogGetResult(&sdr);
+
+	*result = (CommonDialogResult)sdr.result;
+	*buttonId = (SaveDataDialogButtonId)sdr.buttonId;
+
+	return (CommonDialogError)error;
+}
+
 void SaveDataDialog::SetUserId(SceUserServiceUserId userId)
 {
 	_items.userId = userId;
