@@ -82,12 +82,14 @@ SceUserServiceUserId SaveDataDialog::GetUserId()
 
 void SaveDataDialog::SetTitleId(const char* titleId)
 {
-	auto len = MIN(strlen(titleId), SCE_SAVE_DATA_TITLE_ID_DATA_SIZE-1);
-	memcpy(_titleId.data, titleId, len);
 	if (titleId == nullptr)
 		_items.titleId = nullptr;
 	else
+	{
+		auto len = MIN(strlen(titleId), SCE_SAVE_DATA_TITLE_ID_DATA_SIZE-1);
+		memcpy(_titleId.data, titleId, len);
 		_items.titleId = &_titleId;
+	}
 }
 
 const char* SaveDataDialog::GetTitleId()
