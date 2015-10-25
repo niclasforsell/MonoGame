@@ -58,6 +58,18 @@ CommonDialogStatus SaveDataDialog::UpdateStatus()
 	return (CommonDialogStatus)status;
 }
 
+CommonDialogError SaveDataDialog::GetResult(CS_OUT CommonDialogResult *result, CS_OUT SaveDataDialogButtonId *buttonId)
+{
+	SceSaveDataDialogResult sdr;
+	memset(&sdr, 0, sizeof(sdr));
+	auto error = sceSaveDataDialogGetResult(&sdr);
+
+	*result = (CommonDialogResult)sdr.result;
+	*buttonId = (SaveDataDialogButtonId)sdr.buttonId;
+
+	return (CommonDialogError)error;
+}
+
 void SaveDataDialog::SetUserId(SceUserServiceUserId userId)
 {
 	_items.userId = userId;
@@ -70,12 +82,14 @@ SceUserServiceUserId SaveDataDialog::GetUserId()
 
 void SaveDataDialog::SetTitleId(const char* titleId)
 {
-	auto len = MIN(strlen(titleId), SCE_SAVE_DATA_TITLE_ID_DATA_SIZE-1);
-	memcpy(_titleId.data, titleId, len);
 	if (titleId == nullptr)
 		_items.titleId = nullptr;
 	else
+	{
+		auto len = MIN(strlen(titleId), SCE_SAVE_DATA_TITLE_ID_DATA_SIZE-1);
+		memcpy(_titleId.data, titleId, len);
 		_items.titleId = &_titleId;
+	}
 }
 
 const char* SaveDataDialog::GetTitleId()

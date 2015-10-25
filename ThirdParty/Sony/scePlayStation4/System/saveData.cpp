@@ -197,7 +197,7 @@ void SaveData::SetMTime(time_t mtime)
 	assert(result == SCE_OK);
 }
 
-SaveDataResult SaveData::LoadIcon(void *buffer, size_t bufferSize, CS_OUT size_t *dataSize)
+SaveDataResult SaveData::_LoadIcon(void *buffer, size_t bufferSize, CS_OUT size_t *dataSize)
 {
 	SceSaveDataIcon icon;
 	memset(&icon, 0, sizeof(icon));
@@ -211,13 +211,13 @@ SaveDataResult SaveData::LoadIcon(void *buffer, size_t bufferSize, CS_OUT size_t
 	return (SaveDataResult)result;
 }
 
-SaveDataResult SaveData::SaveIcon(void *buffer, size_t bufferSize, size_t dataSize)
+SaveDataResult SaveData::_SaveIcon(void *buffer, size_t bufferSize)
 {
 	SceSaveDataIcon icon;
 	memset(&icon, 0, sizeof(icon));
 	icon.buf = buffer;
 	icon.bufSize = bufferSize;
-	icon.dataSize = dataSize;
+	icon.dataSize = bufferSize;
 
 	auto result = sceSaveDataSaveIcon(&_mountPoint, &icon);
 	return (SaveDataResult)result;
