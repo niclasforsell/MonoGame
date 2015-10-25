@@ -156,6 +156,9 @@
     <ClCompile Include="System\appContent.cpp">
       <Filter>System</Filter>
     </ClCompile>
+    <ClCompile Include="Network\netCtl.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -386,6 +389,9 @@
     <ClInclude Include="System\saveDataDirNameSearch.h" />
     <ClInclude Include="System\appContent.h">
       <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\netCtl.h">
+      <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
