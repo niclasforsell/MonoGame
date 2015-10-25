@@ -8,6 +8,19 @@ namespace Sce.PlayStation4.Network
 {
     public partial class Np
     {
+        public static void SetNpTitleId(string titleId, string titleSecret)
+        {
+            var count = titleSecret.Length / 2;
+            var titleBytes = new byte[count];
+            for (var i = 0; i < count; i++)
+            {
+                var b = Convert.ToByte(titleSecret.Substring(i * 2, 2), 16);
+                titleBytes[i] = b;
+            }
+
+            SetNpTitleId(titleId, titleBytes);
+        }
+
         public static void SetNpTitleId(string titleId, byte[] titleSecret)
         {
             if (titleId.Length != 12)
