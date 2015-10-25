@@ -1,6 +1,7 @@
 #pragma once
 
 #include "predecls.h"
+#include "np.h"
 
 #include <np.h>
 #include <sceerror.h>
@@ -118,8 +119,6 @@ enum class NpCommunityError
 	ServerErrorUnspecified = SCE_NP_COMMUNITY_SERVER_ERROR_UNSPECIFIED,
 };
 
-enum class NpResult;
-
 
 class NpScore;
 class NpScoreRequest;
@@ -158,6 +157,7 @@ class CS_API NpScoreRankings
 	SceNpScoreRankNumber _last;
 
 	int32_t _index;
+	size_t _count;
 
 public:
 
@@ -167,7 +167,7 @@ public:
 	int32_t GetIndex();
 	void SetIndex(int32_t index);
 	
-	size_t GetArrayNum();
+	int32_t GetNumResults();
 
 	SceNpScoreRankNumber GetFirstInRange();
 	SceNpScoreRankNumber GetLastInRange();
@@ -215,8 +215,7 @@ public:
 										bool includeSelf,
 										NpScoreRankings* results);
 
-	NpCommunityError GetMyRankings(	NpScoreTitleContext* context,
-									SceNpScoreBoardId boardId,
+	NpCommunityError GetMyRankings(	SceNpScoreBoardId boardId,
 									UserServiceUserId userId,
 									NpScoreRankings* results);
 
