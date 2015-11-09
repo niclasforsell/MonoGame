@@ -71,5 +71,55 @@ namespace Sce.PlayStation4.Network
 
             return checkResult;
         }
+
+        /// <summary>
+        /// Sets age based content restriction.
+        /// TODO: support per-region restrictions.
+        /// </summary>
+        /// <param name="defaultAgeRestriction">The strictest age restriction of all regions</param>
+        public static void SetContentRestriction(int defaultAgeRestriction)
+        {
+            _SetContentRestriction(defaultAgeRestriction);
+        }
+
+        /// <summary>
+        /// Returns true if it's OK to use network features based on
+        /// currently set age restriction.
+        /// https://ps4.scedev.net/resources/documents/TRC/1.5/TRC/R4109.html
+        /// </summary>
+        public static bool CheckNpAvailability(int userId)
+        {
+            NpResult result = _CheckNpAvailability(userId);
+
+            if (result != NpResult.Ok &&
+                result != NpResult.ErrorAgeRestriction)
+            {
+                throw new Exception(result.ToString());
+            }
+
+            return result == NpResult.Ok;
+        }
+
+        public struct ParentalControlInfo
+        {
+            public int Age;
+            public bool ChatRestriction;
+            public bool UgcRestriction;
+        }
+
+        public static ParentalControlInfo GetParentalControlInfo(int userId)
+        {
+            var controlInfo = new ParentalControlInfo();
+            NpResult result;
+            unsafe
+            {
+                result = _GetParentalControlInfo(userId, &controlInfo.Age, &controlInfo.ChatRestriction, &controlInfo.UgcRestriction);
+            }
+
+            if (result != NpResult.Ok)
+                throw new Exception(result.ToString());
+
+            return controlInfo;
+        }
     }
 }
