@@ -98,16 +98,25 @@ NpResult Np::_GetParentalControlInfo(UserServiceUserId userId, int* age, bool *c
 	SceNpParentalControlInfo parentalControlInfo;
 	memset(&parentalControlInfo, 0, sizeof(SceNpParentalControlInfo));
 
-	int reqId = sceNpCreateRequest();
-	
+	int reqId = sceNpCreateRequest();	
 	auto result = sceNpGetParentalControlInfo(reqId, &onlineId, &ageInfo, &parentalControlInfo);
-	if (onlineIdResult == SCE_OK)
+	sceNpDeleteRequest(reqId);
+
+	if (result == SCE_OK)
 	{
 		(*age) = (int)ageInfo;
 		(*chatRestriction) = parentalControlInfo.chatRestriction;
 		(*ugcRestriction) = parentalControlInfo.ugcRestriction;
 	}
-	sceNpDeleteRequest(reqId);
+	else
+	{
+		// https://ps4.scedev.net/resources/documents/SDK/3.000/Np-Reference/0042.html
+		// This function itself may return a viewer age restriction error (SCE_NP_ERROR_AGE_RESTRICTION). 
+		// If an error occurs for this function including in such cases, appropriate parental control information will not return
+		(*age) = 0;
+		(*chatRestriction) = true;
+		(*ugcRestriction) = true;
+	}
 	return (NpResult)result;
 }
 
