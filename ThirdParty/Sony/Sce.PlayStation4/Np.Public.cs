@@ -6,6 +6,13 @@ using System.Text;
 
 namespace Sce.PlayStation4.Network
 {
+    public enum NpState
+    {
+        Unknown = 0,
+        SignedOut,
+        SignedIn
+    }
+
     public partial class Np
     {
         public static void SetNpTitleId(string titleId, string titleSecret)
@@ -120,6 +127,16 @@ namespace Sce.PlayStation4.Network
                 throw new Exception(result.ToString());
 
             return controlInfo;
+        }
+
+        public static NpState GetState(int userId)
+        {
+            int state = 0;
+            unsafe
+            {
+                _GetState(userId, &state);
+            }
+            return (NpState)state;
         }
     }
 }
