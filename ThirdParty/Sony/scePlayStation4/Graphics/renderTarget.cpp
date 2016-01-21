@@ -177,6 +177,9 @@ unsigned char* RenderTarget::GetDataDetiled(uint64_t *levelOffset, uint64_t *lev
 	*/
 
 	GpuAddress::TilingParameters tilingParameters;
+#if SCE_ORBIS_SDK_VERSION >= 0x03008201u // SDK Version 3.0
+	tilingParameters.initFromRenderTarget(_renderTarget, 0);
+#else
 	tilingParameters.m_tileMode = _renderTarget->getTileMode();
 	tilingParameters.m_elemFormat = _renderTarget->getDataFormat();
 	tilingParameters.m_linearWidth = _renderTarget->getWidth();
@@ -188,6 +191,7 @@ unsigned char* RenderTarget::GetDataDetiled(uint64_t *levelOffset, uint64_t *lev
 	tilingParameters.m_arraySlice = 0;
 	tilingParameters.m_surfaceFlags.m_value = 0;
 	tilingParameters.m_surfaceFlags.m_prt = 1;
+#endif
 
 #if SCE_ORBIS_SDK_VERSION >= 0x02000131u // SDK Version 2.0
 	uint64_t surfaceSize64 = 0;
