@@ -34,6 +34,6 @@ VertexShader::VertexShader(const void *data)
 
 VertexShader::~VertexShader()
 {
-	mem::free(_binary);
+	mem::freeShared(_binary);
 	mem::free(_shader);
 }
