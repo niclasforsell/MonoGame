@@ -33,7 +33,11 @@ CommonDialogError NpProfileDialog::Open(NpProfileDialogMode mode, UserServiceUse
 
 	SceNpProfileDialogParam param;
 	sceNpProfileDialogParamInitialize(&param);
+#if SCE_ORBIS_SDK_VERSION >= 0x03008201u // SDK Version 3.0
+	param.mode = (SceNpProfileDialogMode)mode;	
+#else
 	param.mode = (sceNpProfileDialogMode)mode;
+#endif
 	param.userId = (SceUserServiceUserId)userId;
 	param.targetOnlineId = targetOnlineId;
 	param.userData = (void*)userData;
