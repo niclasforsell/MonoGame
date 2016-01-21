@@ -571,7 +571,8 @@ void GraphicsSystem::_discardBuffer(DisplayBuffer *backBuffer, uint8_t *&buffer,
 
 void GraphicsSystem::_safeDeleteBuffer(void *buffer)
 {
-	assert(buffer != nullptr);
+	if (buffer == nullptr)
+		return;
 
 	scePthreadMutexLock(&_frameLock);
 	
