@@ -51,6 +51,13 @@ public:
 	static NpResult _NotifyPlusFeature(UserServiceUserId userId, NpPlusFeature features);
 
 	static NpResult _CheckPlus(UserServiceUserId userId, NpPlusFeature features, bool *authorised);
+
+	// TODO: add support for setting array of SceNpContentRestriction for region specific restrictions
+	static NpResult _SetContentRestriction(int defaultAgeRestriction);
+
+	static NpResult _CheckNpAvailability(UserServiceUserId userId);
+
+	static NpResult _GetParentalControlInfo(UserServiceUserId userId, int* age, bool *chatRestriction, bool* ugcRestriction);
 };
 
 } // namespace Network

@@ -54,3 +54,69 @@ NpResult Np::_CheckPlus(UserServiceUserId userId, NpPlusFeature features, bool *
 	return result;
 }
 
+static NpResult _SetContentRestriction(int defaultAgeRestriction)
+{
+	SceNpContentRestriction contentRestriction;
+	memset(&contentRestriction, 0, sizeof(contentRestriction));
+	contentRestriction.size = sizeof(contentRestriction);
+	contentRestriction.defaultAgeRestriction = (int8_t)defaultAgeRestriction;
+
+	// TODO: add support for setting array of SceNpContentRestriction for region specific restrictions
+	contentRestriction.ageRestrictionCount = 0;
+	contentRestriction.ageRestriction = NULL;
+
+	return (NpResult)sceNpSetContentRestriction(&contentRestriction);
+}
+
+static NpResult _CheckNpAvailability(UserServiceUserId userId)
+{
+	SceNpOnlineId onlineId;
+	memset(&onlineId, 0, sizeof(SceNpOnlineId));
+
+	auto onlineIdResult = sceNpGetOnlineId((SceUserServiceUserId)userId, &onlineId);
+	if (onlineIdResult != SCE_OK)
+		return (NpResult)onlineIdResult;
+
+	int reqId = sceNpCreateRequest();
+
+	auto result = sceNpCheckNpAvailability(reqId, &onlineId, NULL);
+
+	sceNpDeleteRequest(reqId);
+	return (NpResult)result;
+}
+
+NpResult Np::_GetParentalControlInfo(UserServiceUserId userId, int* age, bool *chatRestriction, bool* ugcRestriction)
+{
+	SceNpOnlineId onlineId;
+	memset(&onlineId, 0, sizeof(SceNpOnlineId));
+
+	auto onlineIdResult = sceNpGetOnlineId((SceUserServiceUserId)userId, &onlineId);
+	if (onlineIdResult != SCE_OK)
+		return (NpResult)onlineIdResult;
+
+	int8_t ageInfo = 0;
+	SceNpParentalControlInfo parentalControlInfo;
+	memset(&parentalControlInfo, 0, sizeof(SceNpParentalControlInfo));
+
+	int reqId = sceNpCreateRequest();	
+	auto result = sceNpGetParentalControlInfo(reqId, &onlineId, &ageInfo, &parentalControlInfo);
+	sceNpDeleteRequest(reqId);
+
+	if (result == SCE_OK)
+	{
+		(*age) = (int)ageInfo;
+		(*chatRestriction) = parentalControlInfo.chatRestriction;
+		(*ugcRestriction) = parentalControlInfo.ugcRestriction;
+	}
+	else
+	{
+		// https://ps4.scedev.net/resources/documents/SDK/3.000/Np-Reference/0042.html
+		// This function itself may return a viewer age restriction error (SCE_NP_ERROR_AGE_RESTRICTION). 
+		// If an error occurs for this function including in such cases, appropriate parental control information will not return
+		(*age) = 0;
+		(*chatRestriction) = true;
+		(*ugcRestriction) = true;
+	}
+	return (NpResult)result;
+}
+
