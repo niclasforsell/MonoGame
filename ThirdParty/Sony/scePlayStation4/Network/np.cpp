@@ -120,3 +120,7 @@ NpResult Np::_GetParentalControlInfo(UserServiceUserId userId, int* age, bool *c
 	return (NpResult)result;
 }
 
+NpResult Np::_GetState(UserServiceUserId userId, int* state)
+{
+	return (NpResult)sceNpGetState(userId, (SceNpState*)state);
+}

@@ -58,6 +58,8 @@ public:
 	static NpResult _CheckNpAvailability(UserServiceUserId userId);
 
 	static NpResult _GetParentalControlInfo(UserServiceUserId userId, int* age, bool *chatRestriction, bool* ugcRestriction);
+
+	static NpResult _GetState(UserServiceUserId userId, int* state);
 };
 
 } // namespace Network
