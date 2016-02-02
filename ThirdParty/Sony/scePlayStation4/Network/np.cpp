@@ -54,7 +54,7 @@ NpResult Np::_CheckPlus(UserServiceUserId userId, NpPlusFeature features, bool *
 	return result;
 }
 
-static NpResult _SetContentRestriction(int defaultAgeRestriction)
+NpResult Np::_SetContentRestriction(int defaultAgeRestriction)
 {
 	SceNpContentRestriction contentRestriction;
 	memset(&contentRestriction, 0, sizeof(contentRestriction));
@@ -68,7 +68,7 @@ static NpResult _SetContentRestriction(int defaultAgeRestriction)
 	return (NpResult)sceNpSetContentRestriction(&contentRestriction);
 }
 
-static NpResult _CheckNpAvailability(UserServiceUserId userId)
+NpResult Np::_CheckNpAvailability(UserServiceUserId userId)
 {
 	SceNpOnlineId onlineId;
 	memset(&onlineId, 0, sizeof(SceNpOnlineId));
