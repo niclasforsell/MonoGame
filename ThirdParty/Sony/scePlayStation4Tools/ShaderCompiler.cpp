@@ -1,16 +1,31 @@
 #include "stdafx.h"
 #include "ShaderCompiler.h"
 
-#include <memory.h>
-#include <shader/compiler.h>
-#include <shader/binary.h>
-#include <shader/shader_parser.h>
 #include <../include/sdk_version.h>
+
+#if SCE_ORBIS_SDK_VERSION >= 0x03008201u
+#define USING_WAVE
+#endif
+
+#include <memory.h>
+#include <shader.h>
+#include <shader/binary.h>
+#ifdef USING_WAVE
+#include <shader/wave_psslc.h>
+#else
+#include <shader/compiler.h>
+#include <shader/shader_parser.h>
+#endif
 
 using namespace System::Text;
 
 using namespace sce::Shader;
 using namespace sce::Shader::Binary;
+
+#ifdef USING_WAVE
+using namespace sce::Shader::Wave;
+#define Compiler Psslc
+#endif
 
 namespace sce { namespace PlayStation4 { namespace Tools {
 
@@ -46,6 +61,9 @@ Compiler::SourceFile* OpenFileCallback(
 	const char *fileName,
 	const Compiler::SourceLocation *includedFrom,
 	const Compiler::Options *compileOptions,
+#ifdef USING_WAVE
+	void *userData,
+#endif
 	const char **errorString)
 {
 	auto sourceFile = (Compiler::SourceFile*)compileOptions->userData;
@@ -57,7 +75,11 @@ bool ShaderCompiler::Compile(String^ filePath, String^ code, String^ entryPoint,
 	_reset();
 
 	Compiler::Options options;
+#ifdef USING_WAVE
+	Compiler::initializeOptions(&options, SCE_WAVE_API_VERSION);
+#else
 	Compiler::initializeOptions(&options);
+#endif
 
 	if (profile->Equals("sce_vs_vs_orbis", System::StringComparison::InvariantCultureIgnoreCase))
 		options.targetProfile = Compiler::TargetProfile::kTargetProfileVsVs;
@@ -87,13 +109,17 @@ bool ShaderCompiler::Compile(String^ filePath, String^ code, String^ entryPoint,
 		options.sdbCache = 2;
 
 		// Add debug information.
+#ifndef USING_WAVE
 		options.generateDebugInfo = 1;
+#endif
 
 		// Reduce optimization levels.
 		options.optimizationLevel = 0;
 		options.useFastmath = 0;
+#ifndef USING_WAVE
 		options.useFastprecision = 0;
 		options.useFastint = 0;
+#endif
 	}
 
 	Compiler::CallbackList callbacks;
