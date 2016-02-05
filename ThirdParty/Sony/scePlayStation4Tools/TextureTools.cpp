@@ -3,6 +3,7 @@
 #include <texture_tool/image.h>
 #include <texture_tool/filter.h>
 #include <texture_tool/mipped_image.h>
+#include <../include/sdk_version.h>
 
 namespace sce { namespace PlayStation4 { namespace Tools {
 
@@ -57,7 +58,11 @@ array<Byte>^ TextureTools::CompressImage2D(int width, int height, int mips, int 
 	// Get the compressed, tiled, and padded surface.
 	auto surface = gcnew array<Byte>(surfaceSize);
 	pin_ptr<uint8_t> pinned = &surface[surface->GetLowerBound(0)];
+#if SCE_ORBIS_SDK_VERSION >= 0x03008201u
+	image.fillSurface(pinned, surfaceSize, tileMode, dataFormat);
+#else
 	image.fillSurface(pinned, surfaceSize, tileMode, dataFormat, 0, padFlags);
+#endif
 
 	return surface;
 }
