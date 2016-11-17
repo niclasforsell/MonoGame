@@ -7,3 +7,6 @@
 [submodule "ThirdParty/NVorbis"]
 	path = ThirdParty/NVorbis
 	url = https://github.com/ioctlLR/NVorbis.git
+[submodule "MonoGame.XB1"]
+	path = MonoGame.XB1
+	url = https://github.com/niclasforsell/MonoGame.XB1.git
