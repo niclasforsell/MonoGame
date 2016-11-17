@@ -12,7 +12,9 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
 	public class SpriteBatch : GraphicsResource
 	{
-        #region Private Fields
+        //fka:: option to supply complete modelViewProjectionMatrix
+		public bool SkipProjectionCalculation { get; set; }
+		#region Private Fields
         readonly SpriteBatcher _batcher;
 
 		SpriteSortMode _sortMode;
@@ -42,6 +44,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
         public SpriteBatch (GraphicsDevice graphicsDevice)
 		{
+			//fka:: default to not calculate projection
+			SkipProjectionCalculation = false;
 			if (graphicsDevice == null)
             {
 				throw new ArgumentNullException ("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
@@ -129,24 +133,31 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup the default sprite effect.
 			var vp = gd.Viewport;
 
-		    Matrix projection;
+			if (!SkipProjectionCalculation)
+			{
+				Matrix projection;
 
-            // Normal 3D cameras look into the -z direction (z = 1 is in font of z = 0). The
-            // sprite batch layer depth is the opposite (z = 0 is in front of z = 1).
-            // --> We get the correct matrix with near plane 0 and far plane -1.
-            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, -1, out projection);
+				// Normal 3D cameras look into the -z direction (z = 1 is in font of z = 0). The
+				// sprite batch layer depth is the opposite (z = 0 is in front of z = 1).
+				// --> We get the correct matrix with near plane 0 and far plane -1.
+				Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, -1, out projection);
 
-            // Some platforms require a half pixel offset to match DX.
-            if (NeedsHalfPixelOffset)
-            {
-                projection.M41 += -0.5f * projection.M11;
-                projection.M42 += -0.5f * projection.M22;
-            }
+				// Some platforms require a half pixel offset to match DX.
+				if (NeedsHalfPixelOffset)
+				{
+					projection.M41 += -0.5f * projection.M11;
+					projection.M42 += -0.5f * projection.M22;
+				}
 
-            Matrix.Multiply(ref _matrix, ref projection, out projection);
+				Matrix.Multiply(ref _matrix, ref projection, out projection);
 
-            _matrixTransform.SetValue(projection);
-            _spritePass.Apply();
+				_matrixTransform.SetValue(projection);
+			}
+			else 
+			{
+				_matrixTransform.SetValue(_matrix);
+			}
+			_spritePass.Apply();
 		}
 		
         void CheckValid(Texture2D texture)
