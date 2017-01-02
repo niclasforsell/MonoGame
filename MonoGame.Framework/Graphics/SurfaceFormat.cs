@@ -158,7 +158,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// ATC/ATITC compression (Android)
         /// </summary>
         RgbaAtcInterpolatedAlpha = 81,
-
+		/// <summary>
+		/// Indicates placement in ESRAM (Xbox One)
+		/// </summary>
+		ColorESRAM = 500,
         #endregion
     }
 }
