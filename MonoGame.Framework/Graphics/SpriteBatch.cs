@@ -137,6 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
             if (!SkipProjectionCalculation)
 			{
+				var vp = gd.Viewport;
 				if ((vp.Width != _lastViewport.Width) || (vp.Height != _lastViewport.Height))
             	{
                 	// Normal 3D cameras look into the -z direction (z = 1 is in font of z = 0). The
@@ -161,7 +162,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			else 
 			{
-				_matrixTransform.SetValue(_matrix);
+				_matrixTransform.SetValue(_matrix.Value);
 			}
             _spritePass.Apply();
 		}
