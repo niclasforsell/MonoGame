@@ -131,7 +131,7 @@ namespace Microsoft.Xna.Framework.Audio
                 if (MasterVoice == null)
                 {
                     // Let windows autodetect number of channels and sample rate.
-                    MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate);
+                    MasterVoice = new MasteringVoice(Device, 8, XAudio2.DefaultSampleRate);
                 }
 
                 // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
@@ -159,9 +159,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         private static DataStream ToDataStream(int offset, byte[] buffer, int length)
         {
-            // NOTE: We make a copy here because old versions of 
-            // DataStream.Create didn't work correctly for offsets.
-            var data = new byte[length - offset];
+			// NOTE: We make a copy here because old versions of 
+			// DataStream.Create didn't work correctly for offsets.
+			var data = new byte[length - offset];
             Buffer.BlockCopy(buffer, offset, data, 0, length - offset);
 
             return DataStream.Create(data, true, false);

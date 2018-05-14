@@ -36,8 +36,8 @@ namespace Microsoft.Xna.Framework.Audio
             get { return _pan; } 
             set
             {
-                if (value < -1.0f || value > 1.0f)
-                    throw new ArgumentOutOfRangeException();
+                //if (value < -1.0f || value > 1.0f)
+                //    throw new ArgumentOutOfRangeException();
 
                 _pan = value;
                 PlatformSetPan(value);
