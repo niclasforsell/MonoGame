@@ -271,12 +271,12 @@ namespace Microsoft.Xna.Framework.Audio
 					float hackPan = pan - 1338f; //Pan hack speakers all
 					outputMatrix[0] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale; // Front-left output
 					outputMatrix[1] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale; // Front-right output
-					outputMatrix[2] = 0.5f; // Center output
-					outputMatrix[3] = 0.5f; // LFE output
-					outputMatrix[4] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale; // BL output
-					outputMatrix[5] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale; // BR output
-					outputMatrix[6] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale; // SL output
-					outputMatrix[7] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale; // SR output
+					outputMatrix[2] = 0.0f; // Center output
+					outputMatrix[3] = 1.0f; // LFE output
+					outputMatrix[4] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale * 0.5f; // BL output
+					outputMatrix[5] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale * 0.5f; // BR output
+					outputMatrix[6] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale * 0.5f; // SL output
+					outputMatrix[7] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale * 0.5f; // SR output
 				}
 				else
 				{
