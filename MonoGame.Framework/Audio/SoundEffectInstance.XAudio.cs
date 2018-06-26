@@ -303,20 +303,20 @@ namespace Microsoft.Xna.Framework.Audio
 					outputMatrix[2] = MathHelper.Clamp(hackPan, 0f, 1f) * scale; // Front-right output, Left input//outputMatrix[2] = 0f; // Front-right output, Left input
 					outputMatrix[3] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale; // Front-right output, Right input//outputMatrix[3] = (1f + pan) * scale; // Front-right output, Right input
 
-					outputMatrix[4] = 0.5f * scale; // Center output, Left input
-					outputMatrix[5] = 0.5f * scale; // Center output, Right input
+                    outputMatrix[4] = 0f; //0.5f * scale; // Center output, Left input
+                    outputMatrix[5] = 0f; //0.5f * scale; // Center output, Right input
 
-					outputMatrix[6] = 0.5f * scale; // Sub output, Left input
-					outputMatrix[7] = 0.5f * scale; // Sub output, Right input
+					outputMatrix[6] = 1f * scale; // Sub output, Left input
+					outputMatrix[7] = 1f * scale; // Sub output, Right input
 
-					outputMatrix[8] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale; // Side-left output, Left input
-					outputMatrix[9] = MathHelper.Clamp(-hackPan, 0f, 1f) * scale; // Side-left output, Right input
-					outputMatrix[10] = MathHelper.Clamp(hackPan, 0f, 1f) * scale; // Side-right output, Left input
-					outputMatrix[11] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale; // Side-right output, Right input
-					outputMatrix[12] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale; // Back-left output, Left input
-					outputMatrix[13] = MathHelper.Clamp(-hackPan, 0f, 1f) * scale; // Back-left output, Right input
-					outputMatrix[14] = MathHelper.Clamp(hackPan, 0f, 1f) * scale; // Back-right output, Left input
-					outputMatrix[15] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale; // Back-right output, Right input
+					outputMatrix[8] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale * 0.5f; // Side-left output, Left input
+					outputMatrix[9] = MathHelper.Clamp(-hackPan, 0f, 1f) * scale * 0.5f; // Side-left output, Right input
+					outputMatrix[10] = MathHelper.Clamp(hackPan, 0f, 1f) * scale * 0.5f; // Side-right output, Left input
+					outputMatrix[11] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale * 0.5f; // Side-right output, Right input
+					outputMatrix[12] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale * 0.5f; // Back-left output, Left input
+					outputMatrix[13] = MathHelper.Clamp(-hackPan, 0f, 1f) * scale * 0.5f; // Back-left output, Right input
+					outputMatrix[14] = MathHelper.Clamp(hackPan, 0f, 1f) * scale * 0.5f; // Back-right output, Left input
+					outputMatrix[15] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale * 0.5f; // Back-right output, Right input
 				}
 				else
 				{
