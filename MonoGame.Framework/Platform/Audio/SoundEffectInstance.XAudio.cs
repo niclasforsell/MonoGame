@@ -222,9 +222,12 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetPan(float value)
         {
-            // According to XNA documentation:
-            // "Panning, ranging from -1.0f (full left) to 1.0f (full right). 0.0f is centered."
-            _pan = MathHelper.Clamp(value, -1.0f, 1.0f);
+			// According to XNA documentation:
+			// "Panning, ranging from -1.0f (full left) to 1.0f (full right). 0.0f is centered."
+			if (value >= 1337f)
+				_pan = MathHelper.Clamp(value, 1337f, 1339f);
+			else
+				_pan = MathHelper.Clamp(value, -1.0f, 1.0f);
 
             // If we have no voice then nothing more to do.
             if (_voice == null || SoundEffect.MasterVoice == null)
@@ -257,37 +260,100 @@ namespace Microsoft.Xna.Framework.Audio
             var outputMatrix = _outputMatrix;
             Array.Clear(outputMatrix, 0, outputMatrix.Length);
 
-            if (inputChannels == 1) // Mono source
-            {
-                // Left/Right output levels:
-                //   Pan -1.0: L = 1.0, R = 0.0
-                //   Pan  0.0: L = 1.0, R = 1.0
-                //   Pan +1.0: L = 0.0, R = 1.0
-                outputMatrix[0] = (pan > 0f) ? ((1f - pan) * scale) : scale; // Front-left output
-                outputMatrix[1] = (pan < 0f) ? ((1f + pan) * scale) : scale; // Front-right output
-            }
-            else if (inputChannels == 2) // Stereo source
-            {
-                // Left/Right input (Li/Ri) mix for Left/Right outputs (Lo/Ro):
-                //   Pan -1.0: Lo = 0.5Li + 0.5Ri, Ro = 0.0Li + 0.0Ri
-                //   Pan  0.0: Lo = 1.0Li + 0.0Ri, Ro = 0.0Li + 1.0Ri
-                //   Pan +1.0: Lo = 0.0Li + 0.0Ri, Ro = 0.5Li + 0.5Ri
-                if (pan <= 0f)
-                {
-                    outputMatrix[0] = (1f + pan * 0.5f) * scale; // Front-left output, Left input
-                    outputMatrix[1] = (-pan * 0.5f) * scale; // Front-left output, Right input
-                    outputMatrix[2] = 0f; // Front-right output, Left input
-                    outputMatrix[3] = (1f + pan) * scale; // Front-right output, Right input
-                }
-                else
-                {
-                    outputMatrix[0] = (1f - pan) * scale; // Front-left output, Left input
-                    outputMatrix[1] = 0f; // Front-left output, Right input
-                    outputMatrix[2] = (pan * 0.5f) * scale; // Front-right output, Left input
-                    outputMatrix[3] = (1f - pan * 0.5f) * scale; // Front-right output, Right input
-                }
-            }
+			if (inputChannels == 1) // Mono source
+			{
+				// Left/Right output levels:
+				//   Pan -1.0: L = 1.0, R = 0.0
+				//   Pan  0.0: L = 1.0, R = 1.0
+				//   Pan +1.0: L = 0.0, R = 1.0
+				if (pan >= 1336.9f)
+				{
+					float hackPan = pan - 1338f; //Pan hack speakers all
+					outputMatrix[0] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale; // Front-left output
+					outputMatrix[1] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale; // Front-right output
+					outputMatrix[2] = 0.0f; // Center output
+					outputMatrix[3] = 1.0f; // LFE output
+					outputMatrix[4] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale * 0.5f; // BL output
+					outputMatrix[5] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale * 0.5f; // BR output
+					outputMatrix[6] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale * 0.5f; // SL output
+					outputMatrix[7] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale * 0.5f; // SR output
+				}
+				else
+				{
+					outputMatrix[0] = MathHelper.Clamp((1f - pan), 0f, 1f) * scale; // Front-left output
+					outputMatrix[1] = MathHelper.Clamp((1f + pan), 0f, 1f) * scale; // Front-right output
+					outputMatrix[2] = 0.0f; // Center output
+					outputMatrix[3] = 0.5f; // LFE output
+					outputMatrix[4] = 0f; // BL output
+					outputMatrix[5] = 0f; // BR output
+					outputMatrix[6] = 0f; // SL output
+					outputMatrix[7] = 0f; // SR output
+				}
 
+			}
+			else if (inputChannels == 2) // Stereo source
+			{
+				//PAN_HACK_SPEAKERS_ALL
+				if (pan >= 1336.9f)
+				{
+					float hackPan = pan - 1338f; //Pan hack speakers all
+
+					outputMatrix[0] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale; // Front-left output, Left input//outputMatrix[0] = (1f + pan * 0.5f) * scale; // Front-left output, Left input
+					outputMatrix[1] = MathHelper.Clamp(-hackPan, 0f, 1f) * scale; // Front-left output, Right input//outputMatrix[1] = (-pan * 0.5f) * scale; // Front-left output, Right input
+					outputMatrix[2] = MathHelper.Clamp(hackPan, 0f, 1f) * scale; // Front-right output, Left input//outputMatrix[2] = 0f; // Front-right output, Left input
+					outputMatrix[3] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale; // Front-right output, Right input//outputMatrix[3] = (1f + pan) * scale; // Front-right output, Right input
+
+                    outputMatrix[4] = 0f; //0.5f * scale; // Center output, Left input
+                    outputMatrix[5] = 0f; //0.5f * scale; // Center output, Right input
+
+					outputMatrix[6] = 1f * scale; // Sub output, Left input
+					outputMatrix[7] = 1f * scale; // Sub output, Right input
+
+					outputMatrix[8] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale * 0.5f; // Side-left output, Left input
+					outputMatrix[9] = MathHelper.Clamp(-hackPan, 0f, 1f) * scale * 0.5f; // Side-left output, Right input
+					outputMatrix[10] = MathHelper.Clamp(hackPan, 0f, 1f) * scale * 0.5f; // Side-right output, Left input
+					outputMatrix[11] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale * 0.5f; // Side-right output, Right input
+					outputMatrix[12] = MathHelper.Clamp((1f - hackPan), 0f, 1f) * scale * 0.5f; // Back-left output, Left input
+					outputMatrix[13] = MathHelper.Clamp(-hackPan, 0f, 1f) * scale * 0.5f; // Back-left output, Right input
+					outputMatrix[14] = MathHelper.Clamp(hackPan, 0f, 1f) * scale * 0.5f; // Back-right output, Left input
+					outputMatrix[15] = MathHelper.Clamp((1f + hackPan), 0f, 1f) * scale * 0.5f; // Back-right output, Right input
+				}
+				else
+				{
+					// Left/Right input (Li/Ri) mix for Left/Right outputs (Lo/Ro):
+					//   Pan -1.0: Lo = 0.5Li + 0.5Ri, Ro = 0.0Li + 0.0Ri
+					//   Pan  0.0: Lo = 1.0Li + 0.0Ri, Ro = 0.0Li + 1.0Ri
+					//   Pan +1.0: Lo = 0.0Li + 0.0Ri, Ro = 0.5Li + 0.5Ri
+					outputMatrix[0] = MathHelper.Clamp((1f - pan), 0f, 1f) * scale; // Front-left output, Left input//outputMatrix[0] = (1f + pan * 0.5f) * scale; // Front-left output, Left input
+					outputMatrix[1] = MathHelper.Clamp(-pan, 0f, 1f) * scale; // Front-left output, Right input//outputMatrix[1] = (-pan * 0.5f) * scale; // Front-left output, Right input
+					outputMatrix[2] = MathHelper.Clamp(pan, 0f, 1f) * scale; // Front-right output, Left input//outputMatrix[2] = 0f; // Front-right output, Left input
+					outputMatrix[3] = MathHelper.Clamp((1f + pan), 0f, 1f) * scale; // Front-right output, Right input//outputMatrix[3] = (1f + pan) * scale; // Front-right output, Right input
+
+					outputMatrix[4] = 0f; // Center output, Left input
+					outputMatrix[5] = 0f; // Center output, Right input
+
+					outputMatrix[6] = 0.5f * scale; // Sub output, Left input
+					outputMatrix[7] = 0.5f * scale; // Sub output, Right input
+
+					outputMatrix[8] = 0f; // Back-left output, Left input
+					outputMatrix[9] = 0f; // Back-left output, Right input
+					outputMatrix[10] = 0f; // Back-right output, Left input
+					outputMatrix[11] = 0f; // Back-right output, Right input
+					outputMatrix[12] = 0f; // Back-left output, Left input
+					outputMatrix[13] = 0f; // Back-left output, Right input
+					outputMatrix[14] = 0f; // Back-right output, Left input
+					outputMatrix[15] = 0f; // Back-right output, Right input
+
+					//}
+					//else
+					//{
+					//    outputMatrix[0] = (1f - pan) * scale; // Front-left output, Left input
+					//    outputMatrix[1] = 0f; // Front-left output, Right input
+					//    outputMatrix[2] = (pan * 0.5f) * scale; // Front-right output, Left input
+					//    outputMatrix[3] = (1f - pan * 0.5f) * scale; // Front-right output, Right input
+					//}
+				}
+			}
             return outputMatrix;
         }
 

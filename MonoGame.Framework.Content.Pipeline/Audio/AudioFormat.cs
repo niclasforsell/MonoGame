@@ -104,5 +104,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 }
             }
         }
-    }
+
+		internal AudioFormat(List<byte> nativeWaveFormat)
+		{
+			this.nativeWaveFormat = nativeWaveFormat;
+		}
+	}
 }

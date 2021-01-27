@@ -12,7 +12,9 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
 	public class SpriteBatch : GraphicsResource
 	{
-        #region Private Fields
+        //fka:: option to supply complete modelViewProjectionMatrix
+		public bool SkipProjectionCalculation { get; set; }
+		#region Private Fields
         readonly SpriteBatcher _batcher;
 
 		SpriteSortMode _sortMode;
@@ -48,6 +50,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
         public SpriteBatch (GraphicsDevice graphicsDevice, int capacity)
 		{
+			//fka:: default to not calculate projection
+			SkipProjectionCalculation = false;
 			if (graphicsDevice == null)
             {
 				throw new ArgumentNullException ("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
