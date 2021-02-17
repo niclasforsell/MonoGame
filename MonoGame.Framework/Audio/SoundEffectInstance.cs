@@ -36,8 +36,8 @@ namespace Microsoft.Xna.Framework.Audio
             get { return _pan; } 
             set
             {
-                if (value < -1.0f || value > 1.0f)
-                    throw new ArgumentOutOfRangeException();
+                //if (value < -1.0f || value > 1.0f)
+                //    throw new ArgumentOutOfRangeException();
 
                 _pan = value;
                 PlatformSetPan(value);
@@ -70,7 +70,9 @@ namespace Microsoft.Xna.Framework.Audio
             get { return _volume; }
             set
             {
-                // XAct sound effects don't have volume limits.
+				if (_volume == value)
+					return;
+				// XAct sound effects don't have volume limits.
                 if (!_isXAct && (value < 0.0f || value > 1.0f))
                     throw new ArgumentOutOfRangeException();
 
