@@ -14,8 +14,7 @@ using System.Resources;
 [assembly: AssemblyTrademark("MonoGame® is a registered trademark of the MonoGame Team")]
 [assembly: AssemblyCulture("")]
 
-// Mark the assembly as CLS compliant so it can be safely used in other .NET languages
-[assembly: CLSCompliant(true)]
+
 
 // Allow the content pipeline assembly to access
 // some of our internal helper methods that it needs.
