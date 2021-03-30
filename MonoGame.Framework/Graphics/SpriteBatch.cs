@@ -146,7 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 	Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, -1, out _projection);
 
                 	// Some platforms require a half pixel offset to match DX.
-                	if (NeedsHalfPixelOffset)
+                	if (GraphicsDevice.UseHalfPixelOffset)
                 	{
                     	_projection.M41 += -0.5f * _projection.M11;
                     	_projection.M42 += -0.5f * _projection.M22;
