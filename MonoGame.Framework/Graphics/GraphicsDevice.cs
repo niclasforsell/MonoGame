@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// typically referred to as the half-pixel offset. MonoGame
         /// replicates XNA behavior if this flag is set to <c>true</c>.
         /// </remarks>
-        public bool UseHalfPixelOffset { get; private set; }
+        public bool UseHalfPixelOffset { get; set; } // nforsell removed 'private set' in order to be able to debug
 
         private Viewport _viewport;
 
